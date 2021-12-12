@@ -22,6 +22,18 @@ module.exports = function (sequelize) {
       type: Sequelize.STRING(45),
       allowNull: false
     },
+    Email: {
+      type: Sequelize.STRING(45),
+      allowNull: true
+    },
+    address : {
+      type : Sequelize.STRING(500),
+      allowNull : true
+    },
+    phoneNumber: {
+      type: Sequelize.STRING(45),
+      allowNull: true
+    },
     AccountNo: {
       type: Sequelize.STRING(45),
       allowNull: false

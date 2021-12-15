@@ -1,11 +1,8 @@
+const fs = require('fs')
 const models = require('../models/index');
-const cloudinary = require("../config/cloudinary");
-
-const express = require('express')
-
-
-
+const s3 = require("../config/aws")
 const path = require('path')
+
 
 exports.getImageById = (req, res) => {
 
@@ -84,25 +81,38 @@ exports.createImage = async (req, res) => {
     res.status(400).send({ message: 'No File Uploaded!' });
     return;
   }
-  const result = await cloudinary.uploader.upload(req.file.path)
- 
-  var insertData = {
-    filePath: req.file.filename,
-    id: req.body.id,
-    Client_id: req.body.Client_id,
-    avatar: result.secure_url,
-    cloudinary_id: result.public_id,
-  }
-  models.clientProfilePicture
-    .upsert(insertData)
-    .then((data) => res.json(result))
-    .catch((err) => {
-      res.status(500).send({
-        message:
-          err.message || 'Some error occurred while creating the CLient.',
-      });
-    });
-};
+  var params = {
+    ACL: 'public-read',
+    Bucket: process.env.BUCKET_NAME || "norsa",
+    Body: fs.createReadStream(req.file.path),
+    Key: `userAvatar/-${Date.now()}${req.file.originalname}`
+  };
+  s3.upload(params, (err, data) => {
+    if (err) {
+      console.log('Error occured while trying to upload to S3 bucket', err);
+    }
+    if (data) {
+      fs.unlinkSync(req.file.path); // Empty temp folder
+      const locationUrl = data.Location;
+      var insertData = {
+        filePath: req.file.filename,
+        id: req.body.id,
+        Client_id: req.body.Client_id,
+        avatar: locationUrl,
+      }
+      models.clientProfilePicture
+        .upsert(insertData)
+        .then((data) => res.json(data))
+        .catch((err) => {
+          res.status(500).send({
+            message:
+              err.message || 'Some error occurred while creating the CLient.',
+          });
+        });
+
+    }
+  });
+}
 
 
 // router.post("/", upload.single("image"), async (req, res) => {

@@ -1,23 +1,14 @@
 const multer = require('multer')
 const path = require('path')
 
-var storage = multer.diskStorage({
-    destination: (req, file, callBack) => {
-        callBack(null, './public/pdf/')     // './public/images/' directory name where save the file
-    },
-    filename: (req, file, callBack) => {
-        const match = ["application/pdf"];
-        
-        if (match.indexOf(file.mimetype) === -1) {
-            var message = `${file.originalname} is invalid. Only accept pdf.`;
-            return callBack(message, null);
+module.exports = multer({
+    storage: multer.diskStorage({}),
+    fileFilter: (req, file, cb) => {
+        let ext = path.extname(file.originalname);
+        if (ext !== ".pdf") {
+            cb(new Error("File type is not supported"), false);
+            return;
         }
-
-        callBack(null, file.fieldname + '-' + Date.now() + path.extname(file.originalname))
-    }
-})
-
-var uploadPdf = multer({
-    storage: storage
+        cb(null, true);
+    },
 });
-module.exports = uploadPdf;

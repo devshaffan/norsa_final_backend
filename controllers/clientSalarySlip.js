@@ -10,10 +10,7 @@ exports.getFile1ByClientId = (req, res) => {
             }
         })
         .then((data) => {
-            console.log(data);
-            const file = path.join(__dirname, "../public/pdf/", data.file1Path);
-
-            res.download(file); // Set disposition and send it.
+            res.json(data)
         })
         .catch((err) => {
             res.status(500).send({
@@ -32,9 +29,7 @@ exports.getFile2ByClientId = (req, res) => {
             }
         })
         .then((data) => {
-            console.log(data);
-            const file = path.join(__dirname, "../public/pdf/", data.file2Path);
-            res.download(file); // Set disposition and send it.
+            res.json(data)
         })
         .catch((err) => {
             res.status(500).send({
@@ -44,23 +39,58 @@ exports.getFile2ByClientId = (req, res) => {
         });
 }
 exports.addFile = (req, res) => {
-
-    var insertData = {
-        file1Path: req.files['file1'][0].filename,
-        file2Path: req.files['file2'][0].filename,
-        id: req.body.id,
-        Client_id: req.body.Client_id
+    console.log("id is " + req.file)
+    if (!req.body.id) {
+        res.status(400).send({ message: 'Content can not be empty!' });
+        return;
     }
-
-    models.clientSalarySlip
-        .upsert(insertData)
-        .then((data) => res.json(data))
-        .catch((err) => {
-            res.status(500).send({
-                message:
-                    err.message || 'Some error occurred while creating the CLient.',
+    var params = {
+        ACL: 'public-read',
+        Bucket: process.env.BUCKET_NAME || "norsa",
+        Body: fs.createReadStream(req.files['file1'][0].path),
+        Key: `userAvatar/-${Date.now()}${req.files['file1'][0].originalname}`
+    };
+    var file1Path;
+    s3.upload(params, (err, data) => {
+        if (err) {
+            console.log('Error occured while trying to upload to S3 bucket', err);
+        }
+        if (data) {
+            fs.unlinkSync(req.files['file1'][0].path); // Empty temp folder
+            file1Path = data.Location;
+            params = {
+                ACL: 'public-read',
+                Bucket: process.env.BUCKET_NAME || "norsa",
+                Body: fs.createReadStream(req.files['file2'][0].path),
+                Key: `userAvatar/-${Date.now()}${req.files['file2'][0].originalname}`
+            };
+            var file2Path;
+            s3.upload(params, (err, data) => {
+                if (err) {
+                    console.log('Error occured while trying to upload to S3 bucket', err);
+                }
+                if (data) {
+                    fs.unlinkSync(req.files['file2'][0].path); // Empty temp folder
+                    file2Path = data.Location;
+                    var insertData = {
+                        file1Path: file1Path,
+                        file2Path: file2Path,
+                        id: req.body.id,
+                        Client_id: req.body.Client_id
+                    }
+                    models.clientBankStatement
+                        .upsert(insertData)
+                        .then((data) => res.json(data))
+                        .catch((err) => {
+                            res.status(500).send({
+                                message:
+                                    err.message || 'Some error occurred while creating the CLient.',
+                            });
+                        });
+                }
             });
-        });
-};
+        }
+    });
+}
 
 

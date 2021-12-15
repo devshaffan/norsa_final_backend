@@ -13,13 +13,11 @@ const uploadPdf = require("../middleware/uploadPdf");
 //       cb(null, file.originalname)
 //     }
 //   })
-
-
 router.post('/add', uploadPdf.fields([{
     name: 'file1', maxCount: 1
 }, {
     name: 'file2', maxCount: 1
 }]), fileUpload.addFile)
 
-router.post('/add1', uploadPdf.single("file1"), fileUpload.addFile)
+// router.post('/add1', uploadPdf.single("file1"), fileUpload.addFile)
 module.exports = router;

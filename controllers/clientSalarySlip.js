@@ -38,6 +38,52 @@ exports.getFile2ByClientId = (req, res) => {
             });
         });
 }
+
+exports.getFilesByClientId = (req, res) => {
+    models.clientSalarySlip
+        .find({
+            where: {
+                Client_id: `${req.params.id}`
+            }
+        })
+        .then((data) => {
+            res.json(data)
+        })
+        .catch((err) => {
+            res.status(500).send({
+                message:
+                    err.message || 'Some error occurred while retrieving CLient Record .',
+            });
+        });
+}
+exports.delete = (req, res) => {
+    if (!req.params.Client_id) {
+        res.status(400).send({ message: 'Content can not be empty!' });
+        return;
+    }
+    const Client_id = req.params.Client_id;
+    models.clientSalarySlip
+        .destroy({
+            where: {
+                Client_id
+            },
+        })
+        .then((num) => {
+            if (num === 1) {
+                res.send({ message: 'Client Salary Slip was deleted successfully!' });
+            } else {
+                res.send({
+                    message: `Cannot delete Tutorial with id=${Client_id}. Maybe Tutorial was not found!`,
+                });
+            }
+        })
+        .catch((err) => {
+            res.status(500).send({
+                message: err.message || 'Some error occurred while Deleting client.',
+            });
+        });
+};
+
 exports.addFile = (req, res) => {
     console.log("id is " + req.file)
     if (!req.body.id) {

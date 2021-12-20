@@ -10,7 +10,10 @@ router.post('/add', uploadPdf.fields([{
 }, {
     name: 'file2', maxCount: 1
 }]), fileUpload.addFile)
-router.get('/getFile1ByClientId/:id', fileUpload.getFile1ByClientId);
-router.get('/getFile2ByClientId/:id', fileUpload.getFile2ByClientId);
+// router.get('/getFile1ByClientId/:id', fileUpload.getFile1ByClientId);
+// router.get('/getFile2ByClientId/:id', fileUpload.getFile2ByClientId);
+router.get('/getFilesByClientId/:id', fileUpload.getFilesByClientId)
+router.delete('/delete/:Client_id', fileUpload.delete);
+
 
 module.exports = router;

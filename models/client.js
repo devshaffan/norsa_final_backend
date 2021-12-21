@@ -63,8 +63,8 @@ module.exports = function (sequelize) {
       allowNull: true
     },
     Housing: {     // 0 for own house, 1 for living at parents, 2 for renting a house 
-      type: Sequelize.STRING(45),
-      allowNull: true
+      type: Sequelize.INTEGER,
+      allowNull: false
     },
     NameOfPartner: {
       type: Sequelize.STRING(45),

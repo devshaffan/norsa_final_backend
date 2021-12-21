@@ -1,24 +1,24 @@
   
 {
     "development": {
-      "user": "root",
-      "password": "password",
-      "database": "node-demo-app",
-      "host": "127.0.0.1",
+      "username": "root",
+      "password": "",
+      "database": "norsa",
+      "host": "localhost",
       "dialect": "mysql"
     },
     "staging": {
-      "username": "",
+      "username": "root",
       "password": "",
-      "database": "node-demo-app",
-      "host": "127.0.0.1",
+      "database": "norsa",
+      "host": "localhost",
       "dialect": "mysql"
     },
     "production": {
-      "username": "",
+      "username": "root",
       "password": "",
-      "database": "",
-      "host": "127.0.0.1",
+      "database": "norsa",
+      "host": "localhost",
       "dialect": "mysql"
     }
   }

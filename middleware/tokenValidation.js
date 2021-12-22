@@ -18,6 +18,8 @@ const whiteList = [
   '/api/auth/changepassword',
   '/api/auth/verificationemail',
   '/api/auth/refreshsession',
+  '/api/cbs/add',
+  '/api/css/add'
   ];
 const adminApis = [
   '/admin',

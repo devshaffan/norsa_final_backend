@@ -81,11 +81,12 @@ exports.createImage = async (req, res) => {
     res.status(400).send({ message: 'No File Uploaded!' });
     return;
   }
+  const key = `userAvatar/-${Date.now()}${req.file.originalname}`
   var params = {
     ACL: 'public-read',
     Bucket: process.env.BUCKET_NAME || "norsa",
     Body: fs.createReadStream(req.file.path),
-    Key: `userAvatar/-${Date.now()}${req.file.originalname}`
+    Key: key
   };
   s3.upload(params, (err, data) => {
     if (err) {
@@ -95,7 +96,7 @@ exports.createImage = async (req, res) => {
       fs.unlinkSync(req.file.path); // Empty temp folder
       const locationUrl = data.Location;
       var insertData = {
-        filePath: req.file.filename,
+        filePath: key,
         id: req.body.id,
         Client_id: req.body.Client_id,
         avatar: locationUrl,

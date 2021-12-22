@@ -70,6 +70,24 @@ exports.getissuancehistoryByClientId = (req, res) => {
       });
     });
 };
+exports.getissuancehistoryByPincodeAndNfcCard_id = (req, res) => {
+  models.issuancehistory
+    .findAll({
+      where: {
+        Pincode: req.params.Pincode,
+        NfcCard_id : req.params.NfcCard_id
+      }
+    })
+    .then((data) => {
+      res.json(data)
+    })
+    .catch((err) => {
+      res.status(500).send({
+        message:
+          err.message || 'Some error occurred while retrieving All issuancehistory.',
+      });
+    });
+};
 exports.createIssuancehistory = (req, res) => {
   if (!req.body.id) {
     res.status(400).send({ message: 'Content can not be empty!' });

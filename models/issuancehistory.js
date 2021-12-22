@@ -22,6 +22,10 @@ module.exports = function (sequelize) {
         key: 'id'
       }
     },
+    Pincode: {
+      type: Sequelize.STRING(45),
+      allowNull: false,
+    },
     PaybackPeriod: {
       type: Sequelize.STRING(45),
       allowNull: false,

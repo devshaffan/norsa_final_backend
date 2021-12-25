@@ -8,17 +8,17 @@
       "dialect": "mysql"
     },
     "staging": {
-      "username": "root",
-      "password": "",
-      "database": "norsa",
-      "host": "localhost",
+      "username": "b24efc896a4412",
+      "password": "ea7e2fa7",
+      "database": "heroku_801d0b2546249bf",
+      "host": "us-cdbr-east-04.cleardb.com",
       "dialect": "mysql"
     },
     "production": {
-      "username": "root",
-      "password": "",
-      "database": "norsa",
-      "host": "localhost",
+      "username": "b24efc896a4412",
+      "password": "ea7e2fa7",
+      "database": "heroku_801d0b2546249bf",
+      "host": "us-cdbr-east-04.cleardb.com",
       "dialect": "mysql"
     }
   }

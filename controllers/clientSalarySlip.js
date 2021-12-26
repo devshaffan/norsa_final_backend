@@ -1,4 +1,7 @@
+const fs = require('fs')
 const models = require('../models/index');
+const s3 = require("../config/aws")
+const path = require('path')
 
 
 
@@ -85,7 +88,7 @@ exports.delete = (req, res) => {
 };
 
 exports.addFile = (req, res) => {
-    console.log("id is " + req.file)
+    console.log("id is Salary" + req.file)
     if (!req.body.id) {
         res.status(400).send({ message: 'Content can not be empty!' });
         return;
@@ -124,7 +127,7 @@ exports.addFile = (req, res) => {
                         id: req.body.id,
                         Client_id: req.body.Client_id
                     }
-                    models.clientBankStatement
+                    models.clientSalarySlip
                         .upsert(insertData)
                         .then((data) => res.json(data))
                         .catch((err) => {

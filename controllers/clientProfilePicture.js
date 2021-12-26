@@ -71,7 +71,6 @@ exports.getImageByClientId = (req, res) => {
 
 
 exports.createImage = async (req, res) => {
-  console.log("id is " + req.file)
 
   if (!req.body.id) {
     res.status(400).send({ message: 'Content can not be empty!' });

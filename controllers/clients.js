@@ -22,6 +22,26 @@ exports.getAllClients = (req, res) => {
     });
 };
 
+exports.getAllClientsByDealer = (req, res) => {
+  const id = req.params.Dealer_id
+  models.client
+    .findAll({
+      where: {
+        Dealer_id : id
+      }
+    })
+    .then((data) => {
+      console.log(data);
+      res.json(data);
+    })
+    .catch((err) => {
+      res.status(500).send({
+        message:
+          err.message || 'Some error occurred while retrieving All clients.',
+      });
+    });
+};
+
 exports.getNextK_Id = (req, res) => {
   models.client
     .findAll({ attributes: ['id'] })

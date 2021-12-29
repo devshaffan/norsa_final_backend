@@ -97,7 +97,7 @@ exports.getNextNK_Id = (req, res) => {
         nextId = "NK-000" + nextId
       }
       else if (nextId < 100) {
-        nextId = "K-00" + nextId
+        nextId = "NK-00" + nextId
       }
       else if (nextId < 1000) {
         nextId = "NK-0" + nextId

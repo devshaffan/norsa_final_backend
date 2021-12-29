@@ -78,6 +78,42 @@ exports.getNextK_Id = (req, res) => {
       });
     });
 };
+exports.getNextNK_Id = (req, res) => {
+  models.client
+    .findAll({ attributes: ['id'] })
+    .then((data) => {
+      console.log(data);
+      let k_Ids = data.filter((item, index) => {
+        if (item.id.includes("Nk") || item.id.includes("NK"))
+          return item
+      })
+      if (k_Ids.length == 0) {
+        res.json({ id: "NK-0001" })
+        return;
+      }
+      let k_Id = k_Ids[k_Ids.length - 1]
+      let nextId = parseInt(k_Id.id.substring(2, k_Id.id.length)) + 1
+      if (nextId < 10) {
+        nextId = "NK-000" + nextId
+      }
+      else if (nextId < 100) {
+        nextId = "K-00" + nextId
+      }
+      else if (nextId < 1000) {
+        nextId = "NK-0" + nextId
+      }
+      else {
+        nextId = "NK-" + nextId
+      }
+      res.json({ id: nextId })
+    })
+    .catch((err) => {
+      res.status(500).send({
+        message:
+          err.message || 'Some error occurred while retrieving All clients.',
+      });
+    });
+};
 exports.getNextD_Id = (req, res) => {
   models.client
     .findAll({ attributes: ['id'] })

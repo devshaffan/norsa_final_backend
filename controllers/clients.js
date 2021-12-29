@@ -1,10 +1,6 @@
 const models = require('../models/index');
 
 const express = require('express')
-
-
-
-
 exports.getAllClients = (req, res) => {
   const limit = req.params.limit !== undefined ? req.params.limit : 10000;
   const offset = req.params.offset !== undefined ? req.params.limit : 0;
@@ -48,13 +44,14 @@ exports.getNextK_Id = (req, res) => {
     .then((data) => {
       console.log(data);
       let k_Ids = data.filter((item, index) => {
-        if (item.id.includes("k") || item.id.includes("K"))
+        if (item.id[0] == 'k' ||item.id[0] == 'K')
           return item
       })
       if (k_Ids.length == 0) {
         res.json({ id: "K-0001" })
         return;
       }
+     
       let k_Id = k_Ids[k_Ids.length - 1]
       let nextId = parseInt(k_Id.id.substring(2, k_Id.id.length)) + 1
       if (nextId < 10) {
@@ -83,16 +80,18 @@ exports.getNextNK_Id = (req, res) => {
     .findAll({ attributes: ['id'] })
     .then((data) => {
       console.log(data);
+      
       let k_Ids = data.filter((item, index) => {
-        if (item.id.includes("Nk") || item.id.includes("NK"))
+        if (item.id.includes("nk") || item.id.includes("NK"))
           return item
       })
+    
       if (k_Ids.length == 0) {
         res.json({ id: "NK-0001" })
         return;
       }
       let k_Id = k_Ids[k_Ids.length - 1]
-      let nextId = parseInt(k_Id.id.substring(2, k_Id.id.length)) + 1
+      let nextId = parseInt(k_Id.id.substring(3, k_Id.id.length)) + 1
       if (nextId < 10) {
         nextId = "NK-000" + nextId
       }

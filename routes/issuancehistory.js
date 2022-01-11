@@ -8,6 +8,7 @@ router.get('/getAllIssuancehistories', issuancehistory.getAllIssuancehistories);
 router.get('/getAllIssuancehistoriesByAmountPaid', issuancehistory.getAllIssuancehistoriesByAmountPaid);
 
 router.get('/getIssuancehistoryById/:id', issuancehistory.getissuancehistoryById);
+router.get('/getIssueanceHistyByClientId/:Client_id', issuancehistory.getIssueanceHistyByClientId);
 router.get('/getIssuanceHistoryByClientId/:Client_id', issuancehistory.getissuancehistoryByClientId)
 router.get('/getissuancehistoryByPincodeAndNfcCard_id/:Pincode&:NfcCard_id',issuancehistory.getissuancehistoryByPincodeAndNfcCard_id)
 router.post('/createIssuancehistory', issuancehistory.createIssuancehistory);

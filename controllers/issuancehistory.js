@@ -1,5 +1,15 @@
 const models = require('../models/index');
 
+exports.getIssueanceHistyByClientId = (req, res) => {
+  const clientId = req.params.Client_id;
+  models.issuancehistory.findOne({where: {Client_id: clientId, AmountPaid:'0'},order:[['DateTime','DESC']]})
+  .then(data => {
+    res.json({message: 'success', data: data})
+  })
+  .catch(err => {
+    res.status(500).json({message: 'error', data: err.message})
+  });
+};
 exports.getAllIssuancehistories = (req, res) => {
   const limit = req.params.limit !== undefined ? req.params.limit : 10000;
   const offset = req.params.offset !== undefined ? req.params.limit : 0;

@@ -14,25 +14,9 @@ module.exports = function (sequelize) {
         key: 'id'
       }
     },
-    Merchants_id: {
-      type: Sequelize.STRING(45),
-      allowNull: false,
-      references: {
-        model: 'merchants',
-        key: 'id'
-      }
-    },
     Pincode: {
       type: Sequelize.STRING(45),
       allowNull: false,
-    },
-    PaybackPeriod: {
-      type: Sequelize.STRING(45),
-      allowNull: false,
-      references: {
-        model: 'merchanttypediscount',
-        key: 'id'
-      }
     },
     DateTime: {
       type: Sequelize.DATE,
@@ -44,7 +28,8 @@ module.exports = function (sequelize) {
     },
     AmountPaid: {
       type: Sequelize.STRING(45),
-      allowNull: true
+      allowNull: true,
+      defaultValue: 0
     },
     TypeOfReturnPayment: {
       type: Sequelize.STRING(45),
@@ -80,20 +65,6 @@ module.exports = function (sequelize) {
         using: 'BTREE',
         fields: [
           { name: 'Client_id' },
-        ]
-      },
-      {
-        name: 'fk_IssuanceHistory_Merchants1_idx',
-        using: 'BTREE',
-        fields: [
-          { name: 'Merchants_id' },
-        ]
-      },
-      {
-        name: 'fk_IssuanceHistory_MerchantTypeDiscount1_idx',
-        using: 'BTREE',
-        fields: [
-          { name: 'PaybackPeriod' },
         ]
       },
       {

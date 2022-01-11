@@ -3,6 +3,7 @@ const models = require('../models/index');
 const s3 = require("../config/aws")
 const path = require('path')
 
+const _uniqueId = require('lodash.uniqueid');
 
 exports.getImageById = (req, res) => {
 
@@ -71,11 +72,11 @@ exports.getImageByClientId = (req, res) => {
 
 
 exports.createImage = async (req, res) => {
-
-  if (!req.body.id) {
-    res.status(400).send({ message: 'Content can not be empty!' });
-    return;
-  }
+  const id = _uniqueId("prefix-")
+  // if (!req.body.id) {
+  //   res.status(400).send({ message: 'Content can not be empty!' });
+  //   return;
+  // }
   if (!req.file) {
     res.status(400).send({ message: 'No File Uploaded!' });
     return;
@@ -96,7 +97,7 @@ exports.createImage = async (req, res) => {
       const locationUrl = data.Location;
       var insertData = {
         filePath: key,
-        id: req.body.id,
+        id: id,
         Client_id: req.body.Client_id,
         avatar: locationUrl,
       }

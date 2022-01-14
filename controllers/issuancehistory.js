@@ -1,5 +1,27 @@
 const models = require('../models/index');
 
+
+
+exports.getClientByNfcAndPinCode = (req, res) => {
+  const {pinCode, nfcCardId} = req.body;
+  if(!pinCode || !nfcCardId){
+    res.status(400).send({message: 'Content can not be empty!'});
+    return;
+  }
+  models.sequelize.query(`SELECT ih.Client_id FROM nfccard nc
+  JOIN issuancehistory ih ON ih.NfcCard_id=nc.id
+  WHERE nc.number = ${nfcCardId} AND ih.Pincode = ${pinCode}
+  ORDER BY ih.DateTime DESC 
+  LIMIT 1
+  `,{type:models.sequelize.QueryTypes.SELECT} ).then(data => {
+    return res.json({ result: 'ok', data });
+  }).catch(err => {
+    return res.json({ result: 'fail', message: err });
+  });
+}
+
+
+
 exports.getIssueanceHistyByClientId = (req, res) => {
   const clientId = req.params.Client_id;
   models.issuancehistory.findOne({where: {Client_id: clientId, AmountPaid:'0'},order:[['DateTime','DESC']]})

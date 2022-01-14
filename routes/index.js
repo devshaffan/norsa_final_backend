@@ -14,7 +14,8 @@ const nfcCardRouter = require('./nfcCard');
 const groupRouter = require('./group');
 const cslRouter = require('./clientSalarySlip')
 const cbsRouter = require('./clientBankStatement')
-const multipleIssueances = require('./multipleIssueances')
+const multipleIssueances = require('./multipleIssueances');
+const transectionHistoryRouter = require('./transectionHistory');
 
 module.exports = function (app) {
 
@@ -34,5 +35,6 @@ module.exports = function (app) {
   app.use('/api/css', cslRouter);
   app.use('/api/cbs', cbsRouter);
   app.use('/api/multipleIssueances', multipleIssueances);
+  app.use('/api/transactionHistory', transectionHistoryRouter);
 
 };

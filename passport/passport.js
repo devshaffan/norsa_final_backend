@@ -115,7 +115,14 @@ module.exports = function (passport, User) {
           message: 'Email does not exist'
         });
       }
-
+      const isMobile = req.body.mobile;
+      if(!!isMobile){
+        if(user.isAdmin != 0){
+          return done(null, false, {
+            message: 'only Merchants can login in mobile app'
+          });
+        }
+      }
       if (!user.emailConfirmed) {
         return done(null, false, {
           message: 'Email is not verified'

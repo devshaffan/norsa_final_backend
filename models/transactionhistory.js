@@ -14,11 +14,11 @@ module.exports = function (sequelize) {
         key: 'id'
       }
     },
-    MerchantTypeDiscount_ID: {
+    Merchant_ID: {
       type: Sequelize.STRING(45),
       allowNull: false,
       references: {
-        model: 'merchanttypediscount',
+        model: 'merchants',
         key: 'id'
       }
     },

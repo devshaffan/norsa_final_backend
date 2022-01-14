@@ -13,5 +13,6 @@ router.get('/getIssuanceHistoryByClientId/:Client_id', issuancehistory.getissuan
 router.get('/getissuancehistoryByPincodeAndNfcCard_id/:Pincode&:NfcCard_id',issuancehistory.getissuancehistoryByPincodeAndNfcCard_id)
 router.post('/createIssuancehistory', issuancehistory.createIssuancehistory);
 router.post('/upsertIssuancehistory', issuancehistory.upsertIssuancehistory);
+router.post('/getClientByNfcAndPinCode', issuancehistory.getClientByNfcAndPinCode);
 router.delete('/deleteIssuancehistory/:id', issuancehistory.deleteIssuancehistory);
 module.exports = router;

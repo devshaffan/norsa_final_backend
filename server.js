@@ -58,7 +58,8 @@ const user = app.get('models').user;
 passportInitialize(passport, user);
 app.use(authMiddleWare);
 routeInitialize(app);
-//console.table(listEndpoints(app));
+//require("util").inspect.defaultOptions.depth = null;
+//console.log(JSON.stringify(listEndpoints(app)));
 // if (process.env.NODE_ENV === 'development') {
 //   server.listen(config.app.port, () => {
 //     console.log('Server listening at port %d', config.app.port);

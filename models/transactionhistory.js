@@ -54,13 +54,13 @@ module.exports = function (sequelize) {
           { name: 'Client_id' },
         ]
       },
-      {
-        name: 'fk_TransactionHistory_MerchantTypeDiscount1_idx',
-        using: 'BTREE',
-        fields: [
-          { name: 'MerchantTypeDiscount_ID' },
-        ]
-      },
+      // {
+      //   name: 'fk_TransactionHistory_MerchantTypeDiscount1_idx',
+      //   using: 'BTREE',
+      //   fields: [
+      //     { name: 'MerchantTypeDiscount_ID' },
+      //   ]
+      // },
     ]
   }, {
     timestamps: true,

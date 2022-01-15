@@ -122,7 +122,7 @@ exports.getissuancehistoryByPincodeAndNfcCard_id = (req, res) => {
 };
 exports.createIssuancehistory = (req, res) => {
   if (!req.body.id) {
-    res.status(400).send({ message: 'Content can not be empty!' });
+    res.status( 400 ).send( { message: 'Content can not be empty!' } );
     return;
   }
   models.issuancehistory

@@ -23,13 +23,15 @@ exports.getAllByMerchantId = (req, res) => {
     });
 };
 exports.createMultipleIssueances = (req, res) => {
+    const id = req.body.id;
     const issuancehistoryId = req.body.issuancehistoryId;
     const merchantId = req.body.merchantId;
     const numberOfMonthsId = req.body.numberOfMonthsId;
-    if(!issuancehistoryId || !merchantId || !numberOfMonthsId){
-        return res.status(400).send({status: 'error', message: 'Missing parameter: issuancehistoryId, merchantId or numberOfMonthsId'}); 
+    if( !id || !issuancehistoryId || !merchantId || !numberOfMonthsId){
+        return res.status(400).send({status: 'error', message: 'Missing parameter: id, issuancehistoryId, merchantId or numberOfMonthsId'}); 
     }
     models.multipleIssueances.create({
+        id: id,
         issuancehistoryId: issuancehistoryId,
         merchantId: merchantId,
         numberOfMonthsId: numberOfMonthsId

@@ -5,17 +5,17 @@ const reduceUserData = require('../utils/reduceUserData');
 const validator = require('../utils/validator');
 const passport = require('passport');
 
-router.post('/signup', (req, res, next) => {
+router.post( '/signup', ( req, res, next ) => {
   const { email, password, isAdmin } = req.body;
-  const emailValidation = validator.isValidEmail(email);
-  if (!emailValidation.valid) {
-    return res.status(400).send({
+  const emailValidation = validator.isValidEmail( email );
+  if ( !emailValidation.valid ) {
+    return res.status( 400 ).send( {
       result: 'error',
       message: emailValidation.reason
-    });
+    } );
   }
-  const passwordValidation = validator.isValidPassword(password);
-  if (!passwordValidation.valid) {
+  const passwordValidation = validator.isValidPassword( password );
+  if ( !passwordValidation.valid ) {
     return res.status(400).send({
       result: 'error',
       message: passwordValidation.reason

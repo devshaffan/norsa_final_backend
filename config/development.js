@@ -6,10 +6,10 @@ const config = {
     secret: 'asdfasfasdfasdafsdf231243243234234234234234234234',
   },
   db: {
-    host: 'localhost',
-    database: 'norsa',
-    username: 'root',
-    password: 'root',
+    host: 'us-cdbr-east-04.cleardb.com',
+    database: 'heroku_801d0b2546249bf',
+    username: 'b24efc896a4412',
+    password: 'ea7e2fa7',
     dialect: 'mysql',
     port: 3306,
     pool: {

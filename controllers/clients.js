@@ -177,6 +177,28 @@ exports.getAllActiveClients = (req, res) => {
     });
 };
 
+exports.getAllActiveAllClients = (req, res) => {
+  const limit = req.params.limit !== undefined ? req.params.limit : 1000000;
+  const offset = req.params.offset !== undefined ? req.params.limit : 0;
+  models.client
+    .findAll({
+      where: {
+        Status: 1
+      }
+    })
+    .then((data) => {
+      console.log(data);
+      data = data.map((item) => { return { id: item.id, Code: item.Code } })
+      res.json(data);
+    })
+    .catch((err) => {
+      res.status(500).send({
+        message:
+          err.message || 'Some error occurred while retrieving All clients.',
+      });
+    });
+};
+
 exports.getClientById = (req, res) => {
   const clientId = req.params.id;
   console.log('id is ', Number.parseInt(clientId, 10));

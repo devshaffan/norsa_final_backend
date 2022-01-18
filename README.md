@@ -135,3 +135,26 @@ $ npm start
 | /api/transactionHistory/bulkCreateTransectionHistory                               | POST      | anonymous        |               |
 | /api/transactionHistory/deleteTransectionById/:id                                  | DELETE    | anonymous        |               |
 | /api/transactionHistory/updateTransection/:id                                      | PUT       | anonymous        |               |
+
+## searchTransactions
+{{ApiEndpoint}}/transactionHistory/searchTransactions
+the correct response should be like this and further changes will be made with the query string where condition
+```sh
+{
+    "message": "success",
+    "data": [
+        {
+            "id": "1",
+            "ItemDescription": "",
+            "dateTime": null,
+            "AmountUser": null,
+            "client_Id": "D-285",
+            "FirstName": "Lucille",
+            "LastName": "Ricardo",
+            "merchant_Id": "prefix-962",
+            "Name": "Multi-Tronics",
+            "Merchant_Email": ""
+        }
+    ]
+}
+```

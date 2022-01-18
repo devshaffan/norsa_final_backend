@@ -130,6 +130,7 @@ $ npm start
 | /api/multipleIssueances/deleteMultipleIssueances/:id                               | DELETE    | anonymous        |               |
 | /api/transactionHistory/getAllTransactionHistory/:limit&:offset                    | GET       | anonymous        |               |
 | /api/transactionHistory/getTransactionHistoryById/:id                              | GET       | anonymous        |               |
+| /api/transactionHistory/searchTransactions                                         | GET       | anonymous        |               | (use this for searching)
 | /api/transactionHistory/createTransactionHistory                                   | POST      | anonymous        |               |
 | /api/transactionHistory/bulkCreateTransectionHistory                               | POST      | anonymous        |               |
 | /api/transactionHistory/deleteTransectionById/:id                                  | DELETE    | anonymous        |               |

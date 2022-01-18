@@ -1,5 +1,5 @@
 const models = require('../models/index');
-
+const uuidV4 = require('uuid/v4');
 exports.getTransactionHistoryById = (req, res) => {
     const id = req.params.id;
     if(!id){
@@ -7,7 +7,7 @@ exports.getTransactionHistoryById = (req, res) => {
             message: 'id is required'
         });
     }
-    models.transectionHistory.findById(id).then(data => {
+    models.transactionhistory.findById(id).then(data => {
         res.json({ message: 'success', data});
     }).catch(err => {
         res.status(500).send({
@@ -22,12 +22,17 @@ exports.createTransactionHistory = (req, res) => {
       ItemDescription,
       dateTime,
       AmountUser} = req.body;
+      
     if(!Client_id || !Merchant_ID || !ItemDescription || !dateTime || !AmountUser){
         res.status(400).send({
             message: 'data is required'
         });
     }
-    models.transectionHistory.create(req.body).then(data => {
+    models.transactionhistory.create({id:uuidV4(),Client_id,
+        Merchant_ID,
+        ItemDescription,
+        dateTime,
+        AmountUser}).then(data => {
         res.json({ message: 'success', data});
     }).catch(err => {
         res.status(500).send({
@@ -47,7 +52,7 @@ exports.bulkCreateTransectionHistory = (req, res) => {
             message: 'data is required'
         });
     }
-    models.transectionHistory.bulkCreate(req.body).then(data => {
+    models.transactionhistory.bulkCreate(req.body).then(data => {
         res.json({ message: 'success', data});
     }).catch(err => {
         res.status(500).send({
@@ -60,7 +65,7 @@ exports.getAllTransactionHistory = (req, res) => {
     const limit = req.params.limit !== undefined ? req.params.limit : 1000;
     const offset = req.params.offset !== undefined ? req.params.limit : 0;
 
-    models.transectionHistory.findAll({limit, offset}).then(data => {
+    models.transactionhistory.findAll({limit, offset}).then(data => {
         res.json({ message: 'success', data});
     }).catch(err => {
         res.status(500).send({
@@ -76,7 +81,7 @@ exports.deleteTransectionById= (req, res) => {
             message: 'id is required'
         });
     }
-    models.transectionHistory.destroy({where: {
+    models.transactionhistory.destroy({where: {
         id
     }}).then(data => {
         res.json({ message: 'success', data});
@@ -94,7 +99,7 @@ exports.updateTransection= (req, res) => {
             message: 'id is required'
         });
     }
-    models.transectionHistory.update(req.body, {where: {
+    models.transactionhistory.update(req.body, {where: {
         id
     }}).then(data => {
         res.json({ message: 'success', data});
@@ -104,4 +109,9 @@ exports.updateTransection= (req, res) => {
             error: err
         });
     });
+};
+exports.searchTransections= (req, res) => {
+    const limit = req.params.limit !== undefined ? req.params.limit : 1000;
+    const offset = req.params.offset !== undefined ? req.params.limit : 0;
+    
 };

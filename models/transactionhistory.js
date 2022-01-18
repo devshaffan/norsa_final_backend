@@ -9,18 +9,10 @@ module.exports = function (sequelize) {
     Client_id: {
       type: Sequelize.STRING(45),
       allowNull: false,
-      references: {
-        model: 'client',
-        key: 'id'
-      }
     },
     Merchant_ID: {
       type: Sequelize.STRING(45),
       allowNull: false,
-      references: {
-        model: 'merchants',
-        key: 'id'
-      }
     },
     ItemDescription: {
       type: Sequelize.STRING(45),

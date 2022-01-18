@@ -117,7 +117,7 @@ module.exports = function (passport, User) {
       }
       const isMobile = req.body.mobile;
       if(!!isMobile){
-        if(user.isAdmin != 0){
+        if(user.isAdmin != 2){
           return done(null, false, {
             message: 'only Merchants can login in mobile app'
           });

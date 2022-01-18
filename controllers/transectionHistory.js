@@ -110,8 +110,21 @@ exports.updateTransection= (req, res) => {
         });
     });
 };
-exports.searchTransections= (req, res) => {
+exports.searchTransactions= (req, res) => {
     const limit = req.params.limit !== undefined ? req.params.limit : 1000;
     const offset = req.params.offset !== undefined ? req.params.limit : 0;
-    
+    models.sequelize.query(`SELECT t.id id , t.ItemDescription ItemDescription , t.dateTime 'dateTime' , t.AmountUser AmountUser , c.id AS 'client_Id' , c.FirstName FirstName , 
+    c.LastName LastName , m.id merchant_Id, m.Name 'Name' , m.Email 'Merchant_Email'
+    FROM transactionhistory t
+    JOIN client c ON c.id = t.Client_id
+    JOIN merchants m ON m.id = t.Merchant_ID
+    LIMIT ${limit} OFFSET ${offset} `,{type:models.sequelize.QueryTypes.SELECT})
+    .then(data => {
+        res.json({ message: 'success', data});
+    }).catch(err => {
+        res.status(500).send({
+            message: 'error',
+            error: err
+        });
+    });
 };

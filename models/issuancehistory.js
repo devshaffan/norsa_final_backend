@@ -31,6 +31,10 @@ module.exports = function (sequelize) {
       allowNull: true,
       defaultValue: 0
     },
+    AmountDue:{
+      type: Sequelize.STRING(45),
+      defaultValue: 0
+    },
     TypeOfReturnPayment: {
       type: Sequelize.STRING(45),
       allowNull: true

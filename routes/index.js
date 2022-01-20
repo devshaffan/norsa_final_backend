@@ -36,5 +36,5 @@ module.exports = function (app) {
   app.use('/api/cbs', cbsRouter);
   app.use('/api/multipleIssueances', multipleIssueances);
   app.use('/api/transactionHistory', transectionHistoryRouter);
-
+  app.use('/api/amountPaid', require('./amountPaid'));
 };

@@ -9,4 +9,5 @@ router.post('/createTransactionHistory', th.createTransactionHistory);
 router.post('/bulkCreateTransectionHistory', th.bulkCreateTransectionHistory);
 router.delete('/deleteTransectionById/:id', th.deleteTransectionById);
 router.put('/updateTransection/:id', th.updateTransection);
+
 module.exports = router;

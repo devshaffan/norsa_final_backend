@@ -14,6 +14,14 @@ module.exports = function (sequelize) {
         key: 'id'
       }
     },
+    User_id: {
+      type: Sequelize.STRING,
+      allowNull: false,
+      references: {
+        model: 'user',
+        key: 'id'
+      }
+    },
     Code: {
       type: Sequelize.STRING(45),
       allowNull: false
@@ -41,6 +49,10 @@ module.exports = function (sequelize) {
     BankName: {
       type: Sequelize.STRING(45),
       allowNull: false
+    },
+    Devices: {
+      type: Sequelize.STRING(500),
+      allowNull: true
     }
   }, {
     sequelize,

@@ -1,6 +1,6 @@
 const Sequelize = require('sequelize');
 module.exports = function (sequelize) {
-    return sequelize.define('amountPaid', {
+    return sequelize.define('paybackPeriod', {
         id: {
             type: Sequelize.STRING(45),
             allowNull: false,
@@ -9,7 +9,7 @@ module.exports = function (sequelize) {
         date: {
             type: Sequelize.DATE
         },
-        ammount: {
+        amount: {
             type: Sequelize.STRING(45)
 
         },

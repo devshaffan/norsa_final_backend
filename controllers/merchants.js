@@ -126,7 +126,7 @@ exports.getMerchantTypeById = (req, res) => {
 exports.createMerchantType = (req, res) => {
   const id = uuidV4();
   req.body.id = id
-  if (!req.body.id) {
+  if ( !req.body.id ) {
     res.status(400).send({ message: 'Content can not be empty!' });
     return;
   }

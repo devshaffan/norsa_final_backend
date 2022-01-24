@@ -16,6 +16,10 @@ const reduceErrorMessage = require('../utils/reduceErrorMessage');
  * @param {*} req
  * @param {*} res
  */
+exports.ifValid = (req, res) =>{
+   return res.status(200).send({valid : true})
+
+}
 exports.confirmEmail = (req, res) => {
   // var email = req.query.email;
   const { token } = req.query;
@@ -60,6 +64,8 @@ exports.confirmEmail = (req, res) => {
     return res.status(400).send({ result: 400, message: err.toSting() });
   });
 };
+
+
 
 /**
  * Forgot password, get forgot password link into email
@@ -273,7 +279,7 @@ exports.refreshSession = async (req, res) => {
       });
     }
     const accessToken = jwt.sign({ id: payload.id, email: payload.email }, secret, {
-      expiresIn: 60 * 30 // expires in 30 min
+      expiresIn: 60 * 1000 // expires in 30 min
     });
     const newRefreshToken = jwt.sign({ id: payload.id, email: payload.email }, secret, {
       expiresIn: '30d' // expires in 30 days

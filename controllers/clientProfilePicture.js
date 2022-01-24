@@ -2,6 +2,7 @@ const fs = require('fs')
 const models = require('../models/index');
 const s3 = require("../config/aws")
 const path = require('path')
+const uuidV4 = require('uuid/v4');
 
 const _uniqueId = require('lodash.uniqueid');
 
@@ -72,7 +73,7 @@ exports.getImageByClientId = (req, res) => {
 
 
 exports.createImage = async (req, res) => {
-  const id = _uniqueId("prefix-")
+  const id = uuidV4()
   // if (!req.body.id) {
   //   res.status(400).send({ message: 'Content can not be empty!' });
   //   return;

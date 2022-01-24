@@ -51,7 +51,7 @@ module.exports = function (sequelize) {
       allowNull: false
     },
     Devices: {
-      type: Sequelize.STRING(500),
+      type: Sequelize.ARRAY( Sequelize.STRING(45) ),
       allowNull: true
     }
   }, {

@@ -18,7 +18,7 @@ const whiteList = [
   '/api/auth/reset-password',
   '/api/auth/changepassword',
   '/api/auth/verificationemail',
-  '/api/auth/refreshsession',
+  '/api/auth/refresh-session',
   '/api/cbs/add',
   '/api/css/add'
   ];

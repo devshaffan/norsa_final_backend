@@ -1,9 +1,9 @@
 const models = require('../models/index');
 const uuidV4 = require('uuid/v4');
-exports.getAllAmountPaid = (req, res) => {
+exports.getPaybackPeriods = (req, res) => {
     const limit = req.params.limit !== undefined ? req.params.limit : 10000;
     const offset = req.params.offset !== undefined ? req.params.limit : 0;
-    models.amountPaid.findAll({ limit, offset }).then((data) => {
+    models.paybackPeriod.findAll({ limit, offset }).then((data) => {
         res.json({message: "success", data: data})
     }).catch((err) => {
         res.status(500).send({
@@ -12,14 +12,14 @@ exports.getAllAmountPaid = (req, res) => {
         });
     });
 };
-exports.getAmountPaidById = (req, res) => {
+exports.getPaybackPeriodById = (req, res) => {
     const id = req.params.id;
     if(!id){
         res.status(400).send({
             message: "id is required"
         });
     }
-    models.amountPaid.findOne({
+    models.paybackPeriod.findOne({
         where: {
             id
         }
@@ -32,14 +32,14 @@ exports.getAmountPaidById = (req, res) => {
         });
     });
 };
-exports.createAmountPaid = (req, res) => {
+exports.createPaybackPeriod = (req, res) => {
     const body = req.body;
     if(!body.issuanceHistory_Id){
         res.status(400).send({
             message: "issuanceHistory_Id is required"
         });
     }
-    models.amountPaid.create({
+    models.paybackPeriod.create({
         id: uuidV4(),
         issuanceHistory_Id: body.issuanceHistory_Id,
         amount: body.amount,
@@ -54,14 +54,14 @@ exports.createAmountPaid = (req, res) => {
         });
     });
 };
-exports.updateAmountPaid = (req, res) => {
+exports.updatePaybackPeriod = (req, res) => {
     const body = req.body;
     if(!body.id){
         res.status(400).send({
             message: "id is required"
         });
     }
-    models.amountPaid.update(
+    models.paybackPeriod.update(
         {
             issuanceHistory_Id: body.issuanceHistory_Id,
             amount: body.amount,
@@ -82,14 +82,14 @@ exports.updateAmountPaid = (req, res) => {
         });
     });
 };
-exports.deleteAmountPaid = (req, res) => {
+exports.deletePaybackPeriod = (req, res) => {
     const id = req.params.id;
     if(!id){
         res.status(400).send({
             message: "id is required"
         });
     }
-    models.amountPaid.destroy({
+    models.paybackPeriod.destroy({
         where: {
             id
         }

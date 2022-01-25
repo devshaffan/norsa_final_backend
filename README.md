@@ -38,6 +38,7 @@ $ npm start
 | /api/auth/reset-password                                                           | POST      | anonymous        |               |
 | /api/auth/change-password                                                          | POST      | anonymous        |               |
 | /api/auth/validate-reset-password                                                  | POST      | anonymous        |               |
+| /api/auth/getMerchantIdForLoggedInUser/:id                                         | GET       | anonymous        |               |
 | /api/auth/refresh-session                                                          | POST      | anonymous        |               |
 | /api/user/getAllUsers                                                              | GET       | anonymous        |               |
 | /api/user/delete/:id                                                               | DELETE    | anonymous        |               |

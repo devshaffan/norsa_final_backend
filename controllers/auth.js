@@ -354,3 +354,16 @@ exports.verificationEmail = async (req, res) => {
     });
   });
 };
+exports.getMerchantIdForLoggedInUser = (req, res) => {
+
+  const id = req.params.id;
+
+  models.sequelize.query(`SELECT m.id FROM merchants m
+  JOIN users u ON u.id = m.User_id
+  WHERE m.User_id = '${id}'`, { type: models.sequelize.QueryTypes.SELECT })
+  .then(data => {
+    res.json({ message: 'success', data});
+  }).catch(err => {
+    res.status(400).send({ message: 'error', data: err });
+  });
+}

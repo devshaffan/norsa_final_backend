@@ -32,6 +32,26 @@ exports.getPaybackPeriodById = (req, res) => {
         });
     });
 };
+exports.getPaybackPeriodByIssuanceHistory = (req, res) => {
+    const issuanceHistory_Id = req.params.issuanceHistory_Id;
+    if(!issuanceHistory_Id){
+        res.status(400).send({
+            message: "issuanceHistory_Id is required"
+        });
+    }
+    models.paybackPeriod.findOne({
+        where: {
+            issuanceHistory_Id
+        }
+    }).then((data) => {
+        res.json({message: "success", data: data});
+    }).catch((err) => {
+        res.status(500).send({
+            message:
+                err.message || 'Some error occurred while retrieving All clients.',
+        });
+    });
+};
 exports.createPaybackPeriod = (req, res) => {
     const body = req.body;
     if(!body.issuanceHistory_Id){

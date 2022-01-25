@@ -39,7 +39,7 @@ exports.getPaybackPeriodByIssuanceHistory = (req, res) => {
             message: "issuanceHistory_Id is required"
         });
     }
-    models.paybackPeriod.findOne({
+    models.paybackPeriod.findAll({
         where: {
             issuanceHistory_Id
         }

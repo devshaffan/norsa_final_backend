@@ -278,6 +278,7 @@ exports.refreshSession = async (req, res) => {
         message: 'Not found user with your refresh token'
       });
     }
+    const expiryDate = Date.now()*1000
     const accessToken = jwt.sign({ id: payload.id, email: payload.email }, secret, {
       expiresIn: 60 * 1000 // expires in 30 min
     });
@@ -286,12 +287,13 @@ exports.refreshSession = async (req, res) => {
     });
     user.update({
       access_token: accessToken,
-      refresh_token: newRefreshToken
+      refresh_token: newRefreshToken,
     })
     .then(() => {
       const userData = {
         access_token: accessToken,
-        refresh_token: newRefreshToken
+        refresh_token: newRefreshToken,
+        expiryDate : expiryDate
       };
       return res.status(200).json({ result: 'ok', data: userData });
     })

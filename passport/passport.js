@@ -142,6 +142,7 @@ module.exports = function (passport, User) {
       const accessToken = jwt.sign(payload, appSecret, {
         expiresIn: 60 * 1000 // expires in 30 min
       });
+      const expiryDate = Date.now()*1000
       const refreshToken = jwt.sign(payload, appSecret, {
         expiresIn: '30d' // expires in 30 min
       });
@@ -152,7 +153,8 @@ module.exports = function (passport, User) {
         .then(() => {
           const userData = {
             ...reduceUserData(user),
-            accessToken: accessToken
+            accessToken: accessToken,
+            expiryDate : expiryDate
           };
           return done(null, userData);
         })

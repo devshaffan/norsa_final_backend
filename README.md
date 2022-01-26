@@ -38,6 +38,7 @@ $ npm start
 | /api/auth/reset-password                                                           | POST      | anonymous        |               |
 | /api/auth/change-password                                                          | POST      | anonymous        |               |
 | /api/auth/validate-reset-password                                                  | POST      | anonymous        |               |
+| /api/auth/getMerchantIdForLoggedInUser/:id                                         | GET       | anonymous        |               |
 | /api/auth/refresh-session                                                          | POST      | anonymous        |               |
 | /api/user/getAllUsers                                                              | GET       | anonymous        |               |
 | /api/user/delete/:id                                                               | DELETE    | anonymous        |               |
@@ -135,11 +136,12 @@ $ npm start
 | /api/transactionHistory/bulkCreateTransectionHistory                               | POST      | anonymous        |               |
 | /api/transactionHistory/deleteTransectionById/:id                                  | DELETE    | anonymous        |               |
 | /api/transactionHistory/updateTransection/:id                                      | PUT       | anonymous        |               |
-| /api/amountPaid/createAmountPaid {date, issuanceHistory_Id,ammount,status}         | Post       | anonymous        |               |
-| /api/amountPaid/getAmountPaidById/:id                                              | get       | anonymous        |               |
-| /api/amountPaid/getAllAmountPaid                                                   | get       | anonymous        |               |
-| /api/amountPaid/updateAmountPaid {Date,issuanceHistory_Id,ammount,status,id}       | put       | anonymous        |               |
-| /api/amountPaid/deleteAmountPaid/:id                                               | delete       | anonymous        |               |
+| /api/paybackPeriod/createPaybackPeriod {date, issuanceHistory_Id,ammount,status}         | Post       | anonymous        |               |
+| /api/paybackPeriod/getPaybackPeriodById/:id                                              | get       | anonymous        |               |
+| /api/paybackPeriod//getPaybackPeriodByIssuanceHistory/:issuanceHistory_Id          | get       | anonymous        |               |
+| /api/paybackPeriod/getPaybackPeriods                                                   | get       | anonymous        |               |
+| /api/paybackPeriod/updatePaybackPeriod {Date,issuanceHistory_Id,ammount,status,id}       | put       | anonymous        |               |
+| /api/paybackPeriod/deletePaybackPeriod/:id                                               | delete       | anonymous        |               |
 
 
 ## searchTransactions

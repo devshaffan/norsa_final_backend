@@ -50,7 +50,28 @@ module.exports = function (sequelize) {
         model: 'nfccard',
         key: 'id'
       }
+    },
+    profitPercentage: {
+      type: Sequelize.STRING(45),
+      allowNull: true
+    },
+    profitAmount: {
+      type: Sequelize.STRING(45),
+      allowNull: true
+    },
+    tax:{
+      type: Sequelize.STRING(45),
+      allowNull: true
+    },
+    profitAfterTax:{
+      type: Sequelize.STRING(45),
+      allowNull: true
+    },
+    dealerCheck:{
+      type: Sequelize.BOOLEAN,
+      allowNull: true
     }
+
   }, {
     sequelize,
     tableName: 'issuancehistory',

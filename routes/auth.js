@@ -80,5 +80,6 @@ router.post('/reset-password', auth.resetPassword);
 router.post('/change-password', auth.changePassword);
 router.post('/validate-reset-password', auth.validateResetPassword);
 router.post('/refresh-session', auth.refreshSession);
-router.get('/ifValid',auth.ifValid)
+router.get('/ifValid',auth.ifValid);
+router.get('/getMerchantIdForLoggedInUser/:id',auth.getMerchantIdForLoggedInUser);
 module.exports = router;

@@ -278,6 +278,7 @@ exports.refreshSession = async (req, res) => {
         message: 'Not found user with your refresh token'
       });
     }
+    const expiryDate = Date.now() + (60*1500*1000)
     const accessToken = jwt.sign({ id: payload.id, email: payload.email }, secret, {
       expiresIn: 60 * 1000 // expires in 30 min
     });
@@ -286,12 +287,13 @@ exports.refreshSession = async (req, res) => {
     });
     user.update({
       access_token: accessToken,
-      refresh_token: newRefreshToken
+      refresh_token: newRefreshToken,
     })
     .then(() => {
       const userData = {
         access_token: accessToken,
-        refresh_token: newRefreshToken
+        refresh_token: newRefreshToken,
+        expiryDate : expiryDate
       };
       return res.status(200).json({ result: 'ok', data: userData });
     })
@@ -354,3 +356,16 @@ exports.verificationEmail = async (req, res) => {
     });
   });
 };
+exports.getMerchantIdForLoggedInUser = (req, res) => {
+
+  const id = req.params.id;
+
+  models.sequelize.query(`SELECT m.id FROM merchants m
+  JOIN users u ON u.id = m.User_id
+  WHERE m.User_id = '${id}'`, { type: models.sequelize.QueryTypes.SELECT })
+  .then(data => {
+    res.json({ message: 'success', data});
+  }).catch(err => {
+    res.status(400).send({ message: 'error', data: err });
+  });
+}

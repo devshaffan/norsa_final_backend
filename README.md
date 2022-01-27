@@ -136,6 +136,7 @@ $ npm start
 | /api/transactionHistory/bulkCreateTransectionHistory                               | POST      | anonymous        |               |
 | /api/transactionHistory/deleteTransectionById/:id                                  | DELETE    | anonymous        |               |
 | /api/transactionHistory/updateTransection/:id                                      | PUT       | anonymous        |               |
+| /api/transactionHistory/getTodaysTransactions                                      | GET       | anonymous        |               |
 | /api/paybackPeriod/createPaybackPeriod {date, issuanceHistory_Id,ammount,status}         | Post       | anonymous        |               |
 | /api/paybackPeriod/getPaybackPeriodById/:id                                              | get       | anonymous        |               |
 | /api/paybackPeriod//getPaybackPeriodByIssuanceHistory/:issuanceHistory_Id          | get       | anonymous        |               |

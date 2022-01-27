@@ -128,3 +128,14 @@ exports.searchTransactions= (req, res) => {
         });
     });
 };
+exports.getTodaysTransactions = (req, res) => {
+
+    models.sequelize.query(`SELECT * FROM transactionhistory t
+    WHERE Date(t.dateTime) = CURDATE()`,{type:models.sequelize.QueryTypes.SELECT}).then((data)=>{
+        res.json({ message : 'success', data })
+    }).catch((err)=>{
+        res.status(500).send({
+            message: 'error', error: err
+        });
+    });
+};

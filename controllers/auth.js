@@ -280,7 +280,7 @@ exports.refreshSession = async (req, res) => {
     }
     const expiryDate = Date.now() + (60*1500*1000)
     const accessToken = jwt.sign({ id: payload.id, email: payload.email }, secret, {
-      expiresIn: 60 * 1000 // expires in 30 min
+      expiresIn: 60 * 1500 // expires in 30 min
     });
     const newRefreshToken = jwt.sign({ id: payload.id, email: payload.email }, secret, {
       expiresIn: '30d' // expires in 30 days

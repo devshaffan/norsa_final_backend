@@ -117,7 +117,7 @@ exports.searchTransactions= (req, res) => {
     c.LastName LastName , m.id merchant_Id, m.Name 'Name' , m.Email 'Merchant_Email'
     FROM transactionhistory t
     JOIN client c ON c.id = t.Client_id
-    JOIN merchants m ON m.id = t.MerchantTypeDiscount_ID
+    JOIN merchants m ON m.id = t.Merchant_ID
     LIMIT ${limit} OFFSET ${offset} `,{type:models.sequelize.QueryTypes.SELECT})
     .then(data => {
         res.json({ message: 'success', data});

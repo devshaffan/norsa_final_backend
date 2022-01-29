@@ -25,6 +25,14 @@ module.exports = function (sequelize) {
     AmountUser: {
       type: Sequelize.INTEGER,
       allowNull: true
+    },
+    issuancehistoryId: {
+      type: Sequelize.STRING(45),
+      references: {
+        model: 'issuancehistory',
+        key: 'id'
+      }
+
     }
   }, {
     sequelize,

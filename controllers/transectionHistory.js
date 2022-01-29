@@ -21,7 +21,8 @@ exports.createTransactionHistory = (req, res) => {
       Merchant_ID,
       ItemDescription,
       dateTime,
-      AmountUser} = req.body;
+      AmountUser,
+      issuancehistoryId }= req.body;
       
     if(!Client_id || !Merchant_ID || !ItemDescription || !dateTime || !AmountUser){
         res.status(400).send({
@@ -32,7 +33,7 @@ exports.createTransactionHistory = (req, res) => {
         Merchant_ID,
         ItemDescription,
         dateTime,
-        AmountUser}).then(data => {
+        AmountUser,  issuancehistoryId}).then(data => {
         res.json({ message: 'success', data});
     }).catch(err => {
         res.status(500).send({
@@ -46,7 +47,7 @@ exports.bulkCreateTransectionHistory = (req, res) => {
       Merchant_ID,
       ItemDescription,
       dateTime,
-      AmountUser} = req.body;
+      AmountUser , issuancehistoryId} = req.body;
     if(!Client_id || !Merchant_ID || !ItemDescription || !dateTime || !AmountUser){
         res.status(400).send({
             message: 'data is required'

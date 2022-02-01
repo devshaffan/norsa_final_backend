@@ -13,12 +13,24 @@ module.exports = function (sequelize) {
             type: Sequelize.STRING(45)
 
         },
-        status: {
+        amountPaidByClient: {
             type: Sequelize.STRING(45)
         },
         issuanceHistory_Id: {
             type: Sequelize.STRING(45),
             allowNull: false,
+        },
+        paidByDealer: {
+            type: Sequelize.BOOLEAN,
+            allowNull: true
+        },
+        amountPaidToDealer: {
+            type: Sequelize.STRING(45),
+            allowNull: true
+        },
+        dateDeposit: {
+            type: Sequelize.DATE,
+            allowNull: true,
         }
     }, {
         timestamps: true,

@@ -54,18 +54,13 @@ exports.getPaybackPeriodByIssuanceHistory = (req, res) => {
 };
 exports.createPaybackPeriod = (req, res) => {
     const body = req.body;
+    req.body.id = uuidV4();
     if(!body.issuanceHistory_Id){
         res.status(400).send({
             message: "issuanceHistory_Id is required"
         });
     }
-    models.paybackPeriod.create({
-        id: uuidV4(),
-        issuanceHistory_Id: body.issuanceHistory_Id,
-        amount: body.amount,
-        status: body.status,
-        date: body.date
-    }).then((data) => {
+    models.paybackPeriod.create(req.body).then((data) => {
         res.json({message: "success", data: data});
     }).catch((err) => {
         res.status(500).send({
@@ -81,18 +76,11 @@ exports.updatePaybackPeriod = (req, res) => {
             message: "id is required"
         });
     }
-    models.paybackPeriod.update(
-        {
-            issuanceHistory_Id: body.issuanceHistory_Id,
-            amount: body.amount,
-            status: body.status,
-            date: body.date
-        },
-        {
-            where: {
-                id: body.id
-            }
+    models.paybackPeriod.update(body,{
+        where: {
+            id: body.id
         }
+    }
     ).then((data) => {
         res.json({message: "success", data: data});
     }).catch((err) => {

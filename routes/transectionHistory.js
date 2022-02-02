@@ -3,6 +3,7 @@ const router = express.Router();
 const th = require('../controllers/transectionHistory');
 
 router.get('/getAllTransactionHistory/:limit&:offset', th.getAllTransactionHistory);
+router.get('/getAllTransactionHistory', th.getAllTransactionHistory);
 router.get('/getTransactionHistoryById/:id', th.getTransactionHistoryById);
 router.get('/searchTransactions', th.searchTransactions);
 router.get('/getTodaysTransactions', th.getTodaysTransactions);

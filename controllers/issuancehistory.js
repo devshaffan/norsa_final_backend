@@ -1,11 +1,13 @@
 const models = require('../models/index');
 
+const _ = require('lodash');
+const { JSON } = require('sequelize');
 
 
 exports.getClientByNfcAndPinCode = (req, res) => {
-  const {pinCode, nfcCardId} = req.body;
-  if(!pinCode || !nfcCardId){
-    res.status(400).send({message: 'Content can not be empty!'});
+  const { pinCode, nfcCardId } = req.body;
+  if (!pinCode || !nfcCardId) {
+    res.status(400).send({ message: 'Content can not be empty!' });
     return;
   }
   models.sequelize.query(`SELECT ih.Client_id FROM nfccard nc
@@ -13,24 +15,93 @@ exports.getClientByNfcAndPinCode = (req, res) => {
   WHERE nc.number = ${nfcCardId} AND ih.Pincode = ${pinCode}
   ORDER BY ih.DateTime DESC 
   LIMIT 1
-  `,{type:models.sequelize.QueryTypes.SELECT} ).then(data => {
+  `, { type: models.sequelize.QueryTypes.SELECT }).then(data => {
     return res.json({ result: 'ok', data });
   }).catch(err => {
     return res.json({ result: 'fail', message: err });
   });
+}
+const getUsersAgainstAnyMerchant = async (merchants) => {
+  return await models.merchants
+    .findAll({
+      where: {
+        id: merchants
+      },
+      attributes: ['User_id']
+    })
+}
+
+const checkIfMerchantExists = async (issuanceHistoryId) => {
+  const data = await models.multipleIssueances.findAll({ where: { issuanceHistoryId: issuanceHistoryId } })
+  return data
+}
+
+const checkIfUserAuthorized = async (users, token) => {
+  const authorizedUsers = await models.user.findAll({
+    where: {
+      id: users,
+      accessToken: token
+    }
+  })
+  // return authorizedUsers
+  return authorizedUsers.length > 0 ? true : false
+}
+const getClientCodeAndName = async (id) => {
+  return await models.client.findOne({
+    where: {
+      id: id
+    },
+    attributes: ['Code', 'FirstName', 'LastName']
+  })
+}
+
+exports.OnNfcAndPinCode = async (req, res) => {
+  const { pinCode, nfcCardId } = req.body;
+  if (!pinCode || !nfcCardId) {
+    res.status(400).send({ message: 'Content can not be empty!' });
+    return;
+  }
+  const data = await models.issuancehistory.find({
+    where: { NfcCard_id: nfcCardId, Pincode: pinCode },
+    order: [['DateTime', 'DESC']]
+  })
+  const multipleIssuancesList = await checkIfMerchantExists(data.id)
+  if (multipleIssuancesList.length == 0) {
+    const client = await getClientCodeAndName(data.Client_id)
+    const clientCodeAndFullName = { Code: client.Code, FullName: client.FirstName + " " + client.LastName }
+
+    res.json({ message: 'success', data: { data, clientCodeAndFullName } })
+    return;
+  }
+  const merchants = multipleIssuancesList.map((item) => {
+    return item.merchantId
+  })
+  const users = await getUsersAgainstAnyMerchant(merchants)
+  const userIds = users.map((item) => {
+    return item.User_id
+  })
+  const token = _.get(req.headers, 'authorization', null).split(' ')[1]
+  const authorized = await checkIfUserAuthorized(userIds, token)
+  if (!authorized) {
+    res.json({ message: 'success', error: "Not Authorized" })
+    return;
+  }
+  const client = await getClientCodeAndName(data.Client_id)
+  const clientCodeAndFullName = { Code: client.Code, FullName: client.FirstName + " " + client.LastName }
+  res.json({ message: 'success', data: { data, clientCodeAndFullName } })
 }
 
 
 
 exports.getIssueanceHistyByClientId = (req, res) => {
   const clientId = req.params.Client_id;
-  models.issuancehistory.findOne({where: {Client_id: clientId, AmountPaid:'0'},order:[['DateTime','DESC']]})
-  .then(data => {
-    res.json({message: 'success', data: data})
-  })
-  .catch(err => {
-    res.status(500).json({message: 'error', data: err.message})
-  });
+  models.issuancehistory.findOne({ where: { Client_id: clientId, AmountPaid: '0' }, order: [['DateTime', 'DESC']] })
+    .then(data => {
+      res.json({ message: 'success', data: data })
+    })
+    .catch(err => {
+      res.status(500).json({ message: 'error', data: err.message })
+    });
 };
 exports.getAllIssuancehistories = (req, res) => {
   const limit = req.params.limit !== undefined ? req.params.limit : 10000;
@@ -76,7 +147,7 @@ exports.getissuancehistoryById = (req, res) => {
     .findByPk(req.params.id)
     .then((data) => {
       res.json(data);
-      
+
     })
     .catch((err) => {
       res.status(500).send({
@@ -107,7 +178,7 @@ exports.getissuancehistoryByPincodeAndNfcCard_id = (req, res) => {
     .findAll({
       where: {
         Pincode: req.params.Pincode,
-        NfcCard_id : req.params.NfcCard_id
+        NfcCard_id: req.params.NfcCard_id
       }
     })
     .then((data) => {
@@ -122,7 +193,7 @@ exports.getissuancehistoryByPincodeAndNfcCard_id = (req, res) => {
 };
 exports.createIssuancehistory = (req, res) => {
   if (!req.body.id) {
-    res.status( 400 ).send( { message: 'Content can not be empty!' } );
+    res.status(400).send({ message: 'Content can not be empty!' });
     return;
   }
   models.issuancehistory

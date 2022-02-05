@@ -65,6 +65,11 @@ exports.OnNfcAndPinCode = async (req, res) => {
     where: { NfcCard_id: nfcCardId, Pincode: pinCode },
     order: [['DateTime', 'DESC']]
   })
+  if (!data) {
+    res.json({ message: 'success', error: "Nfc Card Id and PinCode doesnt match" })
+    return
+  }
+
   const multipleIssuancesList = await checkIfMerchantExists(data.id)
   if (multipleIssuancesList.length == 0) {
     const client = await getClientCodeAndName(data.Client_id)

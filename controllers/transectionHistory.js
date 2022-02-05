@@ -1,5 +1,7 @@
 const models = require('../models/index');
 const uuidV4 = require('uuid/v4');
+const _ = require('lodash');
+
 exports.getTransactionHistoryById = (req, res) => {
     const id = req.params.id;
     if (!id) {
@@ -83,17 +85,39 @@ const handleTransactionEntry = async (row) => {
 // ON TRANSACTION FUNCTIONALITY END // ON TRANSACTION FUNCTIONALITY END // ON TRANSACTION FUNCTIONALITY END // ON TRANSACTION FUNCTIONALITY END // ON TRANSACTION FUNCTIONALITY END // ON TRANSACTION FUNCTIONALITY END 
 // ON TRANSACTION FUNCTIONALITY END // ON TRANSACTION FUNCTIONALITY END // ON TRANSACTION FUNCTIONALITY END // ON TRANSACTION FUNCTIONALITY END // ON TRANSACTION FUNCTIONALITY END // ON TRANSACTION FUNCTIONALITY END  
 
-exports.createTransactionHistory = (req, res) => {
+const getMerchant_ID = async (token) => {
+    const authorizedUser = await models.user.findOne({
+        attributes: ['id'],
+        where: {
+            accessToken: token
+        }
+    })
+    const merchant = await models.merchants.findOne({
+        attributes: ['id'],
+        where: {
+            User_id: authorizedUser.id,
+        }
+    })
+    if (!merchant) return null
+    return merchant.id
+
+}
+exports.createTransactionHistory = async (req, res) => {
     const { Client_id,
-        Merchant_ID,
         ItemDescription,
         dateTime,
         AmountUser,
         issuancehistoryId } = req.body;
-
-    if (!Client_id || !Merchant_ID || !ItemDescription || !dateTime || !AmountUser) {
+    const Merchant_ID = await getMerchant_ID(_.get(req.headers, 'authorization', null).split(' ')[1])
+    
+    if (!Client_id ||  !ItemDescription || !dateTime || !AmountUser) {
         res.status(400).send({
             message: 'data is required'
+        });
+    }
+    if(!Merchant_ID ){
+        res.status(400).send({
+            message: 'This User doesnt exist as a merchant'
         });
     }
     models.transactionhistory.create({

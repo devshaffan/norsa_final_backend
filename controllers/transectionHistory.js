@@ -26,6 +26,7 @@ const updatePayback = async (issuancehistory_Id, AmountUser) => {
             issuanceHistory_Id: issuancehistory_Id,
         }
     })
+    if (allPaybacks.length == 0) return null
     var eachAmountUser = AmountUser / allPaybacks.length
     for (var i = 0; i < allPaybacks.length; i++) {
         await models.paybackPeriod.update({ amount: parseFloat(allPaybacks[i].amount) + eachAmountUser }, { where: { id: allPaybacks[i].id } })
@@ -44,13 +45,14 @@ const getNumberOfMonthsAndInterest = async (issuancehistoryId, merchantId) => {
             id: merchantId,
         }
     })
+    if (!miData || !merchantData) return null
     const merchanttypediscount = await models.merchanttypediscount.findOne({
         where: {
             id: miData.numberOfMonthsId,
             MerchantType_id: merchantData.MerchantType_id
         }
     })
-
+    if (!merchanttypediscount) return null
     return { NumberOfMonths: merchanttypediscount.NumberOfMonths, Interest: merchanttypediscount.Interest }
 }
 const getInterestOn = async (Merchant_ID) => {
@@ -59,25 +61,30 @@ const getInterestOn = async (Merchant_ID) => {
             id: Merchant_ID,
         }
     })
+    if (!merchantData) return null
     const merchantType = await models.merchanttype.findOne({
         where: {
             id: merchantData.MerchantType_id
         }
     })
+    if (!merchantType) return null
     return merchantType.interestOn
 }
 
 const updateBalance = async (issuancehistoryId, amount) => {
-    const data = await models.issuancehistory.find({ where: { id: issuancehistoryId } })
+    const data = await models.issuancehistory.findOne({ where: { id: issuancehistoryId } })
+    if (!data) return null
     await models.issuancehistory.update({ Balance: parseFloat(data.Balance) - amount }, { where: { id: issuancehistoryId } })
 }
 
 const handleTransactionEntry = async (row) => {
     await updateBalance(row.issuancehistoryId, row.AmountUser)
-    const intersetOn = await getInterestOn(row.Merchant_ID)
+    const interestOn = await getInterestOn(row.Merchant_ID)
+    if (!interestOn) return null
     var AmountUser = parseFloat(row.AmountUser)
-    if (intersetOn.toLocaleLowerCase() == "client") {
+    if (interestOn.toLocaleLowerCase() == "client") {
         const { NumberOfMonths, Interest } = await getNumberOfMonthsAndInterest(row.issuancehistoryId, row.Merchant_ID)
+        if (!NumberOfMonths || !Interest) return null
         AmountUser = AmountUser + AmountUser * parseFloat(Interest) / 100
     }
     await updatePayback(row.issuancehistoryId, AmountUser)
@@ -92,6 +99,7 @@ const getMerchant_ID = async (token) => {
             accessToken: token
         }
     })
+    if (!authorizedUser) return null
     const merchant = await models.merchants.findOne({
         attributes: ['id'],
         where: {
@@ -109,13 +117,13 @@ exports.createTransactionHistory = async (req, res) => {
         AmountUser,
         issuancehistoryId } = req.body;
     const Merchant_ID = await getMerchant_ID(_.get(req.headers, 'authorization', null).split(' ')[1])
-    
-    if (!Client_id ||  !ItemDescription || !dateTime || !AmountUser) {
+
+    if (!Client_id || !ItemDescription || !dateTime || !AmountUser) {
         res.status(400).send({
             message: 'data is required'
         });
     }
-    if(!Merchant_ID ){
+    if (!Merchant_ID) {
         res.status(400).send({
             message: 'This User doesnt exist as a merchant'
         });

@@ -10,6 +10,7 @@ const http = require('http');
 var path = require('path');
 var express = require('express');
 var cookieParser = require('cookie-parser');
+var resetAllBalancesCronJob = require('./cronJobs/issuanceHistory')
 //const listEndpoints = require('express-list-endpoints')
 
 const routeInitialize = require('./routes');
@@ -22,7 +23,10 @@ const passportInitialize = require('./passport/passport');
 let server; //eslint-disable-line
 let httpServer; //eslint-disable-line
 const port = process.env.PORT || 3000;
-server = require( 'http' ).createServer( app ).listen( port ); // eslint-disable-line
+server = require( 'http' ).createServer( app ).listen( port );
+resetAllBalancesCronJob.start()
+
+// eslint-disable-line
 // if (process.env.NODE_ENV !== 'production') {
   // server = require('http').createServer(app); // eslint-disable-line
 // } else {

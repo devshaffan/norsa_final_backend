@@ -62,32 +62,32 @@ exports.getFilesByClientId = (req, res) => {
 
 exports.delete = (req, res) => {
     if (!req.params.Client_id) {
-      res.status(400).send({ message: 'Content can not be empty!' });
-      return;
+        res.status(400).send({ message: 'Content can not be empty!' });
+        return;
     }
     const Client_id = req.params.Client_id;
     models.clientBankStatement
-      .destroy({
-        where: {
-          Client_id
-        },
-      })
-      .then((num) => {
-        if (num === 1) {
-          res.send({ message: 'Client Bank Statement was deleted successfully!' });
-        } else {
-          res.send({
-            message: `Cannot delete Tutorial with id=${Client_id}. Maybe Tutorial was not found!`,
-          });
-        }
-      })
-      .catch((err) => {
-        res.status(500).send({
-          message: err.message || 'Some error occurred while Deleting client.',
+        .destroy({
+            where: {
+                Client_id
+            },
+        })
+        .then((num) => {
+            if (num === 1) {
+                res.send({ message: 'Client Bank Statement was deleted successfully!' });
+            } else {
+                res.send({
+                    message: `Cannot delete Tutorial with id=${Client_id}. Maybe Tutorial was not found!`,
+                });
+            }
+        })
+        .catch((err) => {
+            res.status(500).send({
+                message: err.message || 'Some error occurred while Deleting client.',
+            });
         });
-      });
-  };
-  
+};
+
 
 exports.addFile = (req, res) => {
 

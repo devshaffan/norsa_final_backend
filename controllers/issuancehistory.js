@@ -1,4 +1,5 @@
 const models = require('../models/index');
+const fs = require('fs')
 
 const _ = require('lodash');
 const { JSON } = require('sequelize');

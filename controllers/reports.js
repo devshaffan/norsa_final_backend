@@ -17,7 +17,7 @@ exports.merchantReport = (req, res) => {
     WHEN mt.interestOn = 'Client' THEN 0
     ELSE SUM(t.AmountUser)/100 * (d.Interest) * 0.06
     END AS 'Tax On Norsa',
-    m.BankName, m.AccountNo
+    m.BankName AS 'Bank Name', m.AccountNo AS 'Account No'
     FROM transactionhistory t
     JOIN merchants m ON m.id = t.Merchant_ID
     JOIN merchanttype mt ON mt.id = m.MerchantType_id

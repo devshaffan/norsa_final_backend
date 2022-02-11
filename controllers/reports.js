@@ -3,10 +3,11 @@ const models = require('../models/index');
 exports.merchantReport = (req, res) => {
     const date = req.params.date
     models.sequelize.query(`SELECT m.Code, m.Name,
+    SUM(t.AmountUser) AS 'Total Amount',
     CASE
     WHEN mt.interestOn = 'Client' THEN SUM(t.AmountUser)
     ELSE SUM(t.AmountUser) - (SUM(t.AmountUser)/100 * (d.Interest))
-    END AS 'Total Amount',
+    END AS 'Merchant Incentive',
     d.Interest AS 'Percentage %',
     CASE
     WHEN mt.interestOn = 'Client' THEN 0
@@ -16,7 +17,7 @@ exports.merchantReport = (req, res) => {
     WHEN mt.interestOn = 'Client' THEN 0
     ELSE SUM(t.AmountUser)/100 * (d.Interest) * 0.06
     END AS 'Tax On Norsa',
-    m.BankName, m.AccountNo
+    m.BankName AS 'Bank Name', m.AccountNo AS 'Account No'
     FROM transactionhistory t
     JOIN merchants m ON m.id = t.Merchant_ID
     JOIN merchanttype mt ON mt.id = m.MerchantType_id

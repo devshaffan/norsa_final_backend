@@ -3,10 +3,11 @@ const models = require('../models/index');
 exports.merchantReport = (req, res) => {
     const date = req.params.date
     models.sequelize.query(`SELECT m.Code, m.Name,
+    SUM(t.AmountUser) AS 'Total Amount',
     CASE
     WHEN mt.interestOn = 'Client' THEN SUM(t.AmountUser)
     ELSE SUM(t.AmountUser) - (SUM(t.AmountUser)/100 * (d.Interest))
-    END AS 'Total Amount',
+    END AS 'Merchant Incentive',
     d.Interest AS 'Percentage %',
     CASE
     WHEN mt.interestOn = 'Client' THEN 0

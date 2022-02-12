@@ -11,5 +11,7 @@ router.post('/createTransactionHistory', th.createTransactionHistory);
 router.post('/bulkCreateTransectionHistory', th.bulkCreateTransectionHistory);
 router.delete('/deleteTransectionById/:id', th.deleteTransectionById);
 router.put('/updateTransection/:id', th.updateTransection);
+router.get('/getTodaysTransactions', th.getTodaysTransactions);
+router.get('/getMerchantsTodaysTransactions', th.getMerchantsTodaysTransactions);
 
 module.exports = router;

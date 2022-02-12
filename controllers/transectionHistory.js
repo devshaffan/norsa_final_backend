@@ -1,7 +1,7 @@
 const models = require('../models/index');
 const uuidV4 = require('uuid/v4');
 const _ = require('lodash');
-
+const { Op } = require('sequelize')
 exports.getTransactionHistoryById = (req, res) => {
     const id = req.params.id;
     if (!id) {
@@ -108,7 +108,23 @@ const getMerchant_ID = async (token) => {
     })
     if (!merchant) return null
     return merchant.id
-
+}
+exports.getMerchantsTodaysTransactions = async (req, res) => {
+    const Merchant_ID = await getMerchant_ID(_.get(req.headers, 'authorization', null).split(' ')[1])
+    if (!Merchant_ID) {
+        res.status(400).send({
+            message: 'This User doesnt exist as a merchant'
+        });
+    }
+    models.sequelize.query(`SELECT * FROM transactionhistory t
+    WHERE (Date(t.dateTime) = CURDATE() AND t.Merchant_ID = '${Merchant_ID}')`,
+        { type: models.sequelize.QueryTypes.SELECT }).then((data) => {
+            res.json({ message: 'success', data })
+        }).catch((err) => {
+            res.status(500).send({
+                message: 'error', error: err
+            });
+        });
 }
 exports.createTransactionHistory = async (req, res) => {
     const { Client_id,

@@ -62,7 +62,7 @@ exports.OnNfcAndPinCode = async (req, res) => {
     res.status(400).send({ message: 'Content can not be empty!' });
     return;
   }
-  const data = await models.issuancehistory.find({
+  const data = await models.issuancehistory.findOne({
     where: { NfcCard_id: nfcCardId, Pincode: pinCode },
     order: [['DateTime', 'DESC']]
   })
@@ -70,12 +70,24 @@ exports.OnNfcAndPinCode = async (req, res) => {
     res.json({ message: 'success', error: "Nfc Card Id and PinCode doesnt match" })
     return
   }
-
   const multipleIssuancesList = await checkIfMerchantExists(data.id)
-  if (multipleIssuancesList.length == 0) {
-    const client = await getClientCodeAndName(data.Client_id)
-    const clientCodeAndFullName = { Code: client.Code, FullName: client.FirstName + " " + client.LastName }
 
+  if (!multipleIssuancesList) {
+    res.json({ message: 'success', error: "Merchant doesnt exist" })
+    return
+  }
+
+  if (multipleIssuancesList.length == 0) {
+    if (!data.Client_id) {
+      res.json({ message: 'success', error: "Client ID doesnt exist" })
+      return
+    }
+    const client = await getClientCodeAndName(data.Client_id)
+    if (!client) {
+      res.json({ message: 'success', error: "Client doesnt exist" })
+      return
+    }
+    const clientCodeAndFullName = { Code: client.Code, FullName: client.FirstName + " " + client.LastName }
     res.json({ message: 'success', data: { data, clientCodeAndFullName } })
     return;
   }
@@ -83,6 +95,10 @@ exports.OnNfcAndPinCode = async (req, res) => {
     return item.merchantId
   })
   const users = await getUsersAgainstAnyMerchant(merchants)
+  if (!users || users.length == 0) {
+    res.json({ message: 'success', error: "Client doesnt exist" })
+    return
+  }
   const userIds = users.map((item) => {
     return item.User_id
   })
@@ -92,7 +108,15 @@ exports.OnNfcAndPinCode = async (req, res) => {
     res.json({ message: 'success', error: "Not Authorized" })
     return;
   }
+  if (!data.Client_id) {
+    res.json({ message: 'success', error: "Client ID doesnt exist" })
+    return
+  }
   const client = await getClientCodeAndName(data.Client_id)
+  if (!client) {
+    res.json({ message: 'success', error: "Client doesnt exist" })
+    return
+  }
   const clientCodeAndFullName = { Code: client.Code, FullName: client.FirstName + " " + client.LastName }
   res.json({ message: 'success', data: { data, clientCodeAndFullName } })
 }

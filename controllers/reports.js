@@ -35,10 +35,10 @@ exports.merchantReport = (req, res) => {
 
 exports.transactionReport = (req, res) => {
     const token = _.get(req.headers, 'authorization', null).split(' ')[1]
-    models.sequelize.query(`SELECT * from transactionhistory t 
+    models.sequelize.query(`SELECT t.* from transactionhistory t 
     JOIN merchants m ON m.id = t.Merchant_ID
     JOIN users u ON u.id=m.User_id
-    WHERE u.accessToken='${token}'
+    WHERE u.accessToken='${token}' AND Date(t.dateTime) = CURDATE()
     group BY t.Merchant_ID`
         , { type: models.sequelize.QueryTypes.SELECT }).then(data => {
             return res.json(data)

@@ -88,7 +88,7 @@ exports.OnNfcAndPinCode = async (req, res) => {
       return
     }
     const clientCodeAndFullName = { Code: client.Code, FullName: client.FirstName + " " + client.LastName }
-    res.json({ message: 'success', data: { data, clientCodeAndFullName } })
+    res.json({ message: 'success', data: { data, clientCodeAndFullName, numberOfMonths: 1 } })
     return;
   }
   const merchants = multipleIssuancesList.map((item) => {
@@ -118,9 +118,18 @@ exports.OnNfcAndPinCode = async (req, res) => {
     return
   }
   const clientCodeAndFullName = { Code: client.Code, FullName: client.FirstName + " " + client.LastName }
-  res.json({ message: 'success', data: { data, clientCodeAndFullName } })
+  const numberOfMonths = await getNumberOfMonths(multipleIssuancesList[0].numberOfMonthsId)
+
+  res.json({ message: 'success', data: { data, clientCodeAndFullName, numberOfMonths } })
 }
 
+const getNumberOfMonths = async (id) => {
+  const data = await models.merchanttypediscount.findByPk(id)
+  if (data) {
+    return data.NumberOfMonths
+  }
+  return null
+}
 
 
 exports.getIssueanceHistyByClientId = (req, res) => {

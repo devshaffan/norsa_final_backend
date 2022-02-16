@@ -87,8 +87,8 @@ exports.OnNfcAndPinCode = async (req, res) => {
       res.json({ message: 'success', error: "Client doesnt exist" })
       return
     }
-    const clientCodeAndFullName = { Code: client.Code, FullName: client.FirstName + " " + client.LastName }
-    res.json({ message: 'success', data: { data, clientCodeAndFullName, numberOfMonths: 1 } })
+    const clientCodeAndFullName = { Code: client.Code, FullName: client.FirstName + " " + client.LastName, numberOfMonths: 1 }
+    res.json({ message: 'success', data: { data, clientCodeAndFullName } })
     return;
   }
   const merchants = multipleIssuancesList.map((item) => {
@@ -117,10 +117,9 @@ exports.OnNfcAndPinCode = async (req, res) => {
     res.json({ message: 'success', error: "Client doesnt exist" })
     return
   }
-  const clientCodeAndFullName = { Code: client.Code, FullName: client.FirstName + " " + client.LastName }
   const numberOfMonths = await getNumberOfMonths(multipleIssuancesList[0].numberOfMonthsId)
-
-  res.json({ message: 'success', data: { data, clientCodeAndFullName, numberOfMonths } })
+  const clientCodeAndFullName = { Code: client.Code, FullName: client.FirstName + " " + client.LastName, numberOfMonths }
+  res.json({ message: 'success', data: { data, clientCodeAndFullName } })
 }
 
 const getNumberOfMonths = async (id) => {

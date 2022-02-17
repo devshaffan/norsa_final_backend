@@ -4,7 +4,7 @@ const clientPictureRouter = require('./clientProfilePicture')
 const publicClientPictureRouter = require('./publicClientProfilePicture')
 const userRouter = require('./user')
 const publicClientsRouter = require('./publicClient')
-
+const reportRouter = require('./reports')
 const merchantsRouter = require('./merchants');
 const dealerRouter = require('./dealer');
 const deviceRouter = require('./device');
@@ -18,7 +18,7 @@ const multipleIssueances = require('./multipleIssueances');
 const transectionHistoryRouter = require('./transectionHistory');
 
 module.exports = function (app) {
-
+  app.use('/api/reports',reportRouter)
   app.use('/api/public/clients', publicClientsRouter)
   app.use('/api/auth', authRouter);
   app.use('/api/user', userRouter);

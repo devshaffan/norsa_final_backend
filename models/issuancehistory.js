@@ -31,7 +31,12 @@ module.exports = function (sequelize) {
       allowNull: true,
       defaultValue: 0
     },
-    AmountDue:{
+    Balance: {
+      type: Sequelize.STRING(45),
+      allowNull: true,
+      defaultValue: 0
+    },
+    AmountDue: {
       type: Sequelize.STRING(45),
       defaultValue: 0
     },
@@ -59,15 +64,15 @@ module.exports = function (sequelize) {
       type: Sequelize.STRING(45),
       allowNull: true
     },
-    tax:{
+    tax: {
       type: Sequelize.STRING(45),
       allowNull: true
     },
-    profitAfterTax:{
+    profitAfterTax: {
       type: Sequelize.STRING(45),
       allowNull: true
     },
-    dealerCheck:{
+    dealerCheck: {
       type: Sequelize.BOOLEAN,
       allowNull: true
     }

@@ -10,6 +10,7 @@ const http = require('http');
 var path = require('path');
 var express = require('express');
 var cookieParser = require('cookie-parser');
+var resetAllBalancesCronJob = require('./cronJobs/issuanceHistory')
 //const listEndpoints = require('express-list-endpoints')
 
 const routeInitialize = require('./routes');
@@ -22,9 +23,12 @@ const passportInitialize = require('./passport/passport');
 let server; //eslint-disable-line
 let httpServer; //eslint-disable-line
 const port = process.env.PORT || 3000;
-server = require( 'http' ).createServer( app ).listen( port ); // eslint-disable-line
+server = require('http').createServer(app).listen(port);
+resetAllBalancesCronJob.start()
+
+// eslint-disable-line
 // if (process.env.NODE_ENV !== 'production') {
-  // server = require('http').createServer(app); // eslint-disable-line
+// server = require('http').createServer(app); // eslint-disable-line
 // } else {
 //   server = require('https').createServer(app); //eslint-disable-line
 //   httpServer = http.createServer((req, res) => {
@@ -50,7 +54,7 @@ app.use(require('cookie-parser')());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
-app.use('/static',express.static(path.join(__dirname, 'public')));
+app.use('/static', express.static(path.join(__dirname, 'public')));
 app.use(passport.initialize());
 app.use(passport.session());
 dbInitialize(app);

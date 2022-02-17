@@ -13,7 +13,7 @@ module.exports = function (sequelize) {
             type: Sequelize.STRING(45)
 
         },
-        status: {
+        amountPaidByClient: {
             type: Sequelize.STRING(45)
         },
         issuanceHistory_Id: {

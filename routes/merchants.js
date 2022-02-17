@@ -10,6 +10,7 @@ router.post('/createMerchant', merchants.createMerchant);
 router.post('/upsertMerchant', merchants.upsertMerchant);
 router.delete('/deleteMerchant/:id', merchants.deleteMerchant);
 
+router.get('/getMerchantNameByUserId', merchants.getMerchantNameByUserId);
 router.get('/getAllMerchantTypes/:limit&:offset', merchants.getAllMerchantTypes);
 router.get('/getAllMerchantTypes', merchants.getAllMerchantTypes);
 router.get('/getMerchantTypeById/:id', merchants.getMerchantTypeById);

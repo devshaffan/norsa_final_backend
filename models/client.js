@@ -89,6 +89,9 @@ module.exports = function (sequelize) {
     RecievedCreditInPast: {
       type: Sequelize.INTEGER,
       allowNull: true
+    },
+    membership:{
+      type: Sequelize.BOOLEAN,
     }
   }, {
     sequelize,

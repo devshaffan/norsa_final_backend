@@ -57,8 +57,8 @@ const getClientCodeAndName = async (id) => {
 }
 
 exports.OnNfcAndPinCode = async (req, res) => {
-  const { pinCode, nfcCardId } = req.body;
-  if (!pinCode || !nfcCardId) {
+  const { nfcCardId } = req.body;
+  if (!nfcCardId) {
     res.status(400).send({ message: 'Content can not be empty!' });
     return;
   }

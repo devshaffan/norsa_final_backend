@@ -9,7 +9,7 @@ const config = {
       host: 'localhost',
       database: 'norsa',
       username: 'root',
-      password: 'root',
+      password: '',
       dialect: 'mysql',
       port: 3306,
       pool: {

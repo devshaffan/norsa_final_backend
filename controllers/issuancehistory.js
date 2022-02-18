@@ -63,7 +63,7 @@ exports.OnNfcAndPinCode = async (req, res) => {
     return;
   }
   const data = await models.issuancehistory.findOne({
-    where: { NfcCard_id: nfcCardId, Pincode: pinCode },
+    where: { NfcCard_id: nfcCardId },
     order: [['DateTime', 'DESC']]
   })
   if (!data) {
@@ -79,6 +79,8 @@ exports.OnNfcAndPinCode = async (req, res) => {
 
   if (multipleIssuancesList.length == 0) {
     if (!data.Client_id) {
+
+
       res.json({ message: 'success', error: "Client ID doesnt exist" })
       return
     }

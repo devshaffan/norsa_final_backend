@@ -31,6 +31,13 @@ module.exports = function (sequelize) {
         dateDeposit: {
             type: Sequelize.DATE,
             allowNull: true,
+        },
+        handledBy : {
+            type: Sequelize.STRING(45),
+            references: {
+                model: 'client',
+                key: 'id'
+            }
         }
     }, {
         timestamps: true,

@@ -53,7 +53,7 @@ const getNumberOfMonthsAndInterest = async (issuancehistoryId, merchantId) => {
         }
     })
     if (!merchanttypediscount) return null
-    return { NumberOfMonths: merchanttypediscount.NumberOfMonths, Interest: merchanttypediscount.Interest }
+    return merchanttypediscount.Interest
 }
 const getInterestOn = async (Merchant_ID) => {
     const merchantData = await models.merchants.findOne({
@@ -83,8 +83,8 @@ const handleTransactionEntry = async (row) => {
     if (!interestOn) return null
     var AmountUser = parseFloat(row.AmountUser)
     if (interestOn.toLocaleLowerCase() == "client") {
-        const { NumberOfMonths, Interest } = await getNumberOfMonthsAndInterest(row.issuancehistoryId, row.Merchant_ID)
-        if (!NumberOfMonths || !Interest) return null
+        const Interest = await getNumberOfMonthsAndInterest(row.issuancehistoryId, row.Merchant_ID)
+        if (!Interest) return null
         AmountUser = AmountUser + AmountUser * parseFloat(Interest) / 100
     }
     await updatePayback(row.issuancehistoryId, AmountUser)

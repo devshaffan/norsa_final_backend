@@ -57,13 +57,13 @@ const getClientCodeAndName = async (id) => {
 }
 
 exports.OnNfcAndPinCode = async (req, res) => {
-  const { pinCode, nfcCardId } = req.body;
-  if (!pinCode || !nfcCardId) {
+  const { nfcCardId } = req.body;
+  if (!nfcCardId) {
     res.status(400).send({ message: 'Content can not be empty!' });
     return;
   }
   const data = await models.issuancehistory.findOne({
-    where: { NfcCard_id: nfcCardId, Pincode: pinCode },
+    where: { NfcCard_id: nfcCardId },
     order: [['DateTime', 'DESC']]
   })
   if (!data) {
@@ -79,6 +79,8 @@ exports.OnNfcAndPinCode = async (req, res) => {
 
   if (multipleIssuancesList.length == 0) {
     if (!data.Client_id) {
+
+
       res.json({ message: 'success', error: "Client ID doesnt exist" })
       return
     }
@@ -87,7 +89,7 @@ exports.OnNfcAndPinCode = async (req, res) => {
       res.json({ message: 'success', error: "Client doesnt exist" })
       return
     }
-    const clientCodeAndFullName = { Code: client.Code, FullName: client.FirstName + " " + client.LastName }
+    const clientCodeAndFullName = { Code: client.Code, FullName: client.FirstName + " " + client.LastName, numberOfMonths: 1 }
     res.json({ message: 'success', data: { data, clientCodeAndFullName } })
     return;
   }
@@ -117,10 +119,18 @@ exports.OnNfcAndPinCode = async (req, res) => {
     res.json({ message: 'success', error: "Client doesnt exist" })
     return
   }
-  const clientCodeAndFullName = { Code: client.Code, FullName: client.FirstName + " " + client.LastName }
+  const numberOfMonths = await getNumberOfMonths(multipleIssuancesList[0].numberOfMonthsId)
+  const clientCodeAndFullName = { Code: client.Code, FullName: client.FirstName + " " + client.LastName, numberOfMonths }
   res.json({ message: 'success', data: { data, clientCodeAndFullName } })
 }
 
+const getNumberOfMonths = async (id) => {
+  const data = await models.merchanttypediscount.findByPk(id)
+  if (data) {
+    return data.NumberOfMonths
+  }
+  return null
+}
 
 
 exports.getIssueanceHistyByClientId = (req, res) => {

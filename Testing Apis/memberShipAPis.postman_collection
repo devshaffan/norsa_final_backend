@@ -1,0 +1,372 @@
+{
+	"info": {
+		"_postman_id": "77b82026-6081-45a0-a094-8e79b74c5075",
+		"name": "For Export",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Membership",
+			"item": [
+				{
+					"name": "getAllMembership",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImRlMjM0M2FmLTEyMTAtNGYyMS05YTdmLWY3MjcxNmFlZGY3ZSIsImVtYWlsIjoiYWRtaW5AZ21haWwuY29tIiwiaWF0IjoxNjQ1MTE5MDg2LCJleHAiOjE2NDUyMDkwODZ9.VUz59jhFJttGDgBgoJb-8pjpV0c94hVuxkTLTLfmtrU",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/x-www-form-urlencoded"
+							}
+						],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "title",
+									"value": "asdafnkdsnlfnladksnfl; knf;lna;lknf lknaldnfk;ndalsnfl;nonewoi;fnaownf;oieoifoewoifewoijfiojeawoijfoiejwoiasdafnkdsnlfnladksnfl; knf;lna;lknf lknaldnfk;ndalsnfl;nonewoi;fnaownf;oieoifoewoifewoijfiojeawoijfoiejwoiasdafnkdsnlfnladksnfl; knf;lna;lknf lknaldnfk;ndalsnfl;nonewoi;fnaownf;oieoifoewoifewoijfiojeawoijfoiejwoiasdafnkdsnlfnladksnfl; knf;lna;lknf lknaldnfk;ndalsnfl;nonewoi;fnaownf;oieoifoewoifewoijfiojeawoijfoiejwoiasdafnkdsnlfnladksnfl; knf;lna;lknf lknaldnfk;ndalsnfl;nonewoi;fnaownf;oieoifoewoifewoijfiojeawoijfoiejwoiasdafnkdsnlfnladksnfl; knf;lna;lknf lknaldnfk;ndalsnfl;nonewoi;fnaownf;oieoifoewoifewoijfiojeawoijfoiejwoiasdafnkdsnlfnladksnfl; knf;lna;lknf lknaldnfk;ndalsnfl;nonewoi;fnaownf;oieoifoewoifewoijfiojeawoijfoiejwoiasdafnkdsnlfnladksnfl; knf;lna;lknf lknaldnfk;ndalsnfl;nonewoi;fnaownf;oieoifoewoifewoijfiojeawoijfoiejwoiasdafnkdsnlfnladksnfl; knf;lna;lknf lknaldnfk;ndalsnfl;nonewoi;fnaownf;oieoifoewoifewoijfiojeawoijfoiejwoi",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "id",
+									"value": "1",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "title",
+									"value": "xzcsczscds",
+									"type": "text",
+									"disabled": true
+								}
+							]
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/membership/getAllMembership",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"membership",
+								"getAllMembership"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getAllMembershipByClientId",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImRlMjM0M2FmLTEyMTAtNGYyMS05YTdmLWY3MjcxNmFlZGY3ZSIsImVtYWlsIjoiYWRtaW5AZ21haWwuY29tIiwiaWF0IjoxNjQ1MTE5MDg2LCJleHAiOjE2NDUyMDkwODZ9.VUz59jhFJttGDgBgoJb-8pjpV0c94hVuxkTLTLfmtrU",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/x-www-form-urlencoded"
+							}
+						],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "title",
+									"value": "asdafnkdsnlfnladksnfl; knf;lna;lknf lknaldnfk;ndalsnfl;nonewoi;fnaownf;oieoifoewoifewoijfiojeawoijfoiejwoiasdafnkdsnlfnladksnfl; knf;lna;lknf lknaldnfk;ndalsnfl;nonewoi;fnaownf;oieoifoewoifewoijfiojeawoijfoiejwoiasdafnkdsnlfnladksnfl; knf;lna;lknf lknaldnfk;ndalsnfl;nonewoi;fnaownf;oieoifoewoifewoijfiojeawoijfoiejwoiasdafnkdsnlfnladksnfl; knf;lna;lknf lknaldnfk;ndalsnfl;nonewoi;fnaownf;oieoifoewoifewoijfiojeawoijfoiejwoiasdafnkdsnlfnladksnfl; knf;lna;lknf lknaldnfk;ndalsnfl;nonewoi;fnaownf;oieoifoewoifewoijfiojeawoijfoiejwoiasdafnkdsnlfnladksnfl; knf;lna;lknf lknaldnfk;ndalsnfl;nonewoi;fnaownf;oieoifoewoifewoijfiojeawoijfoiejwoiasdafnkdsnlfnladksnfl; knf;lna;lknf lknaldnfk;ndalsnfl;nonewoi;fnaownf;oieoifoewoifewoijfiojeawoijfoiejwoiasdafnkdsnlfnladksnfl; knf;lna;lknf lknaldnfk;ndalsnfl;nonewoi;fnaownf;oieoifoewoifewoijfiojeawoijfoiejwoiasdafnkdsnlfnladksnfl; knf;lna;lknf lknaldnfk;ndalsnfl;nonewoi;fnaownf;oieoifoewoifewoijfiojeawoijfoiejwoi",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "id",
+									"value": "1",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "title",
+									"value": "xzcsczscds",
+									"type": "text",
+									"disabled": true
+								}
+							]
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/membership/getMembershipById/1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"membership",
+								"getMembershipById",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getMembershipById",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImRlMjM0M2FmLTEyMTAtNGYyMS05YTdmLWY3MjcxNmFlZGY3ZSIsImVtYWlsIjoiYWRtaW5AZ21haWwuY29tIiwiaWF0IjoxNjQ1MTE5MDg2LCJleHAiOjE2NDUyMDkwODZ9.VUz59jhFJttGDgBgoJb-8pjpV0c94hVuxkTLTLfmtrU",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/x-www-form-urlencoded"
+							}
+						],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "title",
+									"value": "asdafnkdsnlfnladksnfl; knf;lna;lknf lknaldnfk;ndalsnfl;nonewoi;fnaownf;oieoifoewoifewoijfiojeawoijfoiejwoiasdafnkdsnlfnladksnfl; knf;lna;lknf lknaldnfk;ndalsnfl;nonewoi;fnaownf;oieoifoewoifewoijfiojeawoijfoiejwoiasdafnkdsnlfnladksnfl; knf;lna;lknf lknaldnfk;ndalsnfl;nonewoi;fnaownf;oieoifoewoifewoijfiojeawoijfoiejwoiasdafnkdsnlfnladksnfl; knf;lna;lknf lknaldnfk;ndalsnfl;nonewoi;fnaownf;oieoifoewoifewoijfiojeawoijfoiejwoiasdafnkdsnlfnladksnfl; knf;lna;lknf lknaldnfk;ndalsnfl;nonewoi;fnaownf;oieoifoewoifewoijfiojeawoijfoiejwoiasdafnkdsnlfnladksnfl; knf;lna;lknf lknaldnfk;ndalsnfl;nonewoi;fnaownf;oieoifoewoifewoijfiojeawoijfoiejwoiasdafnkdsnlfnladksnfl; knf;lna;lknf lknaldnfk;ndalsnfl;nonewoi;fnaownf;oieoifoewoifewoijfiojeawoijfoiejwoiasdafnkdsnlfnladksnfl; knf;lna;lknf lknaldnfk;ndalsnfl;nonewoi;fnaownf;oieoifoewoifewoijfiojeawoijfoiejwoiasdafnkdsnlfnladksnfl; knf;lna;lknf lknaldnfk;ndalsnfl;nonewoi;fnaownf;oieoifoewoifewoijfiojeawoijfoiejwoi",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "id",
+									"value": "1",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "title",
+									"value": "xzcsczscds",
+									"type": "text",
+									"disabled": true
+								}
+							]
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/membership/getAllMembershipByClientId/D-200",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"membership",
+								"getAllMembershipByClientId",
+								"D-200"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "createMembership",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImRlMjM0M2FmLTEyMTAtNGYyMS05YTdmLWY3MjcxNmFlZGY3ZSIsImVtYWlsIjoiYWRtaW5AZ21haWwuY29tIiwiaWF0IjoxNjQ1MTE5MDg2LCJleHAiOjE2NDUyMDkwODZ9.VUz59jhFJttGDgBgoJb-8pjpV0c94hVuxkTLTLfmtrU",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/x-www-form-urlencoded"
+							}
+						],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "amount",
+									"value": "100",
+									"type": "text"
+								},
+								{
+									"key": "clientFk",
+									"value": "D-200",
+									"type": "text"
+								},
+								{
+									"key": "month",
+									"value": "August",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/membership/createMembership",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"membership",
+								"createMembership"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "updateMembership",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImRlMjM0M2FmLTEyMTAtNGYyMS05YTdmLWY3MjcxNmFlZGY3ZSIsImVtYWlsIjoiYWRtaW5AZ21haWwuY29tIiwiaWF0IjoxNjQ1MTE5MDg2LCJleHAiOjE2NDUyMDkwODZ9.VUz59jhFJttGDgBgoJb-8pjpV0c94hVuxkTLTLfmtrU",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/x-www-form-urlencoded"
+							}
+						],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "amount",
+									"value": "1000",
+									"type": "text"
+								},
+								{
+									"key": "clientFk",
+									"value": "D-200",
+									"type": "text"
+								},
+								{
+									"key": "month",
+									"value": "August",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/membership/updateMembership/575f50a2-b841-4e08-b510-d24dde54e18e",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"membership",
+								"updateMembership",
+								"575f50a2-b841-4e08-b510-d24dde54e18e"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "deleteMembership",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImRlMjM0M2FmLTEyMTAtNGYyMS05YTdmLWY3MjcxNmFlZGY3ZSIsImVtYWlsIjoiYWRtaW5AZ21haWwuY29tIiwiaWF0IjoxNjQ1MTE5MDg2LCJleHAiOjE2NDUyMDkwODZ9.VUz59jhFJttGDgBgoJb-8pjpV0c94hVuxkTLTLfmtrU",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/x-www-form-urlencoded"
+							}
+						],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "amount",
+									"value": "1000",
+									"type": "text"
+								},
+								{
+									"key": "clientFk",
+									"value": "D-200",
+									"type": "text"
+								},
+								{
+									"key": "month",
+									"value": "August",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/membership/deleteMembership/575f50a2-b841-4e08-b510-d24dde54e18e",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"membership",
+								"deleteMembership",
+								"575f50a2-b841-4e08-b510-d24dde54e18e"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}

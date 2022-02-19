@@ -37,4 +37,7 @@ module.exports = function (app) {
   app.use('/api/multipleIssueances', multipleIssueances);
   app.use('/api/transactionHistory', transectionHistoryRouter);
   app.use('/api/paybackPeriod', require('./paybackPeriod'));
+  app.use('/api/insurance', require('./insurance'));
+  app.use('/api/membership', require('./membership'));
+
 };

@@ -67,13 +67,13 @@ exports.OnNfcAndPinCode = async (req, res) => {
     order: [['DateTime', 'DESC']]
   })
   if (!data) {
-    res.status(400).send({ message: 'success', error: "Nfc Card Id and PinCode doesnt match" })
+    res.status(400).send({ message: 'success', error: "Invalid Card!" })
     return
   }
   const multipleIssuancesList = await checkIfMerchantExists(data.id)
 
   if (!multipleIssuancesList) {
-    res.status(400).send({ message: 'success', error: "Merchant doesnt exist" })
+    res.status(400).send({ message: 'success', error: "Invalid Card!" })
     return
   }
 
@@ -81,12 +81,12 @@ exports.OnNfcAndPinCode = async (req, res) => {
     if (!data.Client_id) {
 
 
-      res.status(400).send({ message: 'success', error: "Client ID doesnt exist" })
+      res.status(400).send({ message: 'success', error: "Invalid Card!" })
       return
     }
     const client = await getClientCodeAndName(data.Client_id)
     if (!client) {
-      res.status(400).send({ message: 'success', error: "Client doesnt exist" })
+      res.status(400).send({ message: 'success', error: "Invalid Card!" })
       return
     }
     const clientCodeAndFullName = { Code: client.Code, FullName: client.FirstName + " " + client.LastName, numberOfMonths: 1 }
@@ -98,7 +98,7 @@ exports.OnNfcAndPinCode = async (req, res) => {
   })
   const users = await getUsersAgainstAnyMerchant(merchants)
   if (!users || users.length == 0) {
-    res.status(400).send({ message: 'success', error: "Client doesnt exist" })
+    res.status(400).send({ message: 'success', error: "Invalid Card!" })
     return
   }
   const userIds = users.map((item) => {
@@ -107,16 +107,16 @@ exports.OnNfcAndPinCode = async (req, res) => {
   const token = _.get(req.headers, 'authorization', null).split(' ')[1]
   const authorized = await checkIfUserAuthorized(userIds, token)
   if (!authorized) {
-    res.status(400).send({ message: 'success', error: "Not Authorized" })
+    res.status(400).send({ message: 'success', error: "Invalid Card!" })
     return;
   }
   if (!data.Client_id) {
-    res.status(400).send({ message: 'success', error: "Client ID doesnt exist" })
+    res.status(400).send({ message: 'success', error: "Invalid Card!" })
     return
   }
   const client = await getClientCodeAndName(data.Client_id)
   if (!client) {
-    res.status(400).send({ message: 'success', error: "Client doesnt exist" })
+    res.status(400).send({ message: 'success', error: "Invalid Card!" })
     return
   }
   const numberOfMonths = await getNumberOfMonths(multipleIssuancesList[0].numberOfMonthsId)

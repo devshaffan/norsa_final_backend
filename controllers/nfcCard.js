@@ -8,7 +8,7 @@ exports.getAllNfcCards = (req, res) => {
     .findAll({
       limit, offset,
       order: [
-        [sequelize.cast(sequelize.col('number'), 'INT'), 'ASC'],
+        [sequelize.cast(sequelize.col('number'), 'SIGNED'), 'ASC'],
       ],
     })
     .then((data) => {

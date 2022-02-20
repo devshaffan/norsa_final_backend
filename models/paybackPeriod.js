@@ -28,6 +28,10 @@ module.exports = function (sequelize) {
             type: Sequelize.STRING(45),
             allowNull: true
         },
+        remarks: {
+            type: Sequelize.STRING(200),
+            allowNull: true
+        },
         dateDeposit: {
             type: Sequelize.DATE,
             allowNull: true,
@@ -38,6 +42,14 @@ module.exports = function (sequelize) {
                 model: 'client',
                 key: 'id'
             }
+        },
+        handledByUserId: {
+          type: Sequelize.STRING,
+          allowNull: true,
+          references: {
+            model: 'users',
+            key: 'id'
+          }
         }
     }, {
         timestamps: true,

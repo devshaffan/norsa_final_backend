@@ -43,7 +43,7 @@ exports.getMerchantNameByUserId = async (req, res) => {
   if (!authorizedUser) {
     res.status(500).send({
       message:
-        err.message || 'Some error occurred while retrieving merchants Record .',
+        'user doesnt exist .',
     });
   }
   const merchant = await models.merchants.findOne({
@@ -55,7 +55,7 @@ exports.getMerchantNameByUserId = async (req, res) => {
   if (!merchant) {
     res.status(500).send({
       message:
-        err.message || 'Some error occurred while retrieving merchants Record .',
+        'No merchant exist .',
     });
     return
   }

@@ -18,6 +18,26 @@ exports.getTransactionHistoryById = (req, res) => {
         });
     });
 };
+exports.getTransactionHistoryByClientId = (req, res) => {
+    const Client_id = req.params.id;
+    if (!Client_id) {
+        res.status(400).send({
+            message: 'id is required'
+        });
+    }
+    models.transactionhistory.findAll({
+        where: {
+            Client_id: Client_id
+        }
+    }).then(data => {
+        res.json({ message: 'success', data });
+    }).catch(err => {
+        res.status(500).send({
+            message: 'error',
+            error: err
+        });
+    });
+};
 // ON TRANSACTION FUNCTIONALITY START // ON TRANSACTION FUNCTIONALITY START // ON TRANSACTION FUNCTIONALITY START // ON TRANSACTION FUNCTIONALITY START // ON TRANSACTION FUNCTIONALITY START // ON TRANSACTION FUNCTIONALITY START 
 // ON TRANSACTION FUNCTIONALITY START // ON TRANSACTION FUNCTIONALITY START // ON TRANSACTION FUNCTIONALITY START // ON TRANSACTION FUNCTIONALITY START // ON TRANSACTION FUNCTIONALITY START 
 const updatePayback = async (issuancehistory_Id, AmountUser) => {

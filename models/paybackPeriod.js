@@ -36,13 +36,6 @@ module.exports = function (sequelize) {
             type: Sequelize.DATE,
             allowNull: true,
         },
-        handledBy : {
-            type: Sequelize.STRING(45),
-            references: {
-                model: 'client',
-                key: 'id'
-            }
-        },
         handledByUserId: {
           type: Sequelize.STRING,
           allowNull: true,

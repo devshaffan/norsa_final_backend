@@ -45,11 +45,11 @@ exports.deleteUser = (req, res) => {
 }
 exports.getUserById = (req, res) => {
     // const clientId = req.params.id;
-    // console.log('id is ', Number.parseInt(clientId, 10));
+    // //console.log('id is ', Number.parseInt(clientId, 10));
     models.user
         .findByPk(req.params.id)
         .then((data) => {
-            console.log(data);
+            //console.log(data);
             res.json(data);
         })
         .catch((err) => {
@@ -62,7 +62,7 @@ exports.getUserById = (req, res) => {
 
 exports.getUserByEmail= (req, res) => {
     // const clientId = req.params.id;
-    // console.log('id is ', Number.parseInt(clientId, 10));
+    // //console.log('id is ', Number.parseInt(clientId, 10));
     models.user
         .find({
             where : {
@@ -70,7 +70,7 @@ exports.getUserByEmail= (req, res) => {
             }
         })
         .then((data) => {
-            console.log(data);
+            //console.log(data);
             res.json(data);
         })
         .catch((err) => {

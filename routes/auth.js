@@ -4,7 +4,7 @@ const auth = require('../controllers/auth');
 const reduceUserData = require('../utils/reduceUserData');
 const validator = require('../utils/validator');
 const passport = require('passport');
-
+const loggedInUsers = [];
 router.post( '/signup', ( req, res, next ) => {
   const { email, password, isAdmin } = req.body;
   const emailValidation = validator.isValidEmail( email );
@@ -51,15 +51,28 @@ router.post('/login', (req, res, next) => {
     }
     return req.logIn(user, (errLogin) => {
       if (err) { return next(errLogin); }
+      //will use set here to make sure unique 
+      // loggedInUsers.push(user.id:{
+      //   expires: Date.now() + (60*1500*1000)
+      // }
+      //     ,
+      //     userId: );
       return res.status(200).json({ result: 'ok', data: reduceUserData(user) });
     });
   })(req, res, next);
 });
 router.get('/logout', (req, res) => {
-  if (!req.isAuthenticated()) {
-    return res.status(401).send({ result: 'error', message: 'Not authorized' });
+   loggedInUsers.splice(loggedInUsers.indexOf(req.user.id), 1);
+});
+router.get('/loggedInUsers', (req, res) => {
+  //console.log(loggedInUsers.length);
+  loggedInUsers.forEach(user => {
+    if(user.expires < Date.now()) {
+      loggedInUsers.splice(loggedInUsers.indexOf(req.user.id), 1);
   }
-  return req.session.destroy(() => res.redirect('/'));
+  });
+  //console.log(loggedInUsers.length);
+  return res.status(200).json({ result: 'ok', data: loggedInUsers.length });
 });
 
 // apis

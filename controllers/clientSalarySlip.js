@@ -89,7 +89,7 @@ exports.delete = (req, res) => {
 };
 
 exports.addFile = (req, res) => {
-    // console.log("id is Salary" + req.file)
+    // //console.log("id is Salary" + req.file)
     // if (!req.body.id) {
     //     res.status(400).send({ message: 'Content can not be empty!' });
     //     return;
@@ -105,7 +105,7 @@ exports.addFile = (req, res) => {
     var file1Path;
     s3.upload(params, (err, data) => {
         if (err) {
-            console.log('Error occured while trying to upload to S3 bucket', err);
+            //console.log('Error occured while trying to upload to S3 bucket', err);
         }
         if (data) {
             fs.unlinkSync(req.files['file1'][0].path); // Empty temp folder
@@ -119,7 +119,7 @@ exports.addFile = (req, res) => {
             var file2Path;
             s3.upload(params, (err, data) => {
                 if (err) {
-                    console.log('Error occured while trying to upload to S3 bucket', err);
+                    //console.log('Error occured while trying to upload to S3 bucket', err);
                 }
                 if (data) {
                     fs.unlinkSync(req.files['file2'][0].path); // Empty temp folder

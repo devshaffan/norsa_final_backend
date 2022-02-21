@@ -11,6 +11,7 @@ const whiteList = [
   '/api/public/clientProfilePicture/createImage',
   '/api/auth/signup',
   '/api/auth/login',
+  '/api/auth/loggedInUsers',
   '/api/auth/confirm-email',
   '/api/auth/confirm-email/deeplink',
   '/api/auth/forgot-password',

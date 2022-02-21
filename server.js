@@ -63,13 +63,13 @@ passportInitialize(passport, user);
 app.use(authMiddleWare);
 routeInitialize(app);
 //require("util").inspect.defaultOptions.depth = null;
-//console.log(JSON.stringify(listEndpoints(app)));
+////console.log(JSON.stringify(listEndpoints(app)));
 // if (process.env.NODE_ENV === 'development') {
 //   server.listen(config.app.port, () => {
-//     console.log('Server listening at port %d', config.app.port);
+//     //console.log('Server listening at port %d', config.app.port);
 //   });
 // } else {
 //   server.listen(config.app.port, () => {
-//     console.log('SSL server is running at ', config.app.port);
+//     //console.log('SSL server is running at ', config.app.port);
 //   });
 // }

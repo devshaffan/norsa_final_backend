@@ -85,14 +85,14 @@ module.exports = function (passport, User) {
         //         html: text
         //       }
         //     ).then(() => {
-        //       console.log('mail sent success: ');
+        //       //console.log('mail sent success: ');
         //     }).catch(err => {
-        //       console.log('mail send error: ', err);
+        //       //console.log('mail send error: ', err);
         //     });
         //     return done(null, newUser);
         //   })
         //   .catch(error => {
-        //     console.log(error);
+        //     //console.log(error);
         //     return done(null, false, {
         //       message: reduceErrorMessage(error)
         //     });
@@ -160,13 +160,13 @@ module.exports = function (passport, User) {
           return done(null, userData);
         })
         .catch(err => {
-          console.log('Error while update access token for login', err);
+          //console.log('Error while update access token for login', err);
           return done(null, false, {
             message: 'Something went wrong while login'
           });
         });
     }).catch((err) => {
-      console.log('Error: ', err);
+      //console.log('Error: ', err);
       return done(null, false, {
         message: 'Something went wrong'
       });

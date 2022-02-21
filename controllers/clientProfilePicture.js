@@ -11,7 +11,7 @@ exports.getImageById = (req, res) => {
   models.clientProfilePicture
     .findByPk(req.params.id)
     .then((data) => {
-      console.log(data);
+      //console.log(data);
       const file = path.join(__dirname, "../public/images/", data.filePath);
       res.download(file); // Set disposition and send it.
     })
@@ -91,7 +91,7 @@ exports.createImage = async (req, res) => {
   };
   s3.upload(params, (err, data) => {
     if (err) {
-      console.log('Error occured while trying to upload to S3 bucket', err);
+      //console.log('Error occured while trying to upload to S3 bucket', err);
     }
     if (data) {
       fs.unlinkSync(req.file.path); // Empty temp folder
@@ -130,5 +130,5 @@ exports.createImage = async (req, res) => {
 //     await user.save();
 //     res.json(user);
 //   } catch (err) {
-//     console.log(err);
+//     //console.log(err);
 //   }}); 

@@ -7,7 +7,7 @@ exports.getAllClients = (req, res) => {
   models.client
     .findAll({ limit, offset })
     .then((data) => {
-      console.log(data);
+      //console.log(data);
       res.json(data);
     })
     .catch((err) => {
@@ -27,7 +27,7 @@ exports.getAllClientsByDealer = (req, res) => {
       }
     })
     .then((data) => {
-      console.log(data);
+      //console.log(data);
       res.json(data);
     })
     .catch((err) => {
@@ -42,7 +42,7 @@ exports.getNextK_Id = (req, res) => {
   models.client
     .findAll({ attributes: ['id'] })
     .then((data) => {
-      console.log(data);
+      //console.log(data);
       let k_Ids = data.filter((item, index) => {
         if (item.id[0] == 'k' || item.id[0] == 'K')
           return item
@@ -86,7 +86,7 @@ exports.getNextNK_Id = (req, res) => {
   models.client
     .findAll({ attributes: ['id'] })
     .then((data) => {
-      console.log(data);
+      //console.log(data);
 
       let k_Ids = data.filter((item, index) => {
         if (item.id.includes("nk") || item.id.includes("NK"))
@@ -124,7 +124,7 @@ exports.getNextD_Id = (req, res) => {
   models.client
     .findAll({ attributes: ['id'] })
     .then((data) => {
-      console.log(data);
+      //console.log(data);
       let D_Ids = data.filter((item, index) => {
         if (item.id.includes("d") || item.id.includes("D"))
           return item
@@ -167,7 +167,7 @@ exports.getAllActiveClients = (req, res) => {
       }
     })
     .then((data) => {
-      console.log(data);
+      //console.log(data);
       data = data.filter((item) => {
         if (item.id.includes("d") || item.id.includes("D")) {
           return item.Code
@@ -194,7 +194,7 @@ exports.getAllActiveAllClients = (req, res) => {
       }
     })
     .then((data) => {
-      console.log(data);
+      //console.log(data);
       data = data.map((item) => { return { id: item.id, Code: item.Code } })
       res.json(data);
     })
@@ -208,11 +208,11 @@ exports.getAllActiveAllClients = (req, res) => {
 
 exports.getClientById = (req, res) => {
   const clientId = req.params.id;
-  console.log('id is ', Number.parseInt(clientId, 10));
+  //console.log('id is ', Number.parseInt(clientId, 10));
   models.client
     .findByPk(req.params.id)
     .then((data) => {
-      console.log(data);
+      //console.log(data);
       res.json(data);
     })
     .catch((err) => {

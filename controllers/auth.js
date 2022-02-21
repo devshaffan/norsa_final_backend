@@ -52,15 +52,15 @@ exports.confirmEmail = (req, res) => {
           html: text
         }
       ).then(() => {
-        console.log('Mail sent successfully');
+        //console.log('Mail sent successfully');
       }).catch(err => {
-        console.log('Mail send error: ', err);
+        //console.log('Mail send error: ', err);
       });
       return res.status(200).send({ result: 'ok', message: 'Email verified. Your account is active now' });
     }
     return res.status(400).send({ result: 'error', message: 'Invalid email confirm code' });
   }).catch(err => {
-    console.log(err);
+    //console.log(err);
     return res.status(400).send({ result: 400, message: err.toSting() });
   });
 };
@@ -103,11 +103,11 @@ exports.forgotPassword = (req, res) => {
         html: text
       }
     ).catch(err => {
-      console.log('mail send error: ', err);
+      //console.log('mail send error: ', err);
     });
     return res.status(200).send({ result: 'ok', message: 'We sent reset password token to your email.' });
   }).catch(err => {
-    console.log(err);
+    //console.log(err);
     return res.status(400).send({ result: 'error', message: reduceErrorMessage(err) });
   });
 };
@@ -167,12 +167,12 @@ exports.resetPassword = (req, res) => {
         html: text
       }
     ).catch(err => {
-      console.log('mail send error: ', err);
+      //console.log('mail send error: ', err);
     });
 
     return res.json({ result: 'ok', message: 'Password changed' });
   }).catch(err => {
-    console.log(err);
+    //console.log(err);
     return res.status(400).send({ result: 'ok', message: reduceErrorMessage(err) });
   });
 };
@@ -214,12 +214,12 @@ exports.changePassword = (req, res) => {
         html: text
       }
     ).catch(err => {
-      console.log('mail send error: ', err);
+      //console.log('mail send error: ', err);
     });
 
     return res.json({ result: 'ok', message: 'Password changed' });
   }).catch(err => {
-    console.log(err);
+    //console.log(err);
     return res.status(400).send({ result: 'ok', message: reduceErrorMessage(err) });
   });
 };
@@ -257,7 +257,7 @@ exports.validateResetPassword = (req, res) => {
 
     return res.json({ result: 'ok' });
   }).catch(err => {
-    console.log(err);
+    //console.log(err);
     return res.status(400).send({ result: 'ok', message: reduceErrorMessage(err) });
   });
 };
@@ -298,11 +298,11 @@ exports.refreshSession = async (req, res) => {
       return res.status(200).json({ result: 'ok', data: userData });
     })
     .catch(err => {
-      console.log('Error while update access token for login', err);
+      //console.log('Error while update access token for login', err);
       return res.status(400).json({ result: 'ok', message: 'Error in login' });
     });
   } catch (error) {
-    console.log('Error in refresh token');
+    //console.log('Error in refresh token');
     return res.status(403).send({ result: 'error', message: reduceErrorMessage(error) });
   }
 };
@@ -338,10 +338,10 @@ exports.verificationEmail = async (req, res) => {
         html: text
       }
     ).then(() => {
-      console.log('Resent email verification code');
+      //console.log('Resent email verification code');
       return res.json({ result: 'ok', data: 'We sent email verification link to your email.' });
     }).catch(err => {
-      console.log('mail send error: ', err);
+      //console.log('mail send error: ', err);
       return res.status(400).send({
         result: 'error',
         message: 'Error in sending email verification code'
@@ -349,7 +349,7 @@ exports.verificationEmail = async (req, res) => {
     });
   })
   .catch(err => {
-    console.log('Error while update access token for login', err);
+    //console.log('Error while update access token for login', err);
     return res.status(400).send({
       result: 'error',
       message: 'Error while update user'

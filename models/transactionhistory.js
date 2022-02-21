@@ -9,18 +9,10 @@ module.exports = function (sequelize) {
     Client_id: {
       type: Sequelize.STRING(45),
       allowNull: false,
-      references: {
-        model: 'client',
-        key: 'id'
-      }
     },
-    MerchantTypeDiscount_ID: {
+    Merchant_ID: {
       type: Sequelize.STRING(45),
       allowNull: false,
-      references: {
-        model: 'merchanttypediscount',
-        key: 'id'
-      }
     },
     ItemDescription: {
       type: Sequelize.STRING(45),
@@ -33,6 +25,14 @@ module.exports = function (sequelize) {
     AmountUser: {
       type: Sequelize.INTEGER,
       allowNull: true
+    },
+    issuancehistoryId: {
+      type: Sequelize.STRING(45),
+      references: {
+        model: 'issuancehistory',
+        key: 'id'
+      }
+
     }
   }, {
     sequelize,
@@ -54,13 +54,13 @@ module.exports = function (sequelize) {
           { name: 'Client_id' },
         ]
       },
-      {
-        name: 'fk_TransactionHistory_MerchantTypeDiscount1_idx',
-        using: 'BTREE',
-        fields: [
-          { name: 'MerchantTypeDiscount_ID' },
-        ]
-      },
+      // {
+      //   name: 'fk_TransactionHistory_MerchantTypeDiscount1_idx',
+      //   using: 'BTREE',
+      //   fields: [
+      //     { name: 'MerchantTypeDiscount_ID' },
+      //   ]
+      // },
     ]
   }, {
     timestamps: true,

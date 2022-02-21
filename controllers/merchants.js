@@ -1,5 +1,7 @@
 const models = require('../models/index');
 const uuidV4 = require('uuid/v4');
+const _ = require('lodash');
+
 exports.getAllMerchants = (req, res) => {
   const limit = req.params.limit ? null : 1000;
   const offset = req.params.offset ? null : 0;
@@ -29,9 +31,41 @@ exports.getMerchantById = (req, res) => {
       });
     });
 };
+exports.getMerchantNameByUserId = async (req, res) => {
+  const token = _.get(req.headers, 'authorization', null).split(' ')[1]
+
+  const authorizedUser = await models.user.findOne({
+    attributes: ['id'],
+    where: {
+      accessToken: token
+    }
+  })
+  if (!authorizedUser) {
+    res.status(500).send({
+      message:
+        'user doesnt exist .',
+    });
+  }
+  const merchant = await models.merchants.findOne({
+    attributes: ['Name'],
+    where: {
+      User_id: authorizedUser.id,
+    }
+  })
+  if (!merchant) {
+    res.status(500).send({
+      message:
+        'No merchant exist .',
+    });
+    return
+  }
+  res.json(merchant);
+  return
+}
+
 
 exports.createMerchant = (req, res) => {
-  
+
   if (!req.body.id) {
     res.status(400).send({ message: 'Content can not be empty!' });
     return;
@@ -97,7 +131,7 @@ exports.getAllMerchantTypes = (req, res) => {
   const limit = req.params.limit ? null : 10000;
   const offset = req.params.offset ? null : 0;
   models.merchanttype
-    .findAll({  })
+    .findAll({})
     .then((data) => {
       res.json(data);
     })
@@ -219,8 +253,8 @@ exports.getMerchantTypeDiscountById = (req, res) => {
 exports.getMerchantTypeDiscountByMerchantType_id = (req, res) => {
   models.merchanttypediscount
     .findAll({
-      where : {
-        MerchantType_id : req.params.MerchantType_id
+      where: {
+        MerchantType_id: req.params.MerchantType_id
       }
     })
     .then((data) => {
@@ -306,7 +340,7 @@ exports.deleteMerchantTypeDiscountByMerchantType_id = (req, res) => {
   models.merchanttypediscount
     .destroy({
       where: {
-        MerchantType_id : id
+        MerchantType_id: id
       },
     })
     .then((num) => {

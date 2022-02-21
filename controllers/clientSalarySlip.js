@@ -2,6 +2,7 @@ const fs = require('fs')
 const models = require('../models/index');
 const s3 = require("../config/aws")
 const path = require('path')
+const uuidV4 = require('uuid/v4');
 
 
 
@@ -88,11 +89,13 @@ exports.delete = (req, res) => {
 };
 
 exports.addFile = (req, res) => {
-    console.log("id is Salary" + req.file)
-    if (!req.body.id) {
-        res.status(400).send({ message: 'Content can not be empty!' });
-        return;
-    }
+    // console.log("id is Salary" + req.file)
+    // if (!req.body.id) {
+    //     res.status(400).send({ message: 'Content can not be empty!' });
+    //     return;
+    // }
+    const id = uuidV4()
+
     var params = {
         ACL: 'public-read',
         Bucket: process.env.BUCKET_NAME || "norsa",
@@ -124,7 +127,7 @@ exports.addFile = (req, res) => {
                     var insertData = {
                         file1Path: file1Path,
                         file2Path: file2Path,
-                        id: req.body.id,
+                        id: id,
                         Client_id: req.body.Client_id
                     }
                     models.clientSalarySlip

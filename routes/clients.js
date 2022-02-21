@@ -10,6 +10,7 @@ router.get('/getAllClients', clients.getAllClients);
 router.get('/getAllClientsByDealer/:Dealer_id', clients.getAllClientsByDealer);
 router.get('/getNextD_Id', clients.getNextD_Id);
 router.get('/getAllActiveClients', clients.getAllActiveClients);
+router.get('/getAllActiveAllClients', clients.getAllActiveAllClients);
 router.get('/getClientById/:id', clients.getClientById);
 router.post('/createClient', clients.createClient);
 router.post('/upsertClient', clients.upsertClient);

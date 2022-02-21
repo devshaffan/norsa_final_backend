@@ -23,7 +23,7 @@ exports.getAllClientsByDealer = (req, res) => {
   models.client
     .findAll({
       where: {
-        Dealer_id : id
+        Dealer_id: id
       }
     })
     .then((data) => {
@@ -44,16 +44,23 @@ exports.getNextK_Id = (req, res) => {
     .then((data) => {
       console.log(data);
       let k_Ids = data.filter((item, index) => {
-        if (item.id[0] == 'k' ||item.id[0] == 'K')
+        if (item.id[0] == 'k' || item.id[0] == 'K')
           return item
       })
       if (k_Ids.length == 0) {
         res.json({ id: "K-0001" })
         return;
       }
-     
-      let k_Id = k_Ids[k_Ids.length - 1]
-      let nextId = parseInt(k_Id.id.substring(2, k_Id.id.length)) + 1
+
+      let last_Id = 0
+      k_Ids.map(itm => {
+        const id = parseInt(itm.id.substring(2, itm.id.length))
+        if (id > last_Id) {
+          last_Id = id;
+        }
+      })
+
+      let nextId = last_Id + 1
       if (nextId < 10) {
         nextId = "K-000" + nextId
       }
@@ -80,12 +87,12 @@ exports.getNextNK_Id = (req, res) => {
     .findAll({ attributes: ['id'] })
     .then((data) => {
       console.log(data);
-      
+
       let k_Ids = data.filter((item, index) => {
         if (item.id.includes("nk") || item.id.includes("NK"))
           return item
       })
-    
+
       if (k_Ids.length == 0) {
         res.json({ id: "NK-0001" })
         return;
@@ -166,6 +173,28 @@ exports.getAllActiveClients = (req, res) => {
           return item.Code
         }
       })
+      data = data.map((item) => { return { id: item.id, Code: item.Code } })
+      res.json(data);
+    })
+    .catch((err) => {
+      res.status(500).send({
+        message:
+          err.message || 'Some error occurred while retrieving All clients.',
+      });
+    });
+};
+
+exports.getAllActiveAllClients = (req, res) => {
+  const limit = req.params.limit !== undefined ? req.params.limit : 1000000;
+  const offset = req.params.offset !== undefined ? req.params.limit : 0;
+  models.client
+    .findAll({
+      where: {
+        Status: 1
+      }
+    })
+    .then((data) => {
+      console.log(data);
       data = data.map((item) => { return { id: item.id, Code: item.Code } })
       res.json(data);
     })

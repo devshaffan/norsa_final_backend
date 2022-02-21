@@ -4,7 +4,7 @@ const clientPictureRouter = require('./clientProfilePicture')
 const publicClientPictureRouter = require('./publicClientProfilePicture')
 const userRouter = require('./user')
 const publicClientsRouter = require('./publicClient')
-
+const reportRouter = require('./reports')
 const merchantsRouter = require('./merchants');
 const dealerRouter = require('./dealer');
 const deviceRouter = require('./device');
@@ -14,10 +14,11 @@ const nfcCardRouter = require('./nfcCard');
 const groupRouter = require('./group');
 const cslRouter = require('./clientSalarySlip')
 const cbsRouter = require('./clientBankStatement')
-
+const multipleIssueances = require('./multipleIssueances');
+const transectionHistoryRouter = require('./transectionHistory');
 
 module.exports = function (app) {
-
+  app.use('/api/reports',reportRouter)
   app.use('/api/public/clients', publicClientsRouter)
   app.use('/api/auth', authRouter);
   app.use('/api/user', userRouter);
@@ -33,6 +34,10 @@ module.exports = function (app) {
   app.use('/api/group', groupRouter);
   app.use('/api/css', cslRouter);
   app.use('/api/cbs', cbsRouter);
-
+  app.use('/api/multipleIssueances', multipleIssueances);
+  app.use('/api/transactionHistory', transectionHistoryRouter);
+  app.use('/api/paybackPeriod', require('./paybackPeriod'));
+  app.use('/api/insurance', require('./insurance'));
+  app.use('/api/membership', require('./membership'));
 
 };

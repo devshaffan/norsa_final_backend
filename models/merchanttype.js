@@ -9,6 +9,9 @@ module.exports = function (sequelize) {
     Title: {
       type: Sequelize.STRING(45),
       allowNull: false
+    },
+    interestOn: {
+      type: Sequelize.STRING(45),
     }
   }, {
     sequelize,

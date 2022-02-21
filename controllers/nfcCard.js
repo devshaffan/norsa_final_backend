@@ -1,10 +1,16 @@
+const { sequelize } = require('../models/index');
 const models = require('../models/index');
 
 exports.getAllNfcCards = (req, res) => {
   const limit = req.params.limit ? null : 10000;
   const offset = req.params.offset ? null : 0;
   models.nfcCard
-    .findAll({ limit, offset })
+    .findAll({
+      limit, offset,
+      order: [
+        [sequelize.cast(sequelize.col('number'), 'SIGNED'), 'ASC'],
+      ],
+    })
     .then((data) => {
       res.json(data);
     })

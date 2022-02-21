@@ -70,9 +70,13 @@ module.exports = function (sequelize) {
       type: Sequelize.STRING(45),
       allowNull: true
     },
-    address : {
-      type : Sequelize.STRING(500),
-      allowNull : true
+    address: {
+      type: Sequelize.STRING(500),
+      allowNull: true
+    },
+    Remarks: {
+      type: Sequelize.STRING(500),
+      allowNull: true
     },
     MaxBorrowAmount: {
       type: Sequelize.INTEGER,
@@ -86,9 +90,16 @@ module.exports = function (sequelize) {
       type: Sequelize.STRING(500),
       allowNull: true
     },
+    PaymentDue: {
+      type: Sequelize.STRING(45),
+      allowNull: true
+    },
     RecievedCreditInPast: {
       type: Sequelize.INTEGER,
       allowNull: true
+    },
+    membership:{
+      type: Sequelize.BOOLEAN,
     }
   }, {
     sequelize,

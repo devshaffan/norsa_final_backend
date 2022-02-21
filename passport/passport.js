@@ -52,8 +52,9 @@ module.exports = function (passport, User) {
       };
       const appSecret = config.app.secret;
       const accessToken = jwt.sign(payload, appSecret, {
-        expiresIn: 60 * 30 // expires in 30 min
+        expiresIn: 60 * 1500 // expires in 30 min
       });
+      const expiryDate = Date.now() + (60*1500*1000)
       const refreshToken = jwt.sign(payload, appSecret, {
         expiresIn: '90d' // expires in 3 month
       });
@@ -115,7 +116,14 @@ module.exports = function (passport, User) {
           message: 'Email does not exist'
         });
       }
-
+      const isMobile = req.body.mobile;
+      if(!!isMobile){
+        if(user.isAdmin != 2){
+          return done(null, false, {
+            message: 'only Merchants can login in mobile app'
+          });
+        }
+      }
       if (!user.emailConfirmed) {
         return done(null, false, {
           message: 'Email is not verified'
@@ -133,8 +141,9 @@ module.exports = function (passport, User) {
       };
       const appSecret = config.app.secret;
       const accessToken = jwt.sign(payload, appSecret, {
-        expiresIn: 60 * 1000 // expires in 30 min
+        expiresIn: 60 * 1500 // expires in 30 min
       });
+      const expiryDate = Date.now() + (60*1500*1000)
       const refreshToken = jwt.sign(payload, appSecret, {
         expiresIn: '30d' // expires in 30 min
       });
@@ -145,7 +154,8 @@ module.exports = function (passport, User) {
         .then(() => {
           const userData = {
             ...reduceUserData(user),
-            accessToken: accessToken
+            accessToken: accessToken,
+            expiryDate : expiryDate
           };
           return done(null, userData);
         })

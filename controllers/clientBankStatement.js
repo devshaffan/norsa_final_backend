@@ -2,6 +2,7 @@ const fs = require('fs')
 const models = require('../models/index');
 const s3 = require("../config/aws")
 const path = require('path')
+const uuidV4 = require('uuid/v4');
 
 
 exports.getFile1ByClientId = (req, res) => {
@@ -61,41 +62,42 @@ exports.getFilesByClientId = (req, res) => {
 
 exports.delete = (req, res) => {
     if (!req.params.Client_id) {
-      res.status(400).send({ message: 'Content can not be empty!' });
-      return;
+        res.status(400).send({ message: 'Content can not be empty!' });
+        return;
     }
     const Client_id = req.params.Client_id;
     models.clientBankStatement
-      .destroy({
-        where: {
-          Client_id
-        },
-      })
-      .then((num) => {
-        if (num === 1) {
-          res.send({ message: 'Client Bank Statement was deleted successfully!' });
-        } else {
-          res.send({
-            message: `Cannot delete Tutorial with id=${Client_id}. Maybe Tutorial was not found!`,
-          });
-        }
-      })
-      .catch((err) => {
-        res.status(500).send({
-          message: err.message || 'Some error occurred while Deleting client.',
+        .destroy({
+            where: {
+                Client_id
+            },
+        })
+        .then((num) => {
+            if (num === 1) {
+                res.send({ message: 'Client Bank Statement was deleted successfully!' });
+            } else {
+                res.send({
+                    message: `Cannot delete Tutorial with id=${Client_id}. Maybe Tutorial was not found!`,
+                });
+            }
+        })
+        .catch((err) => {
+            res.status(500).send({
+                message: err.message || 'Some error occurred while Deleting client.',
+            });
         });
-      });
-  };
-  
+};
+
 
 exports.addFile = (req, res) => {
 
     console.log("id is " + req.file)
+    const id = uuidV4()
+    // if (!req.body.id) {
+    //     res.status(400).send({ message: 'Content can not be empty!' });
+    //     return;
+    // }
 
-    if (!req.body.id) {
-        res.status(400).send({ message: 'Content can not be empty!' });
-        return;
-    }
     var params = {
         ACL: 'public-read',
         Bucket: process.env.BUCKET_NAME || "norsa",
@@ -127,7 +129,7 @@ exports.addFile = (req, res) => {
                     var insertData = {
                         file1Path: file1Path,
                         file2Path: file2Path,
-                        id: req.body.id,
+                        id: id,
                         Client_id: req.body.Client_id
                     }
                     models.clientBankStatement

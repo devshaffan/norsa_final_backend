@@ -26,6 +26,10 @@ module.exports = function (sequelize) {
       type: Sequelize.INTEGER,
       allowNull: true
     },
+    transactionType:{
+      type: Sequelize.INTEGER,//1 means expense 2 retoure
+
+    },
     issuancehistoryId: {
       type: Sequelize.STRING(45),
       references: {

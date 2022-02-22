@@ -49,13 +49,13 @@ exports.dormantUser = (req, res) => {
     .findOne({ where: { email } })
     .then((user) => {
       let { dormantUser } = user;
-      console.log(dormantUser);
+      //console.log(dormantUser);
       if (dormantUser) {
         dormantUser = 0;
       } else {
         dormantUser = 1;
       }
-      console.log(dormantUser);
+      //console.log(dormantUser);
       models.user
         .update({ dormantUser }, { where: { email } })
         .then(() => {

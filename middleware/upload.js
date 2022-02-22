@@ -22,7 +22,7 @@ module.exports = multer({
 //     callBack(null, './public/images/')     // './public/images/' directory name where save the file
 //   },
 //   filename: (req, file, callBack) => {
-//     console.log("the file is " + file)
+//     //console.log("the file is " + file)
 //     const match = ["image/png", "image/jpeg"];
 
 //     if (match.indexOf(file.mimetype) === -1) {

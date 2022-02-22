@@ -6,7 +6,7 @@ exports.getRenderedTemplate = (templateName, data) => {
     const template = require(`../templates/emails/default/${templateName}`); //eslint-disable-line
     return template.render(data);
   } catch (error) {
-    console.log('getRenderedTemplate error: ', error);
+    //console.log('getRenderedTemplate error: ', error);
   }
   return '';
 };
@@ -23,7 +23,7 @@ exports.renderHtmlTemplate = async (templateName, data) => {
     const html = await ejs.renderFile(emailTemplateLink, locals);
     return html;
   } catch (error) {
-    console.log('getRenderedTemplate error: ', error);
+    //console.log('getRenderedTemplate error: ', error);
     return '';
   }
 };

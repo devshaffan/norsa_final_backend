@@ -28,7 +28,7 @@ module.exports = function (sequelize) {
     },
     transactionType:{
       type: Sequelize.INTEGER,//1 means expense 2 retoure
-
+      allowNull:true
     },
     issuancehistoryId: {
       type: Sequelize.STRING(45),

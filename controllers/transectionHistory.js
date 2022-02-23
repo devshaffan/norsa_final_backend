@@ -96,7 +96,7 @@ const updateBalance = async (issuancehistoryId, amount, type) => {
     if (!data) return null
     if (type == 1)
         await models.issuancehistory.update({ Balance: parseFloat(data.Balance) - amount }, { where: { id: issuancehistoryId } })
-    else
+    else if (type == 2)
         await models.issuancehistory.update({ Balance: parseFloat(data.Balance) + amount }, { where: { id: issuancehistoryId } })
 }
 
@@ -109,9 +109,12 @@ const handleTransactionEntry = async (row) => {
         const Interest = await getNumberOfMonthsAndInterest(row.issuancehistoryId, row.Merchant_ID)
         if (!Interest) return null
         AmountUser = AmountUser + AmountUser * parseFloat(Interest) / 100
+
     }
     await updatePayback(row.issuancehistoryId, AmountUser)
 }
+
+
 // ON TRANSACTION FUNCTIONALITY END // ON TRANSACTION FUNCTIONALITY END // ON TRANSACTION FUNCTIONALITY END // ON TRANSACTION FUNCTIONALITY END // ON TRANSACTION FUNCTIONALITY END // ON TRANSACTION FUNCTIONALITY END 
 // ON TRANSACTION FUNCTIONALITY END // ON TRANSACTION FUNCTIONALITY END // ON TRANSACTION FUNCTIONALITY END // ON TRANSACTION FUNCTIONALITY END // ON TRANSACTION FUNCTIONALITY END // ON TRANSACTION FUNCTIONALITY END  
 

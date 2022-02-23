@@ -91,14 +91,17 @@ const getInterestOn = async (Merchant_ID) => {
     return merchantType.interestOn
 }
 
-const updateBalance = async (issuancehistoryId, amount) => {
+const updateBalance = async (issuancehistoryId, amount, type) => {
     const data = await models.issuancehistory.findOne({ where: { id: issuancehistoryId } })
     if (!data) return null
-    await models.issuancehistory.update({ Balance: parseFloat(data.Balance) - amount }, { where: { id: issuancehistoryId } })
+    if (type == 1)
+        await models.issuancehistory.update({ Balance: parseFloat(data.Balance) - amount }, { where: { id: issuancehistoryId } })
+    else
+        await models.issuancehistory.update({ Balance: parseFloat(data.Balance) + amount }, { where: { id: issuancehistoryId } })
 }
 
 const handleTransactionEntry = async (row) => {
-    await updateBalance(row.issuancehistoryId, row.AmountUser)
+    await updateBalance(row.issuancehistoryId, row.AmountUser, row.transactionType)
     const interestOn = await getInterestOn(row.Merchant_ID)
     if (!interestOn) return null
     var AmountUser = parseFloat(row.AmountUser)
@@ -151,7 +154,8 @@ exports.createTransactionHistory = async (req, res) => {
         ItemDescription,
         dateTime,
         AmountUser,
-        issuancehistoryId } = req.body;
+        issuancehistoryId,
+        transactionType } = req.body;
     const Merchant_ID = await getMerchant_ID(_.get(req.headers, 'authorization', null).split(' ')[1])
 
     if (!Client_id || !ItemDescription || !dateTime || !AmountUser) {
@@ -165,12 +169,14 @@ exports.createTransactionHistory = async (req, res) => {
         });
     }
     models.transactionhistory.create({
-        id: uuidV4(), Client_id,
+        id: uuidV4(),
+        Client_id,
         Merchant_ID,
         ItemDescription,
         dateTime,
         AmountUser,
-        issuancehistoryId
+        issuancehistoryId,
+        transactionType
     }).then(data => {
         handleTransactionEntry(data)
         res.json({ message: 'success', data: data });

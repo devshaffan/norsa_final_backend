@@ -40,7 +40,7 @@ exports.getMerchantNameByUserId = async (req, res) => {
       accessToken: token
     }
   })
-  if (!authorizedUser) {
+  if (!authorizedUser  || !authorizedUser.id) {
     res.status(500).send({
       message:
         'user doesnt exist .',

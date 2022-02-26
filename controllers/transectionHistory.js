@@ -142,7 +142,8 @@ exports.getMerchantsTodaysTransactions = async (req, res) => {
             message: 'This User doesnt exist as a merchant'
         });
     }
-    models.sequelize.query(`SELECT * FROM transactionhistory t
+    models.sequelize.query(`SELECT m.Name AS 'Name', t.* FROM transactionhistory t
+    JOIN merchants m ON m.id = t.Merchant_ID
     WHERE (Date(t.dateTime) = CURDATE() AND t.Merchant_ID = '${Merchant_ID}')`,
         { type: models.sequelize.QueryTypes.SELECT }).then((data) => {
             res.json({ message: 'success', data })
@@ -170,6 +171,7 @@ exports.createTransactionHistory = async (req, res) => {
         res.status(400).send({
             message: 'This User doesnt exist as a merchant'
         });
+        return;
     }
     models.transactionhistory.create({
         id: uuidV4(),
@@ -283,7 +285,8 @@ exports.searchTransactions = (req, res) => {
 };
 exports.getTodaysTransactions = (req, res) => {
 
-    models.sequelize.query(`SELECT * FROM transactionhistory t
+    models.sequelize.query(`SELECT m.Name AS 'Name', t.*   FROM transactionhistory t
+    JOIN merchants m ON m.id=t.Merchant_ID
     WHERE Date(t.dateTime) = CURDATE() AND t.transactionType = 1`, { type: models.sequelize.QueryTypes.SELECT }).then((data) => {
         res.json({ message: 'success', data })
     }).catch((err) => {

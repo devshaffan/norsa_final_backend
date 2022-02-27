@@ -49,7 +49,7 @@ exports.getTransactionHistoryByClientId = (req, res) => {
 };
 // ON TRANSACTION FUNCTIONALITY START // ON TRANSACTION FUNCTIONALITY START // ON TRANSACTION FUNCTIONALITY START // ON TRANSACTION FUNCTIONALITY START // ON TRANSACTION FUNCTIONALITY START // ON TRANSACTION FUNCTIONALITY START 
 // ON TRANSACTION FUNCTIONALITY START // ON TRANSACTION FUNCTIONALITY START // ON TRANSACTION FUNCTIONALITY START // ON TRANSACTION FUNCTIONALITY START // ON TRANSACTION FUNCTIONALITY START 
-const updatePayback = async (issuancehistory_Id, AmountUser) => {
+const updatePayback = async (issuancehistory_Id, AmountUser, type) => {
     const allPaybacks = await models.paybackPeriod.findAll({
         where: {
             issuanceHistory_Id: issuancehistory_Id,
@@ -57,8 +57,15 @@ const updatePayback = async (issuancehistory_Id, AmountUser) => {
     })
     if (allPaybacks.length == 0) return null
     var eachAmountUser = AmountUser / allPaybacks.length
-    for (var i = 0; i < allPaybacks.length; i++) {
-        await models.paybackPeriod.update({ amount: parseFloat(allPaybacks[i].amount) + eachAmountUser }, { where: { id: allPaybacks[i].id } })
+    if (type == 1) {
+        for (var i = 0; i < allPaybacks.length; i++) {
+            await models.paybackPeriod.update({ amount: parseFloat(allPaybacks[i].amount) + eachAmountUser }, { where: { id: allPaybacks[i].id } })
+        }
+    }
+    else {
+        for (var i = 0; i < allPaybacks.length; i++) {
+            await models.paybackPeriod.update({ amount: parseFloat(allPaybacks[i].amount) - eachAmountUser }, { where: { id: allPaybacks[i].id } })
+        }
     }
 }
 const getNumberOfMonthsAndInterest = async (issuancehistoryId, merchantId) => {
@@ -103,9 +110,9 @@ const getInterestOn = async (Merchant_ID) => {
 const updateBalance = async (issuancehistoryId, amount, type) => {
     const data = await models.issuancehistory.findOne({ where: { id: issuancehistoryId } })
     if (!data) return null
-    if (type == 1)
+    if (parseInt(type) == 1)
         await models.issuancehistory.update({ Balance: parseFloat(data.Balance) - amount }, { where: { id: issuancehistoryId } })
-    else if (type == 2)
+    else if (parseInt(type) == 2)
         await models.issuancehistory.update({ Balance: parseFloat(data.Balance) + amount }, { where: { id: issuancehistoryId } })
 }
 
@@ -120,7 +127,7 @@ const handleTransactionEntry = async (row) => {
         AmountUser = AmountUser + AmountUser * parseFloat(Interest) / 100
 
     }
-    await updatePayback(row.issuancehistoryId, AmountUser)
+    await updatePayback(row.issuancehistoryId, AmountUser, parseInt(row.transactionType))
 }
 
 

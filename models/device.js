@@ -10,8 +10,8 @@ module.exports = function (sequelize) {
       type: Sequelize.STRING(45),
       allowNull: false
     },
-    batteryStatus: {
-      type: Sequelize.STRING(45),
+    macAddress: {
+      type: Sequelize.STRING(100),
       allowNull: true
     },
     status: {

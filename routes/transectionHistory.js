@@ -6,7 +6,6 @@ router.get('/getAllTransactionHistory/:limit&:offset', th.getAllTransactionHisto
 router.get('/getAllTransactionHistory', th.getAllTransactionHistory);
 router.get('/getTransactionHistoryById/:id', th.getTransactionHistoryById);
 router.get('/searchTransactions', th.searchTransactions);
-router.get('/getTodaysTransactions', th.getTodaysTransactions);
 router.post('/createTransactionHistory', th.createTransactionHistory);
 router.post('/bulkCreateTransectionHistory', th.bulkCreateTransectionHistory);
 router.delete('/deleteTransectionById/:id', th.deleteTransectionById);

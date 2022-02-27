@@ -25,18 +25,27 @@ exports.getTransactionHistoryByClientId = (req, res) => {
             message: 'id is required'
         });
     }
-    models.transactionhistory.findAll({
-        where: {
-            Client_id: Client_id
-        }
-    }).then(data => {
-        res.json({ message: 'success', data });
-    }).catch(err => {
-        res.status(500).send({
-            message: 'error',
-            error: err
+    models.sequelize.query(`SELECT m.Name AS 'Name', t.* FROM transactionhistory t
+    JOIN merchants m ON m.id = t.Merchant_ID WHERE t.Client_id = ${Client_id}`,
+        { type: models.sequelize.QueryTypes.SELECT }).then((data) => {
+            res.json({ message: 'success', data })
+        }).catch((err) => {
+            res.status(500).send({
+                message: 'error', error: err
+            });
         });
-    });
+    // models.transactionhistory.findAll({
+    //     where: {
+    //         Client_id: Client_id
+    //     }
+    // }).then(data => {
+    //     res.json({ message: 'success', data });
+    // }).catch(err => {
+    //     res.status(500).send({
+    //         message: 'error',
+    //         error: err
+    //     });
+    // });
 };
 // ON TRANSACTION FUNCTIONALITY START // ON TRANSACTION FUNCTIONALITY START // ON TRANSACTION FUNCTIONALITY START // ON TRANSACTION FUNCTIONALITY START // ON TRANSACTION FUNCTIONALITY START // ON TRANSACTION FUNCTIONALITY START 
 // ON TRANSACTION FUNCTIONALITY START // ON TRANSACTION FUNCTIONALITY START // ON TRANSACTION FUNCTIONALITY START // ON TRANSACTION FUNCTIONALITY START // ON TRANSACTION FUNCTIONALITY START 

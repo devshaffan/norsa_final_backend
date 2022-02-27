@@ -103,9 +103,9 @@ const getInterestOn = async (Merchant_ID) => {
 const updateBalance = async (issuancehistoryId, amount, type) => {
     const data = await models.issuancehistory.findOne({ where: { id: issuancehistoryId } })
     if (!data) return null
-    if (type == 1)
+    if (parseInt(type) == 1)
         await models.issuancehistory.update({ Balance: parseFloat(data.Balance) - amount }, { where: { id: issuancehistoryId } })
-    else if (type == 2)
+    else if (parseInt(type) == 2)
         await models.issuancehistory.update({ Balance: parseFloat(data.Balance) + amount }, { where: { id: issuancehistoryId } })
 }
 

@@ -41,7 +41,7 @@ exports.getPaybackPeriodByIssuanceHistory = (req, res) => {
     }
     models.paybackPeriod.findAll({
         where: {
-            issuanceHistory_Id
+            issuanceHistory_Id: issuanceHistory_Id
         }
     }).then((data) => {
         res.json({message: "success", data: data});

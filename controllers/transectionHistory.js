@@ -125,7 +125,6 @@ const handleTransactionEntry = async (row) => {
         const Interest = await getNumberOfMonthsAndInterest(row.issuancehistoryId, row.Merchant_ID)
         if (!Interest) return null
         AmountUser = AmountUser + AmountUser * parseFloat(Interest) / 100
-
     }
     await updatePayback(row.issuancehistoryId, AmountUser, parseInt(row.transactionType))
 }

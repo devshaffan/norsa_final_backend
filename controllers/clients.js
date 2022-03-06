@@ -1,6 +1,32 @@
 const models = require('../models/index');
 
 const express = require('express')
+exports.checkSedulaExist = (req, res) => {
+  const idCard = req.params.idCard
+  if (!idCard) {
+    res.status(404).json({ err: "idCard is undefined" })
+    return
+  }
+  models.client
+    .findAll({
+      where: {
+        idCard: idCard
+      }
+    })
+    .then((data) => {
+      //console.log(data);
+      if (data.length > 0)
+        res.json({ exist: true });
+      else
+        res.json({ exist: false })
+    })
+    .catch((err) => {
+      res.status(500).send({
+        message:
+          err.message || 'Some error occurred while retrieving All clients.',
+      });
+    });
+};
 exports.getAllClients = (req, res) => {
   const limit = req.params.limit !== undefined ? req.params.limit : 10000;
   const offset = req.params.offset !== undefined ? req.params.limit : 0;

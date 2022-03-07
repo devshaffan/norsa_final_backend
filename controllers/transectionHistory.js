@@ -240,6 +240,28 @@ exports.getAllTransactionHistory = (req, res) => {
         });
     });
 };
+
+exports.sumByIssuanceHistoryId = (req, res) => {
+    const id = req.params.id
+
+    models.transactionhistory.findAll({
+        where: {
+            issuancehistoryId: id
+        }
+    }).then(data => {
+        let amount = 0
+        for (let i = 0; i < data.length; i++) {
+            amount += parseInt(data[i].AmountUser)
+        }
+        res.json({ message: 'success', amount: amount });
+    }).catch(err => {
+        res.status(500).send({
+            message: 'error',
+            error: err
+        });
+    });
+};
+
 exports.deleteTransectionById = (req, res) => {
     const id = req.params.id;
     if (!id) {

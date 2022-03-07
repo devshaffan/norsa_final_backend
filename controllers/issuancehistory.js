@@ -2,7 +2,8 @@ const models = require('../models/index');
 const fs = require('fs')
 
 const _ = require('lodash');
-const { JSON } = require('sequelize');
+const uuidV4 = require('uuid/v4');
+
 
 
 exports.getClientByNfcAndPinCode = (req, res) => {
@@ -238,7 +239,21 @@ exports.createIssuancehistory = (req, res) => {
   }
   models.issuancehistory
     .create(req.body)
-    .then((data) => res.json(data))
+    .then((data) => {
+      const insuranceAmount = parseFloat(data.Amount) * 1 / 100
+      const insuranceTax = insuranceAmount * 6 / 100
+      const insuranceData = {
+        id: uuidV4(),
+        amount: insuranceAmount,
+        tax: insuranceTax,
+        issuanceHistoryFk: data.id
+      }
+      models.insurance
+        .create(insuranceData)
+        .then((resData) => {
+          res.json({ data, resData })
+        })
+    })
     .catch((err) => {
       res.status(500).send({
         message:

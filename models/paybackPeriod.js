@@ -28,6 +28,10 @@ module.exports = function (sequelize) {
             type: Sequelize.STRING(45),
             allowNull: true
         },
+        membershipFee: {
+            type: Sequelize.STRING(45),
+            allowNull: true
+        },
         remarks: {
             type: Sequelize.STRING(200),
             allowNull: true
@@ -37,12 +41,12 @@ module.exports = function (sequelize) {
             allowNull: true,
         },
         handledByUserId: {
-          type: Sequelize.STRING,
-          allowNull: true,
-          references: {
-            model: 'users',
-            key: 'id'
-          }
+            type: Sequelize.STRING,
+            allowNull: true,
+            references: {
+                model: 'users',
+                key: 'id'
+            }
         }
     }, {
         timestamps: true,

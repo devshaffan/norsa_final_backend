@@ -51,7 +51,7 @@ exports.totalSales = (req, res) => {
     const users = req.params.users;
     models.sequelize.query(`
     SELECT Date(p.dateDeposit) AS Fetcha, u.email AS  Nomber, MONTH(p.date) AS Period,
-        (CAST(p.amountPaidByClient AS float) - CAST(p.amountPaidToDealer AS float)) As Montante, p.remarks AS Remarks FROM paybackperiods p
+        (CAST(p.amountPaidByClient AS unsigned) - CAST(p.amountPaidToDealer AS unsigned)) As Montante, p.remarks AS Remarks FROM paybackperiods p
         JOIN users u ON u.id=p.handledByUserId
         WHERE p.dateDeposit IS NOT NULL 
             AND p.amountPaidByClient IS NOT NULL 
@@ -68,7 +68,7 @@ exports.totalSales = (req, res) => {
 exports.totalSalesOfCurrentUser = (req, res) => {
     const token = _.get(req.headers, 'authorization', null).split(' ')[1]
     models.sequelize.query(`SELECT Date(p.dateDeposit) AS Fetcha, u.email AS  Nomber, MONTH(p.date) AS Period,
-    (CAST(p.amountPaidByClient AS float) - CAST(p.amountPaidToDealer AS float)) As Montante, p.remarks AS Remarks FROM paybackperiods p
+    (CAST(p.amountPaidByClient AS unsigned) - CAST(p.amountPaidToDealer AS unsigned)) As Montante, p.remarks AS Remarks FROM paybackperiods p
     JOIN users u ON u.id=p.handledByUserId
     WHERE p.dateDeposit IS NOT NULL 
         AND p.amountPaidByClient IS NOT NULL 

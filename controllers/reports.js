@@ -74,7 +74,7 @@ exports.totalSalesOfCurrentUser = (req, res) => {
         AND p.amountPaidByClient IS NOT NULL 
         AND p.amountPaidToDealer IS NOT NULL 
         AND u.accessToken = '${token}'
-        AND Date(p.date) = CURDATE()
+        AND Date(p.dateDeposit) = CURDATE()
 `, { type: models.sequelize.QueryTypes.SELECT }).then(data => {
         return res.json(data)
     }).catch(err => {

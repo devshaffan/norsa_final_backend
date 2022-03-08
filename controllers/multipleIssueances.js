@@ -2,24 +2,26 @@ const models = require('../models/index');
 
 exports.getAllByIssuancesId = (req, res) => {
     const issuancesId = req.params.issuancesId;
-    if(!issuancesId){
-        return res.status(400).send({status: 'error', message: 'Missing parameter: issuancesId'}); 
+    if (!issuancesId) {
+        return res.status(400).send({ status: 'error', message: 'Missing parameter: issuancesId' });
     }
-    models.multipleIssueances.findAll({where: {issuancehistoryId:issuancesId}}).then(data => {
-        res.status(200).send({status: 'success', data: data});
+    models.multipleIssueances.findAll({ where: { issuancehistoryId: issuancesId } }).then(data => {
+        res.status(200).send({ status: 'success', data: data });
     }).catch(err => {
-        res.status(500).send({status: 'error', message: err.message});
+        res.status(500).send({ status: 'error', message: err.message });
     });
 };
+
+
 exports.getAllByMerchantId = (req, res) => {
     const merchantId = req.params.merchantId;
-    if(!merchantId){
-        return res.status(400).send({status: 'error', message: 'Missing parameter: merchantId'}); 
+    if (!merchantId) {
+        return res.status(400).send({ status: 'error', message: 'Missing parameter: merchantId' });
     }
-    models.multipleIssueances.findAll({where: {merchantId:merchantId}}).then(data => {
-        res.status(200).send({status: 'success', data: data});
+    models.multipleIssueances.findAll({ where: { merchantId: merchantId } }).then(data => {
+        res.status(200).send({ status: 'success', data: data });
     }).catch(err => {
-        res.status(500).send({status: 'error', message: err.message});
+        res.status(500).send({ status: 'error', message: err.message });
     });
 };
 exports.createMultipleIssueances = (req, res) => {
@@ -27,8 +29,8 @@ exports.createMultipleIssueances = (req, res) => {
     const issuancehistoryId = req.body.issuancehistoryId;
     const merchantId = req.body.merchantId;
     const numberOfMonthsId = req.body.numberOfMonthsId;
-    if( !id || !issuancehistoryId || !merchantId || !numberOfMonthsId){
-        return res.status(400).send({status: 'error', message: 'Missing parameter: id, issuancehistoryId, merchantId or numberOfMonthsId'}); 
+    if (!id || !issuancehistoryId || !merchantId || !numberOfMonthsId) {
+        return res.status(400).send({ status: 'error', message: 'Missing parameter: id, issuancehistoryId, merchantId or numberOfMonthsId' });
     }
     models.multipleIssueances.create({
         id: id,
@@ -36,9 +38,9 @@ exports.createMultipleIssueances = (req, res) => {
         merchantId: merchantId,
         numberOfMonthsId: numberOfMonthsId
     }).then(data => {
-        res.status(200).send({status: 'success', data: data});
+        res.status(200).send({ status: 'success', data: data });
     }).catch(err => {
-        res.status(500).send({status: 'error', message: err.message});
+        res.status(500).send({ status: 'error', message: err.message });
     });
 };
 exports.updateMultipleIssueances = (req, res) => {
@@ -46,27 +48,27 @@ exports.updateMultipleIssueances = (req, res) => {
     const issuancehistoryId = req.body.issuancehistoryId;
     const merchantId = req.body.merchantId;
     const numberOfMonthsId = req.body.numberOfMonthsId;
-    if(!id || !issuancehistoryId || !merchantId || !numberOfMonthsId){
-        return res.status(400).send({status: 'error', message: 'Missing parameter: id, issuancehistoryId, merchantId or numberOfMonthsId'}); 
+    if (!id || !issuancehistoryId || !merchantId || !numberOfMonthsId) {
+        return res.status(400).send({ status: 'error', message: 'Missing parameter: id, issuancehistoryId, merchantId or numberOfMonthsId' });
     }
     models.multipleIssueances.update({
         issuancehistoryId: issuancehistoryId,
         merchantId: merchantId,
         numberOfMonthsId: numberOfMonthsId
-    },{where: {id: id}}).then(data => {
-        res.status(200).send({status: 'success', data: data});
+    }, { where: { id: id } }).then(data => {
+        res.status(200).send({ status: 'success', data: data });
     }).catch(err => {
-        res.status(500).send({status: 'error', message: err.message});
+        res.status(500).send({ status: 'error', message: err.message });
     });
 };
 exports.deleteMultipleIssueances = (req, res) => {
     const id = req.params.id;
-    if(!id){
-        return res.status(400).send({status: 'error', message: 'Missing parameter: id'}); 
+    if (!id) {
+        return res.status(400).send({ status: 'error', message: 'Missing parameter: id' });
     }
-    models.multipleIssueances.destroy({where: {id: id}}).then(data => {
-        res.status(200).send({status: 'success', data: data});
+    models.multipleIssueances.destroy({ where: { id: id } }).then(data => {
+        res.status(200).send({ status: 'success', data: data });
     }).catch(err => {
-        res.status(500).send({status: 'error', message: err.message});
+        res.status(500).send({ status: 'error', message: err.message });
     });
 };

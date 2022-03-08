@@ -60,7 +60,7 @@ exports.createInsurance = (req, res) => {
             message: 'Insurance tax is required'
         });
     }
-    if(!req.body.issuancehistoryId) {
+    if(!req.body.issuanceHistoryFk) {
         return res.status(400).send({
             result: 'error',
             message: 'Issuance history id is required'

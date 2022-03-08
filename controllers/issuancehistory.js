@@ -240,19 +240,7 @@ exports.createIssuancehistory = (req, res) => {
   models.issuancehistory
     .create(req.body)
     .then((data) => {
-      const insuranceAmount = parseFloat(data.Amount) * 1 / 100
-      const insuranceTax = insuranceAmount * 6 / 100
-      const insuranceData = {
-        id: uuidV4(),
-        amount: insuranceAmount,
-        tax: insuranceTax,
-        issuanceHistoryFk: data.id
-      }
-      models.insurance
-        .create(insuranceData)
-        .then((resData) => {
-          res.json({ data, resData })
-        })
+      res.json(data)
     })
     .catch((err) => {
       res.status(500).send({

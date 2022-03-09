@@ -39,5 +39,6 @@ module.exports = function (app) {
   app.use('/api/paybackPeriod', require('./paybackPeriod'));
   app.use('/api/insurance', require('./insurance'));
   app.use('/api/membership', require('./membership'));
+  app.use('/api/dealerBulkPayment', require('./dealerBulkPayment'));
 
 };

@@ -18,7 +18,7 @@ const multipleIssueances = require('./multipleIssueances');
 const transectionHistoryRouter = require('./transectionHistory');
 
 module.exports = function (app) {
-  app.use('/api/reports',reportRouter)
+  app.use('/api/reports', reportRouter)
   app.use('/api/public/clients', publicClientsRouter)
   app.use('/api/auth', authRouter);
   app.use('/api/user', userRouter);
@@ -40,5 +40,8 @@ module.exports = function (app) {
   app.use('/api/insurance', require('./insurance'));
   app.use('/api/membership', require('./membership'));
   app.use('/api/dealerBulkPayment', require('./dealerBulkPayment'));
+  app.use('/api/dashboard', require('./dashboard'));
+  app.use('/api/task', require('./task'));
+
 
 };

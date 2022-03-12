@@ -11,7 +11,7 @@ const config = {
       username: 'root',
       password: '',
       dialect: 'mysql',
-      port: 3306,
+      port: 3307,
       pool: {
         max: 5,
         min: 0,

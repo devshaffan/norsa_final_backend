@@ -3,7 +3,7 @@ const _ = require('lodash');
 
 exports.topThreeMerchantsByTransaction = (req, res) => {
     const token = _.get(req.headers, 'authorization', null).split(' ')[1]
-    models.sequelize.query(`SELECT tm.Name, HOUR(tt.dateTime) AS 'Time', SUM(tt.AmountUser) AS 'Amount'
+    models.sequelize.query(`SELECT tm.Name, CONCAT(HOUR(tt.dateTime), ':',MINUTE(tt.dateTime))  AS 'Time', SUM(tt.AmountUser) AS 'Amount'
     FROM transactionhistory tt
     JOIN (
     SELECT m.id

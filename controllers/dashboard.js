@@ -3,12 +3,19 @@ const _ = require('lodash');
 
 exports.topThreeMerchantsByTransaction = (req, res) => {
     const token = _.get(req.headers, 'authorization', null).split(' ')[1]
-    models.sequelize.query(`SELECT m.Name, SUM(t.AmountUser) AS Amount, TIME(t.dateTime) AS Time
+    models.sequelize.query(`SELECT tm.Name, HOUR(tt.dateTime) AS Time, SUM(tt.AmountUser) AS Amount
+    FROM transactionhistory tt
+    JOIN (
+    SELECT m.id
     FROM transactionhistory t 
     JOIN merchants m ON m.id = t.Merchant_ID
     GROUP BY t.Merchant_ID
-    ORDER BY Amount DESC
-    LIMIT 3`
+    ORDER BY SUM(t.AmountUser) DESC
+    LIMIT 3) a ON a.id = tt.Merchant_ID
+    JOIN merchants tm ON tm.id = tt.Merchant_ID
+    group BY HOUR(tt.dateTime), tm.Name
+    ORDER BY tt.Merchant_ID
+    `
         , { type: models.sequelize.QueryTypes.SELECT }).then(data => {
             return res.json(data)
         }).catch(err => {

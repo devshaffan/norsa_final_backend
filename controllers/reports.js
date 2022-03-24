@@ -25,6 +25,7 @@ exports.merchantReport = (req, res) => {
     JOIN issuancehistory i ON i.id = t.issuancehistoryId
     JOIN multipleissueances mi ON (mi.merchantId = t.Merchant_ID AND mi.issuancehistoryId = t.issuancehistoryId)
     JOIN merchanttypediscount d ON d.id = mi.numberOfMonthsId
+    WHERE Month(DATE(t.dateTime)) = Month('${date}')
     group BY t.Merchant_ID`
         , { type: models.sequelize.QueryTypes.SELECT }).then(data => {
             return res.json(data)

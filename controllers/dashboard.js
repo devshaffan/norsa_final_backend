@@ -1,26 +1,66 @@
 const models = require('../models/index');
 const _ = require('lodash');
 
+// exports.topThreeMerchantsByTransaction = (req, res) => {
+//     const token = _.get(req.headers, 'authorization', null).split(' ')[1]
+//     models.sequelize.query(`SELECT tm.Name, CONCAT(HOUR(tt.dateTime), ':',MINUTE(tt.dateTime))  
+//     AS 'Time', SUM(tt.AmountUser) AS 'Amount'
+//     FROM transactionhistory tt
+//     JOIN (
+//     SELECT m.id
+//     FROM transactionhistory t 
+//     JOIN merchants m ON m.id = t.Merchant_ID
+//     GROUP BY t.Merchant_ID
+//     ORDER BY SUM(t.AmountUser) DESC
+//     LIMIT 3) a ON a.id = tt.Merchant_ID
+//     JOIN merchants tm ON tm.id = tt.Merchant_ID
+//     group BY HOUR(tt.dateTime), tm.Name
+//     ORDER BY tt.Merchant_ID
+//     `
+//         , { type: models.sequelize.QueryTypes.SELECT }).then(data => {
+//             data.map((item, index) => {
+
+//             })
+//             return res.json(data)
+//         }).catch(err => {
+//             res.status(500).send({ error: err })
+//         })
+// }
+
 exports.topThreeMerchantsByTransaction = (req, res) => {
     const token = _.get(req.headers, 'authorization', null).split(' ')[1]
-    models.sequelize.query(`SELECT tm.Name, CONCAT(HOUR(tt.dateTime), ':',MINUTE(tt.dateTime))  AS 'Time', SUM(tt.AmountUser) AS 'Amount'
-    FROM transactionhistory tt
-    JOIN (
+    models.sequelize.query(`
     SELECT m.id
     FROM transactionhistory t 
     JOIN merchants m ON m.id = t.Merchant_ID
     GROUP BY t.Merchant_ID
     ORDER BY SUM(t.AmountUser) DESC
-    LIMIT 3) a ON a.id = tt.Merchant_ID
-    JOIN merchants tm ON tm.id = tt.Merchant_ID
-    group BY HOUR(tt.dateTime), tm.Name
-    ORDER BY tt.Merchant_ID
+    LIMIT 3
     `
-        , { type: models.sequelize.QueryTypes.SELECT }).then(data => {
-            return res.json(data)
+        , { type: models.sequelize.QueryTypes.SELECT }).then(async data => {
+            const finalData = await Promise.all(data.map(async (item, index) => {
+                const merchant = {}
+                const merchantData = await getMerchantData(item.id)
+                merchant.id = item.id
+                merchant.data = merchantData
+                return merchant
+            }))
+            return res.json(finalData)
         }).catch(err => {
             res.status(500).send({ error: err })
         })
+}
+const getMerchantData = async (id) => {
+    const data = await models.sequelize.query(`
+    SELECT tm.Name, CONCAT(HOUR(tt.dateTime), ':',MINUTE(tt.dateTime))  
+    AS 'Time', SUM(tt.AmountUser) AS 'Amount'
+    FROM transactionhistory tt
+    JOIN merchants tm ON tm.id = tt.Merchant_ID
+    WHERE tt.Merchant_ID = '${id}'
+    group BY HOUR(tt.dateTime), tm.Name
+    `, { type: models.sequelize.QueryTypes.SELECT })
+    console.log(data)
+    return data
 }
 exports.monthlyTotalProfit = (req, res) => {
     const token = _.get(req.headers, 'authorization', null).split(' ')[1]

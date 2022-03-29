@@ -160,7 +160,8 @@ exports.getMerchantsTodaysTransactions = async (req, res) => {
     models.sequelize.query(`SELECT m.Name AS 'Name', t.* , COUNT(p.id) AS totalPaybackPeriods FROM transactionhistory t
     JOIN merchants m ON m.id = t.Merchant_ID
     JOIN paybackperiods p ON p.issuanceHistory_Id = t.issuancehistoryId 
-    WHERE (Date(t.dateTime) = CURDATE() AND t.Merchant_ID = '${Merchant_ID}')`,
+    WHERE (Date(t.dateTime) = CURDATE() AND t.Merchant_ID = '${Merchant_ID}'
+    group BY t.id)`,
         { type: models.sequelize.QueryTypes.SELECT }).then((data) => {
             res.json({ message: 'success', data })
         }).catch((err) => {

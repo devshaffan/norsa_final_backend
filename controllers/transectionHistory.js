@@ -81,13 +81,23 @@ const getNumberOfMonthsAndInterest = async (issuancehistoryId, merchantId) => {
             id: merchantId,
         }
     })
-    if (!miData || !merchantData) return null
-    const merchanttypediscount = await models.merchanttypediscount.findOne({
-        where: {
-            id: miData.numberOfMonthsId,
-            MerchantType_id: merchantData.MerchantType_id
-        }
-    })
+    if (!merchantData) return null // handle this
+    let merchanttypediscount;
+    if (!miData) {
+        merchanttypediscount = await models.merchanttypediscount.findOne({
+            where: {
+                MerchantType_id: merchantData.MerchantType_id
+            }
+        })
+    }
+    else {
+        merchanttypediscount = await models.merchanttypediscount.findOne({
+            where: {
+                id: miData.numberOfMonthsId,
+                MerchantType_id: merchantData.MerchantType_id
+            }
+        })
+    }
     if (!merchanttypediscount) return null
     return merchanttypediscount.Interest
 }
@@ -253,7 +263,10 @@ exports.sumByIssuanceHistoryId = (req, res) => {
     }).then(data => {
         let amount = 0
         for (let i = 0; i < data.length; i++) {
-            amount += parseInt(data[i].AmountUser)
+            if (data[i].transactionType == 1)
+                amount += parseInt(data[i].AmountUser)
+            else if (data[i].transactionType == 2)
+                amount -= parseInt(data[i].AmountUser)
         }
         res.json({ message: 'success', amount: amount });
     }).catch(err => {

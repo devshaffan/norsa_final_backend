@@ -23,7 +23,7 @@ module.exports = function (sequelize) {
       allowNull: false
     },
     AmountUser: {
-      type: Sequelize.INTEGER,
+      type: Sequelize.FLOAT,
       allowNull: true
     },
     transactionType:{

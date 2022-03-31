@@ -40,7 +40,7 @@ exports.getMerchantNameByUserId = async (req, res) => {
       accessToken: token
     }
   })
-  if (!authorizedUser  || !authorizedUser.id) {
+  if (!authorizedUser || !authorizedUser.id) {
     res.status(500).send({
       message:
         'user doesnt exist .',
@@ -64,11 +64,22 @@ exports.getMerchantNameByUserId = async (req, res) => {
 }
 
 
-exports.createMerchant = (req, res) => {
-
+exports.createMerchant = async (req, res) => {
   if (!req.body.id) {
     res.status(400).send({ message: 'Content can not be empty!' });
     return;
+  }
+  const authorizedUser = await models.merchants.findOne({
+    attributes: ['id'],
+    where: {
+      User_id: req.body.User_id
+    }
+  })
+  if (authorizedUser) {
+    res.status(500).send({
+      message: "user id already exists",
+    })
+    return
   }
   models.merchants
     .create(req.body)

@@ -3,7 +3,7 @@ const cron = require('node-cron')
 
 const models = require('../models/index');
 
-module.exports = cron.schedule('* * 1 * *', function () {
+module.exports = cron.schedule('0 0 1 * *', function () {
     //console.log("HIHIIHIIHIHIHIHIIHIHIHIHIHIHIHIHH")
     models.issuancehistory
         .findAll()

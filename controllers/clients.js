@@ -40,9 +40,10 @@ exports.getClientMaxBorrowAmountById = (req, res) => {
     .then((data) => {
       //console.log(data);
       models.sequelize.query(`Select Sum(CAST(i.Amount AS int)) AS usedAmount from issuancehistory i
-                              WHERE i.Client_id=${clientId}`,
+                              WHERE i.Client_id="${clientId}"`,
         { type: models.sequelize.QueryTypes.SELECT }).then(issueData => {
-          const MaxBorrowAmount = parseInt(data.MaxBorrowAmount) - parseInt(issueData.usedAmount)
+          console.log(issueData)
+          const MaxBorrowAmount = parseInt(data.MaxBorrowAmount) - parseInt(issueData[0].usedAmount)
           res.status(200).send({
             MaxBorrowAmount
           })

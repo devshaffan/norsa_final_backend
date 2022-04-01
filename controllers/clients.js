@@ -27,6 +27,38 @@ exports.checkSedulaExist = (req, res) => {
       });
     });
 };
+exports.getClientMaxBorrowAmountById = (req, res) => {
+  const clientId = req.params.id;
+  //console.log('id is ', Number.parseInt(clientId, 10));
+  if (!clientId) {
+    res.status(500).send({
+      message: "Client Id cannot be null"
+    })
+  }
+  models.client
+    .findByPk(clientId)
+    .then((data) => {
+      //console.log(data);
+      models.sequelize.query(`Select Sum(CAST(i.Amount AS int)) AS usedAmount from issuancehistory i
+                              WHERE i.Client_id=${clientId}`,
+        { type: models.sequelize.QueryTypes.SELECT }).then(issueData => {
+          const MaxBorrowAmount = parseInt(data.MaxBorrowAmount) - parseInt(issueData.usedAmount)
+          res.status(200).send({
+            MaxBorrowAmount
+          })
+          return
+        }).catch(err => {
+          res.status(500).send({ error: err })
+        })
+    })
+    .catch((err) => {
+      res.status(500).send({
+        message:
+          err.message || 'Some error occurred while retrieving CLient Record .',
+      });
+    });
+};
+
 exports.getAllClients = (req, res) => {
   const limit = req.params.limit !== undefined ? req.params.limit : 10000;
   const offset = req.params.offset !== undefined ? req.params.limit : 0;

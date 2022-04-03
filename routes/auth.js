@@ -4,6 +4,7 @@ const auth = require('../controllers/auth');
 const reduceUserData = require('../utils/reduceUserData');
 const validator = require('../utils/validator');
 const passport = require('passport');
+const models = require('../models');
 const loggedInUsers = [];
 router.post( '/signup', ( req, res, next ) => {
   const { email, password, isAdmin } = req.body;
@@ -49,7 +50,7 @@ router.post('/login', (req, res, next) => {
     if (!user) {
       return res.status(400).json({ result: 'error', message: info.message });
     }
-    return req.logIn(user, (errLogin) => {
+    return req.logIn(user, async (errLogin) => {
       if (err) { return next(errLogin); }
       //will use set here to make sure unique 
       // loggedInUsers.push(user.id:{
@@ -57,7 +58,14 @@ router.post('/login', (req, res, next) => {
       // }
       //     ,
       //     userId: );
-      return res.status(200).json({ result: 'ok', data: reduceUserData(user) });
+      const {pinCode} = await models.merchants.findOne({
+        attributes : ['pinCode'],
+        where : {
+          User_id : user.id
+        }
+      })
+      user.pinCode = pinCode
+      return res.status(200).json({ result: 'ok', data: reduceUserData(user), });
     });
   })(req, res, next);
 });

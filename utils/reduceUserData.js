@@ -7,7 +7,8 @@ module.exports = function reduceUserData(userDetails) {
       'refreshToken',
       'dormantUser',
       'isAdmin',
-      'expiryDate'
+      'expiryDate',
+      'pinCode'
     ])
   };
 };

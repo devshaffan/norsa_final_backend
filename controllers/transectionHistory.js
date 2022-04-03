@@ -26,7 +26,7 @@ exports.getTransactionHistoryByClientId = (req, res) => {
         });
     }
     models.sequelize.query(`SELECT m.Name AS 'Name', t.* FROM transactionhistory t
-    JOIN merchants m ON m.id = t.Merchant_ID WHERE t.Client_id = ${Client_id}`,
+    JOIN merchants m ON m.id = t.Merchant_ID WHERE t.Client_id = "${Client_id}"`,
         { type: models.sequelize.QueryTypes.SELECT }).then((data) => {
             res.json({ message: 'success', data })
         }).catch((err) => {

@@ -42,6 +42,10 @@ module.exports = function (sequelize) {
       type: Sequelize.STRING(45),
       allowNull: true
     },
+    pinCode: {
+      type: Sequelize.STRING(45),
+      allowNull: true
+    },
     AccountNo: {
       type: Sequelize.STRING(45),
       allowNull: false

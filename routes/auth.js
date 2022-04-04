@@ -50,7 +50,7 @@ router.post('/login', (req, res, next) => {
     if (!user) {
       return res.status(400).json({ result: 'error', message: info.message });
     }
-    return req.logIn(user, async (errLogin) => {
+    return req.logIn(user, (errLogin) => {
       if (err) { return next(errLogin); }
       //will use set here to make sure unique 
       // loggedInUsers.push(user.id:{

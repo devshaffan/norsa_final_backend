@@ -58,14 +58,14 @@ router.post('/login', (req, res, next) => {
       // }
       //     ,
       //     userId: );
-      const {pinCode} = await models.merchants.findOne({
-        attributes : ['pinCode'],
-        where : {
-          User_id : user.id
-        }
-        
-      })
-      user.pinCode = pinCode
+      // const {pinCode} = await models.merchants.findOne({
+      //   attributes : ['pinCode'],
+      //   where : {
+      //     User_id : user.id
+      //   }
+
+      // })
+      // user.pinCode = pinCode
       return res.status(200).json({ result: 'ok', data: reduceUserData(user), });
     });
   })(req, res, next);

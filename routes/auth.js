@@ -66,7 +66,7 @@ router.post('/login', (req, res, next) => {
 
       // })
       // user.pinCode = pinCode
-      return res.status(200).json({ result: 'ok', data: reduceUserData(user), });
+      return res.status(200).json({ result: 'ok', data: reduceUserData(user)});
     });
   })(req, res, next);
 });

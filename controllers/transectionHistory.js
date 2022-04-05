@@ -1,7 +1,7 @@
 const models = require('../models/index');
 const uuidV4 = require('uuid/v4');
 const _ = require('lodash');
-const { Op } = require('sequelize')
+const { Op } = require('sequelize');
 exports.getTransactionHistoryById = (req, res) => {
     const id = req.params.id;
     if (!id) {
@@ -162,12 +162,12 @@ const getMerchant_ID = async (token) => {
 }
 exports.getMerchantsTodaysTransactions = async (req, res) => {
     const Merchant_ID = await getMerchant_ID(_.get(req.headers, 'authorization', null).split(' ')[1])
-    console.log('Merchant id: ', Merchant_ID);
     if (!Merchant_ID) {
         res.status(400).send({
             message: 'This User doesnt exist as a merchant'
         });
     }
+
     models.sequelize.query(`SELECT m.Name AS 'Name', t.* , COUNT(p.id) AS totalPaybackPeriods FROM transactionhistory t
     JOIN merchants m ON m.id = t.Merchant_ID
     JOIN paybackperiods p ON p.issuanceHistory_Id = t.issuancehistoryId 
@@ -181,6 +181,7 @@ exports.getMerchantsTodaysTransactions = async (req, res) => {
             });
         });
 }
+
 exports.createTransactionHistory = async (req, res) => {
     const { Client_id,
         ItemDescription,
@@ -212,14 +213,34 @@ exports.createTransactionHistory = async (req, res) => {
         transactionType
     }).then(data => {
         handleTransactionEntry(data)
-        res.json({ message: 'success', data: data });
+        models.dailysalesprintcheck.update({
+                datePrinted: new Date(),
+                status: false
+            }, {
+                where:
+                {
+                    merchantId: data.Merchant_ID
+                }
+            })
+            .then(dailySalesData => {
+                res.status(200).send({ success: true, data: data })
+            })
+            .catch(err => {
+                res.status(500).send({
+                    message:
+                        err.message || 'Some error occurred while creating the dealer.',
+                });
+            })
+        // res.json({ message: 'success', data: data });
     }).catch(err => {
         res.status(500).send({
-            message: 'error',
-            error: err
+            message:
+                err.message || 'Some error occurred while creating the dealer.',
         });
     });
 };
+
+
 exports.bulkCreateTransectionHistory = (req, res) => {
     const { Client_id,
         Merchant_ID,

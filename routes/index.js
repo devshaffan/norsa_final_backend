@@ -42,6 +42,7 @@ module.exports = function (app) {
   app.use('/api/dealerBulkPayment', require('./dealerBulkPayment'));
   app.use('/api/dashboard', require('./dashboard'));
   app.use('/api/task', require('./task'));
+  app.use('/api/dailySalesPrintCheck', require('./dailySalesPrintCheck'))
 
 
 };

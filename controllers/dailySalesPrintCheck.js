@@ -32,6 +32,31 @@ exports.getById = (req, res) => {
         });
 };
 
+exports.getByMerchantId = (req, res) => {
+    if (!req.params || !req.params.merchantId) {
+        res.status(500).send({
+            message:
+                 'Merchant Id cannot be null',
+        });
+        return
+    }
+    models.dailysalesprintcheck
+        .findOne({
+            where: {
+                merchantId: req.params.merchantId
+            }
+        })
+        .then((data) => {
+            res.json(data);
+        })
+        .catch((err) => {
+            res.status(500).send({
+                message:
+                    err.message || 'Some error occurred while retrieving group Record .',
+            });
+        });
+};
+
 exports.create = (req, res) => {
     const data = { ...req.body, id: uuidV4() }
     models.dailysalesprintcheck
@@ -67,7 +92,7 @@ exports.updateByMerchantId = (req, res) => {
     if (!req.params || !req.params.merchantId) {
         res.status(500).send({
             message:
-                err.message || 'Merchant Id cannot be null',
+                'Merchant Id cannot be null',
         });
         return
     }

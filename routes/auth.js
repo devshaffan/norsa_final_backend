@@ -5,6 +5,9 @@ const reduceUserData = require('../utils/reduceUserData');
 const validator = require('../utils/validator');
 const passport = require('passport');
 const models = require('../models');
+const { getMerchant_ID } = require('../controllers/transectionHistory');
+const _ = require('lodash');
+
 const loggedInUsers = [];
 router.post('/signup', (req, res, next) => {
   const { email, password, isAdmin } = req.body;
@@ -64,8 +67,14 @@ router.post('/login', (req, res, next) => {
           User_id: user.id
         }
       })
+      const Merchant_ID = await getMerchant_ID(user.accessToken)
+      
+      if (!Merchant_ID) user.Merchant_ID = null
+      else user.Merchant_ID = Merchant_ID
+
       if (!data) user.pinCode = null
       else user.pinCode = data.pinCode
+
       return res.status(200).json({ result: 'ok', data: reduceUserData(user) });
     });
   })(req, res, next);

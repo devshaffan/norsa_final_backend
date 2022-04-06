@@ -8,7 +8,8 @@ module.exports = function reduceUserData(userDetails) {
       'dormantUser',
       'isAdmin',
       'expiryDate',
-      'pinCode'
+      'pinCode',
+      'Merchant_ID'
     ])
   };
 };

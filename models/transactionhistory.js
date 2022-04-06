@@ -40,7 +40,6 @@ module.exports = function (sequelize) {
         model: 'issuancehistory',
         key: 'id'
       }
-
     }
   }, {
     sequelize,

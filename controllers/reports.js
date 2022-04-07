@@ -82,3 +82,18 @@ exports.totalSalesOfCurrentUser = (req, res) => {
         res.status(500).send({ error: err })
     })
 }
+
+
+exports.dealerReport = (req, res) => {
+    const dealers = req.params.dealers
+    if (!dealers) {
+        res.status(500).send({ message: "no dealer selected" })
+    }
+    models.sequelize.query(`SELECT c.* FROM client c WHERE c.Dealer_id = '${dealers}';`, { type: models.sequelize.QueryTypes.SELECT })
+        .then(data => {
+            return res.json(data)
+        })
+        .catch(err => {
+            res.status(500).send({ err })
+        })
+}

@@ -19,6 +19,10 @@ module.exports = function (sequelize) {
         issuanceHistory_Id: {
             type: Sequelize.STRING(45),
             allowNull: false,
+            references: {
+                model: 'issuancehistory',
+                key: 'id'
+            }
         },
         paidByDealer: {
             type: Sequelize.BOOLEAN,

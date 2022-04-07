@@ -268,12 +268,18 @@ exports.upsertIssuancehistory = (req, res) => {
     });
 };
 
-exports.deleteIssuancehistory = (req, res) => {
+exports.deleteIssuancehistory = async (req, res) => {
   if (!req.params.id) {
     res.status(400).send({ message: 'Content can not be empty!' });
     return;
   }
   const id = req.params.id;
+  
+  await models.multipleIssueances.destroy({ where: {issuanceHistoryId : id}})
+  await models.paybackPeriod.destroy({ where: {issuanceHistory_Id : id}})
+  await models.transactionhistory.destroy({ where: {issuanceHistoryId : id}})
+  await models.insurance.destroy({ where: {issuanceHistoryFk : id}})
+
   models.issuancehistory
     .destroy({
       where: {

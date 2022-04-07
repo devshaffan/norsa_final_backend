@@ -90,7 +90,7 @@ exports.updateInsurance = (req, res) => {
     const insurance = {
         amount: req.body.amount,
         tax: req.body.tax,
-        issuanceHistoryId: req.body.issuancehistoryId
+        issuanceHistoryFk: req.body.issuancehistoryId
     };
     models.insurance.update(insurance, {
         where: {id: req.params.id}

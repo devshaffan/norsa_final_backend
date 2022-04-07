@@ -6,7 +6,7 @@ const config = {
     secret: 'asdfasfasdfasdafsdf231243243234234234234234234234',
   },
   db: {
-    host: 'us-cdbr-east-04.cleardb.com',
+    host: 'us-mm-dca-8017d620b68c.g5.cleardb.net',
     database: 'heroku_801d0b2546249bf',
     username: 'b24efc896a4412',
     password: 'ea7e2fa7',

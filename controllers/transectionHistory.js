@@ -189,7 +189,7 @@ exports.createTransactionHistory = async (req, res) => {
         AmountUser,
         issuancehistoryId,
         transactionType } = req.body;
-    const Merchant_ID = await getMerchant_ID(_.get(req.headers, 'authorization', null).split(' ')[1])
+    const Merchant_ID = await this.getMerchant_ID(_.get(req.headers, 'authorization', null).split(' ')[1])
 
     if (!Client_id || !ItemDescription || !dateTime || !AmountUser) {
         res.status(400).send({
@@ -214,14 +214,14 @@ exports.createTransactionHistory = async (req, res) => {
     }).then(data => {
         handleTransactionEntry(data)
         models.dailysalesprintcheck.update({
-                datePrinted: new Date(),
-                status: false
-            }, {
-                where:
-                {
-                    merchantId: data.Merchant_ID
-                }
-            })
+            datePrinted: new Date(),
+            status: false
+        }, {
+            where:
+            {
+                merchantId: data.Merchant_ID
+            }
+        })
             .then(dailySalesData => {
                 res.status(200).send({ success: true, data: data })
             })

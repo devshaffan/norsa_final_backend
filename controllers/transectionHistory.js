@@ -161,7 +161,7 @@ exports.getMerchant_ID = async (token) => {
     return merchant.id
 }
 exports.getMerchantsTodaysTransactions = async (req, res) => {
-    const Merchant_ID = await getMerchant_ID(_.get(req.headers, 'authorization', null).split(' ')[1])
+    const Merchant_ID = await this.getMerchant_ID(_.get(req.headers, 'authorization', null).split(' ')[1])
     if (!Merchant_ID) {
         res.status(400).send({
             message: 'This User doesnt exist as a merchant'

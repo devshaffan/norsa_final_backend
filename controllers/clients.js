@@ -35,24 +35,26 @@ exports.getClientMaxBorrowAmountById = (req, res) => {
       message: "Client Id cannot be null"
     })
   }
+
   models.client
     .findByPk(clientId)
-    .then((data) => {
+    .then(async (data) => {
       //console.log(data);
-      models.sequelize.query(`Select Sum(CAST(i.Amount AS int)) AS usedAmount from issuancehistory i
+      const issueData = await models.sequelize.query(`Select Sum(CAST(i.Amount AS int)) AS usedAmount from issuancehistory i
                               WHERE i.Client_id="${clientId}"`,
-        { type: models.sequelize.QueryTypes.SELECT }).then(issueData => {
-          let MaxBorrowAmount = parseInt(data.MaxBorrowAmount)
-          if (issueData && issueData.length() != 0) {
-            MaxBorrowAmount = MaxBorrowAmount - parseInt(issueData[0].usedAmount)
-          }
-          res.status(200).send({
-            MaxBorrowAmount
-          })
-          return
-        }).catch(err => {
-          res.status(500).send({ error: err })
-        })
+        { type: models.sequelize.QueryTypes.SELECT })
+
+      let MaxBorrowAmount = parseInt(data.MaxBorrowAmount) || 0
+
+      if (issueData && issueData.length > 0) {
+        MaxBorrowAmount = MaxBorrowAmount - parseInt(issueData[0].usedAmount)
+      }
+      const { dealerBalance } = await models.client.findOne({ attributes: ['dealerBalance'] }, { where: { id: data.Dealer_id } })
+
+      res.status(200).send({
+        MaxBorrowAmount: Math.min(parseInt(dealerBalance || 0), MaxBorrowAmount),
+      })
+      return
     })
     .catch((err) => {
       res.status(500).send({
@@ -80,7 +82,7 @@ exports.getAllClients = (req, res) => {
 };
 
 exports.getAllClientsByDealer = (req, res) => {
-  const id = req.params.Dealer_id
+  const id = req.params.Dealer_id 
   models.client
     .findAll({
       where: {
@@ -288,6 +290,9 @@ exports.createClient = (req, res) => {
   if (!req.body.id) {
     res.status(400).send({ message: 'Content can not be empty!' });
     return;
+  }
+  if (req.body.MaxBorrowAmount) {
+    req.body.dealerBalance = req.body.MaxBorrowAmount
   }
   models.client
     .create(req.body)

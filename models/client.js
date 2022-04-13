@@ -82,6 +82,10 @@ module.exports = function (sequelize) {
       type: Sequelize.INTEGER,
       allowNull: true
     },
+    dealerBalance: {
+      type: Sequelize.INTEGER,
+      allowNull: true
+    },
     Dealer_id: {
       type: Sequelize.STRING(45),
       allowNull: true
@@ -98,7 +102,15 @@ module.exports = function (sequelize) {
       type: Sequelize.INTEGER,
       allowNull: true
     },
-    membership:{
+    dealerStatus: {
+      type: Sequelize.INTEGER,
+      allowNull: true
+    },
+    dealerCommision: {
+      type: Sequelize.INTEGER,
+      allowNull: true
+    },
+    membership: {
       type: Sequelize.BOOLEAN,
     }
   }, {

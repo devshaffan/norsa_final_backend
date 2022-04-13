@@ -9,6 +9,7 @@ const whiteList = [
   '/api/public/clients/getNextK_Id',
   '/api/public/clients/getNextNK_Id',
   '/api/public/clientProfilePicture/createImage',
+  '/api/public/cpoa/createFile',
   '/api/auth/signup',
   '/api/auth/login',
   '/api/auth/loggedInUsers',

@@ -2,6 +2,7 @@ const models = require('../models/index');
 const uuidV4 = require('uuid/v4');
 const _ = require('lodash');
 const { Op } = require('sequelize');
+const { getCurrentDate } = require('../utils/dateHandler');
 exports.getTransactionHistoryById = (req, res) => {
     const id = req.params.id;
     if (!id) {
@@ -214,7 +215,7 @@ exports.createTransactionHistory = async (req, res) => {
     }).then(data => {
         handleTransactionEntry(data)
         models.dailysalesprintcheck.update({
-            datePrinted: new Date(),
+            datePrinted: getCurrentDate(),
             status: false
         }, {
             where:

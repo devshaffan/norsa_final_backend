@@ -5,13 +5,19 @@ const lodash = require('lodash');
 const config = require('../config');
 const db = {};
 const DBConfig = config.db;
+const timezone = 'America/Curacao'
+process.env.TZ = timezone
 const dbOptions = {
   port: DBConfig.port,
   host: DBConfig.host,
   dialect: DBConfig.dialect,
   dialectOptions: {
-    connectTimeout: 60000
+    connectTimeout: 60000,
+    useUTC: false,
+    timezone
   }
+  , timezone
+
 };
 dbOptions.pool = DBConfig.pool;
 const sequelize = new Sequelize(

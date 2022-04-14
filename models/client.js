@@ -36,7 +36,7 @@ module.exports = function (sequelize) {
     },
     ChildrenCount: {
       type: Sequelize.INTEGER, // 0 means no children 1 means have 1 child and so on
-      allowNull: false
+      allowNull: true
     },
     Email: {
       type: Sequelize.STRING(45),
@@ -64,7 +64,7 @@ module.exports = function (sequelize) {
     },
     Housing: {     // 0 for own house, 1 for living at parents, 2 for renting a house 
       type: Sequelize.INTEGER,
-      allowNull: false
+      allowNull: true
     },
     NameOfPartner: {
       type: Sequelize.STRING(45),

@@ -47,7 +47,7 @@ exports.getByMerchantId = (req, res) => {
             }
         })
         .then((data) => {
-            res.json(data);
+            res.status(200).send({ success: true, data });
         })
         .catch((err) => {
             res.status(500).send({

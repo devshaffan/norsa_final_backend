@@ -82,7 +82,7 @@ exports.getAllClients = (req, res) => {
 };
 
 exports.getAllClientsByDealer = (req, res) => {
-  const id = req.params.Dealer_id 
+  const id = req.params.Dealer_id
   models.client
     .findAll({
       where: {
@@ -100,6 +100,98 @@ exports.getAllClientsByDealer = (req, res) => {
       });
     });
 };
+
+const getK_Id = async () => {
+  const data = await models.client.findAll({ attributes: ['id'] })
+  if (!data) return null
+  let k_Ids = data.filter((item, index) => {
+    if (item.id[0] == 'k' || item.id[0] == 'K')
+      return item
+  })
+  if (k_Ids.length == 0) {
+    res.json({ id: "K-0001" })
+    return;
+  }
+  let last_Id = 0
+  k_Ids.map(itm => {
+    const id = parseInt(itm.id.substring(2, itm.id.length))
+    if (id > last_Id) {
+      last_Id = id;
+    }
+  })
+
+  let nextId = last_Id + 1
+  if (nextId < 10) {
+    nextId = "K-000" + nextId
+  }
+  else if (nextId < 100) {
+    nextId = "K-00" + nextId
+  }
+  else if (nextId < 1000) {
+    nextId = "K-0" + nextId
+  }
+  else {
+    nextId = "K-" + nextId
+  }
+  return nextId
+}
+
+const getD_Id = async () => {
+  const data = await models.client.findAll({ attributes: ['id'] })
+  if (!data) return null
+  let D_Ids = data.filter((item, index) => {
+    if (item.id.includes("d") || item.id.includes("D"))
+      return item
+  })
+  if (D_Ids.length == 0) {
+    res.json({ id: "D-0001" })
+    return;
+  }
+  let D_Id = D_Ids[D_Ids.length - 1]
+  let nextId = parseInt(D_Id.id.substring(2, D_Id.id.length)) + 1
+  if (nextId < 10) {
+    nextId = "D-000" + nextId
+  }
+  else if (nextId < 100) {
+    nextId = "D-00" + nextId
+  }
+  else if (nextId < 1000) {
+    nextId = "D-0" + nextId
+  }
+  else {
+    nextId = "D-" + nextId
+  }
+  return nextId
+}
+
+const getNK_Id = async () => {
+  const data = await models.client.findAll({ attributes: ['id'] })
+  if (!data) return null
+  let k_Ids = data.filter((item, index) => {
+    if (item.id.includes("nk") || item.id.includes("NK"))
+      return item
+  })
+
+  if (k_Ids.length == 0) {
+    res.json({ id: "NK-0001" })
+    return;
+  }
+  let k_Id = k_Ids[k_Ids.length - 1]
+  let nextId = parseInt(k_Id.id.substring(3, k_Id.id.length)) + 1
+  if (nextId < 10) {
+    nextId = "NK-000" + nextId
+  }
+  else if (nextId < 100) {
+    nextId = "NK-00" + nextId
+  }
+  else if (nextId < 1000) {
+    nextId = "NK-0" + nextId
+  }
+  else {
+    nextId = "NK-" + nextId
+  }
+  return nextId
+}
 
 exports.getNextK_Id = (req, res) => {
   models.client
@@ -183,6 +275,7 @@ exports.getNextNK_Id = (req, res) => {
       });
     });
 };
+
 exports.getNextD_Id = (req, res) => {
   models.client
     .findAll({ attributes: ['id'] })
@@ -286,13 +379,25 @@ exports.getClientById = (req, res) => {
     });
 };
 
-exports.createClient = (req, res) => {
+exports.createClient = async (req, res) => {
   if (!req.body.id) {
     res.status(400).send({ message: 'Content can not be empty!' });
     return;
   }
   if (req.body.MaxBorrowAmount) {
     req.body.dealerBalance = req.body.MaxBorrowAmount
+  }
+  const { id } = req.body
+  let newId = null;
+  if (id.startsWith("K")) {
+    newId = await getK_Id()
+  }
+  else if (id.startsWith("N")) {
+    newId = await getNK_Id()
+  }
+  if (newId) {
+    req.body.id = newId
+    req.body.Code = newId
   }
   models.client
     .create(req.body)

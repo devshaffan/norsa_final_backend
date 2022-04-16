@@ -5,6 +5,7 @@ const jwt = require('jsonwebtoken');
 const reduceErrorMessage = require('../utils/reduceErrorMessage');
 const whiteList = [
   '/api/public/clients/upsertClient',
+  '/api/public/clients/createClient',
   '/api/public/clients/getActiveClientList',
   '/api/public/clients/getNextK_Id',
   '/api/public/clients/getNextNK_Id',

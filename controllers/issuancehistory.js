@@ -3,6 +3,7 @@ const fs = require('fs')
 
 const _ = require('lodash');
 const uuidV4 = require('uuid/v4');
+const { getMerchant_ID } = require('./transectionHistory');
 
 
 
@@ -23,9 +24,9 @@ exports.getClientByNfcAndPinCode = (req, res) => {
     return res.json({ result: 'fail', message: err });
   });
 }
-const getUsersAgainstAnyMerchant = async (merchants) => {
+const getUserAgainstAnyMerchant = async (merchants) => {
   return await models.merchants
-    .findAll({
+    .findOne({
       where: {
         id: merchants
       },
@@ -33,20 +34,21 @@ const getUsersAgainstAnyMerchant = async (merchants) => {
     })
 }
 
-const checkIfMerchantExists = async (issuanceHistoryId) => {
-  const data = await models.multipleIssueances.findAll({ where: { issuanceHistoryId: issuanceHistoryId } })
+const checkIfMerchantExists = async (issuanceHistoryId, merchantId) => {
+  const data = await models.multipleIssueances.findOne({ where: { issuanceHistoryId: issuanceHistoryId, merchantId: merchantId } })
+  if (!data) return null
   return data
 }
 
-const checkIfUserAuthorized = async (users, token) => {
-  const authorizedUsers = await models.user.findAll({
+const checkIfUserAuthorized = async (user, token) => {
+  const authorizedUsers = await models.user.findOne({
     where: {
-      id: users,
+      id: user,
       accessToken: token
     }
   })
   // return authorizedUsers
-  return authorizedUsers.length > 0 ? true : false
+  return authorizedUsers ? true : false
 }
 const getClientCodeAndName = async (id) => {
   return await models.client.findOne({
@@ -56,36 +58,57 @@ const getClientCodeAndName = async (id) => {
     attributes: ['Code', 'FirstName', 'LastName']
   })
 }
+const getUserId = async (token) => {
+  return await models.user.findOne({ where: { accessToken: token } })
+}
 
 exports.OnNfcAndPinCode = async (req, res) => {
   const { nfcCardId } = req.body;
+  const { Pincode } = req.body;
+  const token = _.get(req.headers, 'authorization', null).split(' ')[1]
+  const merchant_id = await getMerchant_ID(token)
+
   if (!nfcCardId) {
     res.status(400).send({ message: 'Content can not be empty!' });
     return;
   }
-  const data = await models.issuancehistory.findOne({
-    where: { NfcCard_id: nfcCardId },
-    order: [['DateTime', 'DESC']]
+  if (!merchant_id) {
+    res.status(400).send({ message: 'Merchant doesnt exist!' });
+    return;
+  }
+  // const data = await models.issuancehistory.findOne({
+  //   where: { NfcCard_id: nfcCardId },
+  //   order: [['DateTime', 'DESC']]
+  // })
+  const data = await models.issuancehistory.findAll({
+    where: { NfcCard_id: nfcCardId, Pincode: Pincode, AmountPaid: 0 },
   })
-  if (!data) {
+
+  if (!data || data.length == 0) {
     res.status(400).send({ message: 'success', error: "Invalid Card!" })
     return
   }
-  const multipleIssuancesList = await checkIfMerchantExists(data.id)
-
-  if (!multipleIssuancesList) {
-    res.status(400).send({ message: 'success', error: "Invalid Card!" })
-    return
+  // const multipleIssuancesList = await checkIfMerchantExists(data.id)
+  let multipleIssuances = null;
+  let issuanceData = null
+  for (var i = 0; i < data.length; i++) {
+    multipleIssuances = await checkIfMerchantExists(data[i].id, merchant_id)
+    if (multipleIssuances) {
+      issuanceData = data[i];
+      break;
+    }
   }
 
-  if (multipleIssuancesList.length == 0) {
-    if (!data.Client_id) {
-
-
+  // if (!multipleIssuancesList) {
+  //   res.status(400).send({ message: 'success', error: "Invalid Card!" })
+  //   return
+  // }
+  if (!multipleIssuances) {
+    if (!data[0].Client_id) {
       res.status(400).send({ message: 'success', error: "Invalid Card!" })
       return
     }
-    const client = await getClientCodeAndName(data.Client_id)
+    const client = await getClientCodeAndName(data[0].Client_id)
     if (!client) {
       res.status(400).send({ message: 'success', error: "Invalid Card!" })
       return
@@ -94,33 +117,32 @@ exports.OnNfcAndPinCode = async (req, res) => {
     res.json({ message: 'success', data: { data, clientCodeAndFullName } })
     return;
   }
-  const merchants = multipleIssuancesList.map((item) => {
-    return item.merchantId
-  })
-  const users = await getUsersAgainstAnyMerchant(merchants)
-  if (!users || users.length == 0) {
+
+  const user = await getUserAgainstAnyMerchant(multipleIssuances.merchantId)
+  if (!user) {
     res.status(400).send({ message: 'success', error: "Invalid Card!" })
     return
   }
-  const userIds = users.map((item) => {
-    return item.User_id
-  })
-  const token = _.get(req.headers, 'authorization', null).split(' ')[1]
-  const authorized = await checkIfUserAuthorized(userIds, token)
+  // const userIds = users.map((item) => {
+  //   return item.User_id
+  // })
+  const authorized = await checkIfUserAuthorized(user.User_id, token)
   if (!authorized) {
     res.status(400).send({ message: 'success', error: "Invalid Card!" })
     return;
   }
-  if (!data.Client_id) {
+  if (!data[0].Client_id) {
     res.status(400).send({ message: 'success', error: "Invalid Card!" })
     return
   }
-  const client = await getClientCodeAndName(data.Client_id)
+  // get that issuance history which is against multiple issuances
+
+  const client = await getClientCodeAndName(issuanceData.Client_id)
   if (!client) {
     res.status(400).send({ message: 'success', error: "Invalid Card!" })
     return
   }
-  const numberOfMonths = await getNumberOfMonths(multipleIssuancesList[0].numberOfMonthsId)
+  const numberOfMonths = await getNumberOfMonths(multipleIssuances.numberOfMonthsId)
   const clientCodeAndFullName = { Code: client.Code, FullName: client.FirstName + " " + client.LastName, numberOfMonths }
   res.json({ message: 'success', data: { data, clientCodeAndFullName } })
 }
@@ -274,11 +296,11 @@ exports.deleteIssuancehistory = async (req, res) => {
     return;
   }
   const id = req.params.id;
-  
-  await models.multipleIssueances.destroy({ where: {issuanceHistoryId : id}})
-  await models.paybackPeriod.destroy({ where: {issuanceHistory_Id : id}})
-  await models.transactionhistory.destroy({ where: {issuanceHistoryId : id}})
-  await models.insurance.destroy({ where: {issuanceHistoryFk : id}})
+
+  await models.multipleIssueances.destroy({ where: { issuanceHistoryId: id } })
+  await models.paybackPeriod.destroy({ where: { issuanceHistory_Id: id } })
+  await models.transactionhistory.destroy({ where: { issuanceHistoryId: id } })
+  await models.insurance.destroy({ where: { issuanceHistoryFk: id } })
 
   models.issuancehistory
     .destroy({

@@ -144,7 +144,7 @@ exports.OnNfcAndPinCode = async (req, res) => {
   }
   const numberOfMonths = await getNumberOfMonths(multipleIssuances.numberOfMonthsId)
   const clientCodeAndFullName = { Code: client.Code, FullName: client.FirstName + " " + client.LastName, numberOfMonths }
-  res.json({ message: 'success', data: { data, clientCodeAndFullName } })
+  res.json({ message: 'success', data: { data: issuanceData, clientCodeAndFullName } })
 }
 
 const getNumberOfMonths = async (id) => {

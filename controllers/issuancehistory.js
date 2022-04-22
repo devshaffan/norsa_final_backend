@@ -80,7 +80,7 @@ exports.OnNfcAndPinCode = async (req, res) => {
   //   order: [['DateTime', 'DESC']]
   // })
   const data = await models.issuancehistory.findAll({
-    where: { NfcCard_id: nfcCardId, AmountPaid: "0" },
+    where: { NfcCard_id: nfcCardId, AmountPaid: 0 },
   })
 
   if (!data || data.length == 0) {

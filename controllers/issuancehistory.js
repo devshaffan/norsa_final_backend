@@ -68,11 +68,11 @@ exports.OnNfcAndPinCode = async (req, res) => {
   const merchant_id = await getMerchant_ID(token)
 
   if (!nfcCardId) {
-    res.status(400).send({ message: 'success', error:  'Content can not be empty!' });
+    res.status(400).send({ message: 'success', error: 'Content can not be empty!' });
     return;
   }
   if (!merchant_id) {
-    res.status(400).send({  message: 'success', error:  'Merchant doesnt exist!' });
+    res.status(400).send({ message: 'success', error: 'Merchant doesnt exist!' });
     return;
   }
   // const data = await models.issuancehistory.findOne({
@@ -113,7 +113,8 @@ exports.OnNfcAndPinCode = async (req, res) => {
       return
     }
     const clientCodeAndFullName = { Code: client.Code, FullName: client.FirstName + " " + client.LastName, numberOfMonths: 1 }
-    res.json({ message: 'success', data: { data, clientCodeAndFullName } })
+    const issuanceData = data[0]
+    res.json({ message: 'success', data: { data: issuanceData, clientCodeAndFullName } })
     return;
   }
 

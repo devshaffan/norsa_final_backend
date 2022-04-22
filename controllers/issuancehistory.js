@@ -64,7 +64,6 @@ const getUserId = async (token) => {
 
 exports.OnNfcAndPinCode = async (req, res) => {
   const { nfcCardId } = req.body;
-  const { Pincode } = req.body;
   const token = _.get(req.headers, 'authorization', null).split(' ')[1]
   const merchant_id = await getMerchant_ID(token)
 
@@ -76,17 +75,12 @@ exports.OnNfcAndPinCode = async (req, res) => {
     res.status(400).send({  message: 'success', error:  'Merchant doesnt exist!' });
     return;
   }
-  console.log(req.body)
-  if(!Pincode){
-    res.status(400).send({ message: 'success', error: "No PinCode" })
-    return
-  }
   // const data = await models.issuancehistory.findOne({
   //   where: { NfcCard_id: nfcCardId },
   //   order: [['DateTime', 'DESC']]
   // })
   const data = await models.issuancehistory.findAll({
-    where: { NfcCard_id: nfcCardId, Pincode: Pincode, AmountPaid: "0" },
+    where: { NfcCard_id: nfcCardId, AmountPaid: "0" },
   })
 
   if (!data || data.length == 0) {

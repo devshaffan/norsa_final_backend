@@ -76,6 +76,7 @@ exports.OnNfcAndPinCode = async (req, res) => {
     res.status(400).send({ message: 'Merchant doesnt exist!' });
     return;
   }
+  console.log(req.body)
   if(!Pincode){
     res.status(400).send({ message: 'success', error: "No PinCode" })
     return

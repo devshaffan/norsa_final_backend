@@ -76,6 +76,10 @@ exports.OnNfcAndPinCode = async (req, res) => {
     res.status(400).send({ message: 'Merchant doesnt exist!' });
     return;
   }
+  if(!Pincode){
+    res.status(400).send({ message: 'success', error: "No PinCode" })
+    return
+  }
   // const data = await models.issuancehistory.findOne({
   //   where: { NfcCard_id: nfcCardId },
   //   order: [['DateTime', 'DESC']]

@@ -69,11 +69,11 @@ exports.OnNfcAndPinCode = async (req, res) => {
   const merchant_id = await getMerchant_ID(token)
 
   if (!nfcCardId) {
-    res.status(400).send({ message: 'Content can not be empty!' });
+    res.status(400).send({ message: 'success', error:  'Content can not be empty!' });
     return;
   }
   if (!merchant_id) {
-    res.status(400).send({ message: 'Merchant doesnt exist!' });
+    res.status(400).send({  message: 'success', error:  'Merchant doesnt exist!' });
     return;
   }
   console.log(req.body)

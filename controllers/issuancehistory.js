@@ -85,7 +85,7 @@ exports.OnNfcAndPinCode = async (req, res) => {
   })
 
   if (!data || data.length == 0) {
-    res.status(400).send({ message: 'success', error: "Invalid Card!" })
+    res.status(400).send({ message: 'success', error: "Invalid Card! data" })
     return
   }
   // const multipleIssuancesList = await checkIfMerchantExists(data.id)
@@ -105,12 +105,12 @@ exports.OnNfcAndPinCode = async (req, res) => {
   // }
   if (!multipleIssuances) {
     if (!data[0].Client_id) {
-      res.status(400).send({ message: 'success', error: "Invalid Card!" })
+      res.status(400).send({ message: 'success', error: "Invalid Card! multipleIssuances" })
       return
     }
     const client = await getClientCodeAndName(data[0].Client_id)
     if (!client) {
-      res.status(400).send({ message: 'success', error: "Invalid Card!" })
+      res.status(400).send({ message: 'success', error: "Invalid Card! client" })
       return
     }
     const clientCodeAndFullName = { Code: client.Code, FullName: client.FirstName + " " + client.LastName, numberOfMonths: 1 }
@@ -120,7 +120,7 @@ exports.OnNfcAndPinCode = async (req, res) => {
 
   const user = await getUserAgainstAnyMerchant(multipleIssuances.merchantId)
   if (!user) {
-    res.status(400).send({ message: 'success', error: "Invalid Card!" })
+    res.status(400).send({ message: 'success', error: "Invalid Card! user" })
     return
   }
   // const userIds = users.map((item) => {
@@ -128,18 +128,18 @@ exports.OnNfcAndPinCode = async (req, res) => {
   // })
   const authorized = await checkIfUserAuthorized(user.User_id, token)
   if (!authorized) {
-    res.status(400).send({ message: 'success', error: "Invalid Card!" })
+    res.status(400).send({ message: 'success', error: "Invalid Card! authorized" })
     return;
   }
   if (!data[0].Client_id) {
-    res.status(400).send({ message: 'success', error: "Invalid Card!" })
+    res.status(400).send({ message: 'success', error: "Invalid Card! data[0].Client_id" })
     return
   }
   // get that issuance history which is against multiple issuances
 
   const client = await getClientCodeAndName(issuanceData.Client_id)
   if (!client) {
-    res.status(400).send({ message: 'success', error: "Invalid Card!" })
+    res.status(400).send({ message: 'success', error: "Invalid Card! client2" })
     return
   }
   const numberOfMonths = await getNumberOfMonths(multipleIssuances.numberOfMonthsId)

@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const clientProofOfAddress = require('../controllers/clientProofOfAddress');
-const upload = require("../middleware/upload");
+const uploadPdf = require('../middleware/uploadPdf');
 
 
 // const multer = require('multer')
@@ -15,5 +15,5 @@ const upload = require("../middleware/upload");
 //   })
 
 
-router.post('/createFile', upload.single("file"), clientProofOfAddress.createFile)
+router.post('/createFile', uploadPdf.single("file"), clientProofOfAddress.createFile)
 module.exports = router;

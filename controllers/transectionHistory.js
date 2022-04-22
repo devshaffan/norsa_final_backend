@@ -167,6 +167,7 @@ exports.getMerchantsTodaysTransactions = async (req, res) => {
         res.status(400).send({
             message: 'This User doesnt exist as a merchant'
         });
+        return;
     }
 
     models.sequelize.query(`SELECT m.Name AS 'Name', t.* , COUNT(p.id) AS totalPaybackPeriods FROM transactionhistory t

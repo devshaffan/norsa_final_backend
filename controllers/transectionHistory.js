@@ -26,8 +26,13 @@ exports.getTransactionHistoryByClientId = (req, res) => {
             message: 'id is required'
         });
     }
-    models.sequelize.query(`SELECT m.Name AS 'Name', t.* FROM transactionhistory t
-    JOIN merchants m ON m.id = t.Merchant_ID WHERE t.Client_id = "${Client_id}"`,
+    models.sequelize.query(`SELECT m.Name AS 'Name', t.*, count(p.date) AS "PaybackMonths" FROM transactionhistory t
+    JOIN merchants m ON m.id = t.Merchant_ID 
+    JOIN issuancehistory i ON i.id = t.issuancehistoryId 
+    JOIN paybackperiods p ON p.issuanceHistory_Id = i.id 
+    WHERE t.Client_id = "${Client_id}"
+    group By t.id
+    `,
         { type: models.sequelize.QueryTypes.SELECT }).then((data) => {
             res.json({ message: 'success', data })
         }).catch((err) => {

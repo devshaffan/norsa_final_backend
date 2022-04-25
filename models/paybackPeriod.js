@@ -28,6 +28,10 @@ module.exports = function (sequelize) {
             type: Sequelize.BOOLEAN,
             allowNull: true
         },
+        invoiceNumber: {
+            type: Sequelize.STRING(45),
+            allowNull: true
+        },
         amountPaidToDealer: {
             type: Sequelize.STRING(45),
             allowNull: true

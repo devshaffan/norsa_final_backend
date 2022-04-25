@@ -61,6 +61,16 @@ const getClientCodeAndName = async (id) => {
 const getUserId = async (token) => {
   return await models.user.findOne({ where: { accessToken: token } })
 }
+const getPaybackPeriodDate = async (issuanceHistoryId) => {
+  const result = await models.paybackPeriod.findOne({
+    where: {
+      issuanceHistory_Id: issuanceHistoryId
+    },
+    order: [["date", "ASC"]],
+    attributes: ['date']
+  })
+  return result
+}
 
 exports.OnNfcAndPinCode = async (req, res) => {
   const { nfcCardId } = req.body;
@@ -102,6 +112,7 @@ exports.OnNfcAndPinCode = async (req, res) => {
   //   res.status(400).send({ message: 'success', error: "Invalid Card!" })
   //   return
   // }
+  const paybackPeriod = await getPaybackPeriodDate(issuanceData ? issuanceData.id : data[0].id)
   if (!multipleIssuances) {
     if (!data[0].Client_id) {
       res.status(400).send({ message: 'success', error: "Invalid Card! multipleIssuances" })
@@ -114,7 +125,7 @@ exports.OnNfcAndPinCode = async (req, res) => {
     }
     const clientCodeAndFullName = { Code: client.Code, FullName: client.FirstName + " " + client.LastName, numberOfMonths: 1 }
     const issuanceData = data[0]
-    res.json({ message: 'success', data: { data: issuanceData, clientCodeAndFullName } })
+    res.json({ message: 'success', data: { data: issuanceData, clientCodeAndFullName, paybackPeriod } })
     return;
   }
 
@@ -144,7 +155,7 @@ exports.OnNfcAndPinCode = async (req, res) => {
   }
   const numberOfMonths = await getNumberOfMonths(multipleIssuances.numberOfMonthsId)
   const clientCodeAndFullName = { Code: client.Code, FullName: client.FirstName + " " + client.LastName, numberOfMonths }
-  res.json({ message: 'success', data: { data: issuanceData, clientCodeAndFullName } })
+  res.json({ message: 'success', data: { data: issuanceData, clientCodeAndFullName, paybackPeriod } })
 }
 
 const getNumberOfMonths = async (id) => {

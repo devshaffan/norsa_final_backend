@@ -1,14 +1,14 @@
 const models = require('../models/index');
 const uuidV4 = require('uuid/v4');
-models.insurance.belongsTo(models.issuancehistory, {foreignKey: 'issuanceHistoryFk'});
+models.insurance.belongsTo(models.issuancehistory, { foreignKey: 'issuanceHistoryFk' });
 exports.getAllInsurance = (req, res) => {
-    const limit = parseInt(req.params.limit, 10)|| 10;
-    const offset = parseInt(req.params.offset, 10)|| 0;
+    const limit = parseInt(req.params.limit, 10) || 10;
+    const offset = parseInt(req.params.offset, 10) || 0;
     models.insurance.findAll({
         limit,
         offset,
     }).then(insurance => {
-        res.status(200).send({result:'ok',data:insurance});
+        res.status(200).send({ result: 'ok', data: insurance });
     }).catch(err => {
         res.status(500).send({
             result: 'error',
@@ -18,7 +18,7 @@ exports.getAllInsurance = (req, res) => {
 };
 
 exports.getInsuranceById = (req, res) => {
-    if(!req.params.id) {
+    if (!req.params.id) {
         return res.status(400).send({
             result: 'error',
             message: 'Insurance id is required'
@@ -31,7 +31,36 @@ exports.getInsuranceById = (req, res) => {
                 message: "Insurance not found with id " + req.params.id
             });
         }
-        res.send({result:'ok',data:insurance});
+        res.send({ result: 'ok', data: insurance });
+    }).catch(err => {
+        if (err.kind === 'ObjectId') {
+            return res.status(404).send({
+                result: 'error',
+                message: "Insurance not found with id " + req.params.id
+            });
+        }
+        return res.status(500).send({
+            result: 'error',
+            message: "Error retrieving insurance with id " + req.params.id
+        });
+    });
+};
+
+exports.getInsuranceAmountByIssuanceHistoryId = (req, res) => {
+    if (!req.params.id) {
+        return res.status(400).send({
+            result: 'error',
+            message: 'Insurance id is required'
+        });
+    }
+    models.insurance.findOne({ where: { issuanceHistoryFk: req.params.id }, attributes: ['amount'] }).then(insuranceAmount => {
+        if (!insuranceAmount) {
+            return res.status(404).send({
+                result: 'error',
+                message: "insurance Amount not found with id " + req.params.id
+            });
+        }
+        res.send({ result: 'ok', data: insuranceAmount });
     }).catch(err => {
         if (err.kind === 'ObjectId') {
             return res.status(404).send({
@@ -48,19 +77,19 @@ exports.getInsuranceById = (req, res) => {
 
 exports.createInsurance = (req, res) => {
     // Validate request
-    if(!req.body.amount) {
+    if (!req.body.amount) {
         return res.status(400).send({
             result: 'error',
             message: 'Insurance amount is required'
         });
     }
-    if(!req.body.tax) {
+    if (!req.body.tax) {
         return res.status(400).send({
             result: 'error',
             message: 'Insurance tax is required'
         });
     }
-    if(!req.body.issuanceHistoryFk) {
+    if (!req.body.issuanceHistoryFk) {
         return res.status(400).send({
             result: 'error',
             message: 'Issuance history id is required'
@@ -71,17 +100,17 @@ exports.createInsurance = (req, res) => {
     insurance.id = uuidV4();
     models.insurance.create(insurance)
         .then(data => {
-            res.send({result:'ok',data:data});
+            res.send({ result: 'ok', data: data });
         }).catch(err => {
-        res.status(500).send({
-            result: 'error',
-            message: err.message || "Some error occurred while creating the Insurance."
+            res.status(500).send({
+                result: 'error',
+                message: err.message || "Some error occurred while creating the Insurance."
+            });
         });
-    });
 };
 
 exports.updateInsurance = (req, res) => {
-    if(!req.params.id) {
+    if (!req.params.id) {
         return res.status(400).send({
             result: 'error',
             message: 'Insurance id is required'
@@ -93,10 +122,10 @@ exports.updateInsurance = (req, res) => {
         issuanceHistoryFk: req.body.issuancehistoryId
     };
     models.insurance.update(insurance, {
-        where: {id: req.params.id}
+        where: { id: req.params.id }
     }).then(num => {
         if (num == 1) {
-            res.send({result:'ok',data:insurance});
+            res.send({ result: 'ok', data: insurance });
         } else {
             res.send({
                 result: 'error',
@@ -112,17 +141,17 @@ exports.updateInsurance = (req, res) => {
 };
 
 exports.deleteInsurance = (req, res) => {
-    if(!req.params.id) {
+    if (!req.params.id) {
         return res.status(400).send({
             result: 'error',
             message: 'Insurance id is required'
         });
     }
     models.insurance.destroy({
-        where: {id: req.params.id}
+        where: { id: req.params.id }
     }).then(num => {
         if (num == 1) {
-            res.send({result:'ok',data:req.params.id});
+            res.send({ result: 'ok', data: req.params.id });
         } else {
             res.send({
                 result: 'error',

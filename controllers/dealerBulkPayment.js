@@ -1,5 +1,6 @@
 const models = require('../models/index');
 const uuidV4 = require('uuid/v4');
+const { getUniqueString } = require('../utils/utils');
 
 exports.getAll = (req, res) => {
   models.sequelize.query(`SELECT d.*, u.email AS email, c.Code AS Code, c.FirstName AS FirstName, c.LastName AS LastName
@@ -32,7 +33,7 @@ exports.getById = (req, res) => {
 };
 
 exports.create = (req, res) => {
-  const data = { ...req.body, id: uuidV4() }
+  const data = { ...req.body, id: uuidV4(), InvoiceNumber: req.body.InvoiceNumber ||  getUniqueString(7) }
   if (!data.Dealer.includes("D")) {
     res.status(500).send({ err: "client should start with D" })
     return
@@ -54,8 +55,10 @@ exports.update = (req, res) => {
     res.status(400).send({ message: 'Content can not be empty!' });
     return;
   }
+  const data = { ...req.body, InvoiceNumber: req.body.InvoiceNumber || getUniqueString(7) }
+
   models.dealerBulkPayment
-    .upsert(req.body)
+    .upsert(data)
     .then((data) => res.json(data))
     .catch((err) => {
       res.status(500).send({

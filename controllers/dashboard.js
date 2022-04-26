@@ -94,7 +94,7 @@ exports.currentDateTransaction = (req, res) => {
 
 exports.todaysTransaction = (req, res) => {
     models.sequelize.query(`SELECT t.Client_id AS "Code", t.Amountuser AS 'Amount', m.Name As 'Merchant_Name', DATE(t.dateTime) AS 'Date', TIME(t.dateTime) AS 'Time' FROM transactionhistory t
-    JOIN merchants m ON m.id=t.Merchant_ID`, { type: models.sequelize.QueryTypes.SELECT }).then(data => {
+    JOIN merchants m ON m.id=t.Merchant_ID WHERE DATE(t.dateTime) = DATE(NOW())`, { type: models.sequelize.QueryTypes.SELECT }).then(data => {
         return res.json(data)
     }).catch(err => {
         res.status(500).send({ error: err })

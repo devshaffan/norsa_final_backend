@@ -48,6 +48,7 @@ exports.topThreeMerchantsByTransaction = (req, res) => {
             return res.json(finalData)
         }).catch(err => {
             res.status(500).send({ error: err })
+            
         })
 }
 const getMerchantData = async (id) => {

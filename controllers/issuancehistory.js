@@ -108,6 +108,18 @@ exports.OnNfcAndPinCode = async (req, res) => {
     }
   }
 
+  /*task to be done 26/4
+  
+  1. get all issuance history id
+  2. get all unique inssuance history id that matches with the merchant id in multiple issuances
+  3. get one issuance history id that doesnt exist in multiple issuance 
+  4. combine 2 3
+  5. check payback period date count against issuance history id of 4
+  6. return [{issuancehistory1, paybackperiod1},
+            {issuancehistory2, paybackperiod2}]
+  7. return previous + paybackCount
+  */
+
   // if (!multipleIssuancesList) {
   //   res.status(400).send({ message: 'success', error: "Invalid Card!" })
   //   return

@@ -98,12 +98,13 @@ exports.OnNfcAndPinCode = async (req, res) => {
     return
   }
   // const multipleIssuancesList = await checkIfMerchantExists(data.id)
-  let multipleIssuances = null;
+  let multipleIssuances = [];
   let issuanceData = null
   for (var i = 0; i < data.length; i++) {
-    multipleIssuances = await checkIfMerchantExists(data[i].id, merchant_id)
-    if (multipleIssuances) {
+    const multipleIssuance = await checkIfMerchantExists(data[i].id, merchant_id)
+    if (multipleIssuance) {
       issuanceData = data[i];
+      multipleIssuances.push(multipleIssuance)
       break;
     }
   }

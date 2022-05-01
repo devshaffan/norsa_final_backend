@@ -423,7 +423,10 @@ exports.createIssuancehistory = (req, res) => {
     res.status(400).send({ message: 'Content can not be empty!' });
     return;
   }
-  req.body.DateTime = req.body.DateTime + new Date(new Date().getTime() + 15 * 60 * 60 * 1000).toLocaleTimeString()
+  const currentDate = new Date()
+  currentDate.setHours(20, 0, 0, 0)
+  // console.log(currentDate)
+  req.body.DateTime = req.body.DateTime+ currentDate.toISOString().split("T")[1]
   models.issuancehistory
     .create(req.body)
     .then((data) => {

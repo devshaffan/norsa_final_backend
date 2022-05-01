@@ -19,7 +19,7 @@ module.exports = function (sequelize) {
       allowNull: false,
     },
     DateTime: {
-      type: Sequelize.DATE,
+      type: Sequelize.DATEONLY,
       allowNull: false
     },
     Amount: {

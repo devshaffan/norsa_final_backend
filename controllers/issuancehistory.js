@@ -103,8 +103,7 @@ exports.OnNfcAndPinCode = async (req, res) => {
   // const data = await models.issuancehistory.findAll({
   //   where: {
   //     NfcCard_id: nfcCardId, AmountPaid: 0, DateTime : {
-
-
+  //       op.
   //     }
   //   }});
   if (!data || data.length == 0) {
@@ -424,6 +423,7 @@ exports.createIssuancehistory = (req, res) => {
     res.status(400).send({ message: 'Content can not be empty!' });
     return;
   }
+  req.body.DateTime = req.body.DateTime + new Date(new Date().getTime() + 15 * 60 * 60 * 1000).toLocaleTimeString()
   models.issuancehistory
     .create(req.body)
     .then((data) => {

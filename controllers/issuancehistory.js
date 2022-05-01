@@ -102,6 +102,104 @@ exports.OnNfcAndPinCode = async (req, res) => {
   const data = await models.issuancehistory.findAll({
     where: { NfcCard_id: nfcCardId, AmountPaid: 0 },
   })
+
+  if (!data || data.length == 0) {
+    res.status(400).send({ message: 'success', error: "Invalid Card! data" })
+    return
+  }
+  // const multipleIssuancesList = await checkIfMerchantExists(data.id)
+  let multipleIssuances = null;
+  let issuanceData = null
+  for (var i = 0; i < data.length; i++) {
+    multipleIssuances = await checkIfMerchantExists(data[i].id, merchant_id)
+    if (multipleIssuances) {
+      issuanceData = data[i];
+      // multipleIssuances.push(multipleIssuance)
+      break;
+    }
+  }
+
+  /*task to be done 26/4
+  
+  1. get all issuance history id
+  2. get all unique inssuance history id that matches with the merchant id in multiple issuances
+  3. get one issuance history id that doesnt exist in multiple issuance 
+  4. combine 2 3
+  5. check payback period date count against issuance history id of 4
+  6. return [{issuancehistory1, paybackperiod1},
+            {issuancehistory2, paybackperiod2}]
+  7. return previous + paybackCount
+  */
+
+  // if (!multipleIssuancesList) {
+  //   res.status(400).send({ message: 'success', error: "Invalid Card!" })
+  //   return
+  // }
+  const paybackPeriod = await getPaybackPeriodDate(issuanceData ? issuanceData.id : data[0].id)
+  if (!multipleIssuances) {
+    if (!data[0].Client_id) {
+      res.status(400).send({ message: 'success', error: "Invalid Card! multipleIssuances" })
+      return
+    }
+    const client = await getClientCodeAndName(data[0].Client_id)
+    if (!client) {
+      res.status(400).send({ message: 'success', error: "Invalid Card! client" })
+      return
+    }
+    const clientCodeAndFullName = { Code: client.Code, FullName: client.FirstName + " " + client.LastName, numberOfMonths: 1 }
+    const issuanceData = data[0]
+    res.json({ message: 'success', data: { data: issuanceData, clientCodeAndFullName, paybackPeriod } })
+    return;
+  }
+
+  const user = await getUserAgainstAnyMerchant(multipleIssuances.merchantId)
+  if (!user) {
+    res.status(400).send({ message: 'success', error: "Invalid Card! user" })
+    return
+  }
+  // const userIds = users.map((item) => {
+  //   return item.User_id
+  // })
+  const authorized = await checkIfUserAuthorized(user.User_id, token)
+  if (!authorized) {
+    res.status(400).send({ message: 'success', error: "Invalid Card! authorized" })
+    return;
+  }
+  if (!data[0].Client_id) {
+    res.status(400).send({ message: 'success', error: "Invalid Card! data[0].Client_id" })
+    return
+  }
+  // get that issuance history which is against multiple issuances
+
+  const client = await getClientCodeAndName(issuanceData.Client_id)
+  if (!client) {
+    res.status(400).send({ message: 'success', error: "Invalid Card! client2" })
+    return
+  }
+  const numberOfMonths = await getNumberOfMonths(multipleIssuances.numberOfMonthsId)
+  const clientCodeAndFullName = { Code: client.Code, FullName: client.FirstName + " " + client.LastName, numberOfMonths }
+  res.json({ message: 'success', data: { data: issuanceData, clientCodeAndFullName, paybackPeriod } })
+}
+exports.OnNfcAndPinCodeNew = async (req, res) => {
+  const { nfcCardId } = req.body;
+  const token = _.get(req.headers, 'authorization', null).split(' ')[1]
+  const merchant_id = await getMerchant_ID(token)
+
+  if (!nfcCardId) {
+    res.status(400).send({ message: 'success', error: 'Content can not be empty!' });
+    return;
+  }
+  if (!merchant_id) {
+    res.status(400).send({ message: 'success', error: 'Merchant doesnt exist!' });
+    return;
+  }
+  // const data = await models.issuancehistory.findOne({
+  //   where: { NfcCard_id: nfcCardId },
+  //   order: [['DateTime', 'DESC']]
+  // })
+  const data = await models.issuancehistory.findAll({
+    where: { NfcCard_id: nfcCardId, AmountPaid: 0 },
+  })
   if (!data || data.length == 0) {
     res.status(400).send({ message: 'success', error: "Invalid Card! data" })
     return

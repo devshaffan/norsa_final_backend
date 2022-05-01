@@ -89,7 +89,7 @@ exports.dealerReport = (req, res) => {
     if (!dealers) {
         res.status(500).send({ message: "no dealer selected" })
     }
-    models.sequelize.query(`SELECT c.* FROM client c WHERE c.Dealer_id = '${dealers}';`, { type: models.sequelize.QueryTypes.SELECT })
+    models.sequelize.query(`SELECT c.Code FROM client c WHERE c.Dealer_id = '${dealers}'`, { type: models.sequelize.QueryTypes.SELECT })
         .then(data => {
             return res.json(data)
         })

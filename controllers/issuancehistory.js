@@ -99,10 +99,14 @@ exports.OnNfcAndPinCode = async (req, res) => {
   //   where: { NfcCard_id: nfcCardId },
   //   order: [['DateTime', 'DESC']]
   // })
-  const data = await models.issuancehistory.findAll({
-    where: { NfcCard_id: nfcCardId, AmountPaid: 0 },
-  })
+  const data = await models.sequelize.query(`SELECT  * FROM issuancehistory i WHERE (i.NfcCard_id = '${nfcCardId}' AND i.AmountPaid='0' AND MONTH(i.DateTime) = MONTH(CURDATE()))`, { type: models.sequelize.QueryTypes.SELECT })
+  // const data = await models.issuancehistory.findAll({
+  //   where: {
+  //     NfcCard_id: nfcCardId, AmountPaid: 0, DateTime : {
 
+
+  //     }
+  //   }});
   if (!data || data.length == 0) {
     res.status(400).send({ message: 'success', error: "Invalid Card! data" })
     return
@@ -197,6 +201,7 @@ exports.OnNfcAndPinCodeNew = async (req, res) => {
   //   where: { NfcCard_id: nfcCardId },
   //   order: [['DateTime', 'DESC']]
   // })
+
   const data = await models.issuancehistory.findAll({
     where: { NfcCard_id: nfcCardId, AmountPaid: 0 },
   })
@@ -247,7 +252,7 @@ exports.OnNfcAndPinCodeNew = async (req, res) => {
   return;
   /*task to be done 26/4
   
-  1. get all issuance history id
+  1. get all issuance history id with current month
   2. get all unique inssuance history id that matches with the merchant id in multiple issuances
   3. get one issuance history id that doesnt exist in multiple issuance 
   4. combine 2 3

@@ -426,7 +426,7 @@ exports.createIssuancehistory = (req, res) => {
   const currentDate = new Date()
   currentDate.setHours(20, 0, 0, 0)
   // console.log(currentDate)
-  req.body.DateTime = req.body.DateTime+ currentDate.toISOString().split("T")[1]
+  req.body.DateTime = req.body.DateTime + "T" + currentDate.toISOString().split("T")[1]
   models.issuancehistory
     .create(req.body)
     .then((data) => {

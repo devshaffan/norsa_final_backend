@@ -33,13 +33,21 @@ exports.merchantReport = (req, res) => {
         })
 }
 exports.transactionReport = (req, res) => {
-    const token = _.get(req.headers, 'authorization', null).split(' ')[1]
+    const merchants = req.params.merchants
+    if (!merchants) {
+        res.status(500).send({ message: "no merchants selected " })
+        return
+    }
     models.sequelize.query(`SELECT m.Name, t.* from transactionhistory t 
     JOIN merchants m ON m.id = t.Merchant_ID
-    JOIN users u ON u.id=m.User_id
-    WHERE u.accessToken='${token}' AND Date(t.dateTime) = CURDATE()
-    group BY t.Merchant_ID`
-        , { type: models.sequelize.QueryTypes.SELECT }).then(data => {
+    WHERE m.id IN (:merchants) 
+    group BY t.Merchant_ID
+    order by m.Name
+    `
+        , {
+            replacements: { merchants: merchants.split(',') },
+            type: models.sequelize.QueryTypes.SELECT
+        }).then(data => {
             return res.json(data)
         }).catch(err => {
             res.status(500).send({ error: err })
@@ -47,16 +55,26 @@ exports.transactionReport = (req, res) => {
 }
 exports.totalSales = (req, res) => {
     const users = req.params.users;
+    const date = req.params.date;
+    if (!users || !date) {
+        res.status(500).send({ message: "no user selected or date" })
+        return
+    }
     models.sequelize.query(`
-    SELECT Date(p.dateDeposit) AS Fetcha, u.email AS  Nomber, MONTH(p.date) AS Period,
-        (CAST(p.amountPaidByClient AS unsigned) - CAST(p.amountPaidToDealer AS unsigned)) As Montante, p.remarks AS Remarks FROM paybackperiods p
-        JOIN users u ON u.id=p.handledByUserId
-        WHERE p.dateDeposit IS NOT NULL 
-            AND p.amountPaidByClient IS NOT NULL 
-            AND p.amountPaidToDealer IS NOT NULL 
-            AND u.id = '${users}'
-        Group BY u.id
-    `, { type: models.sequelize.QueryTypes.SELECT }).then(data => {
+    SELECT i.Client_id AS 'Code', CONCAT(c.FirstName, ' ', c.LastName) AS 'Name', u.email, p.amount, p.dateDeposit, i.TypeOfReturnPayment
+    FROM paybackperiods p
+    JOIN issuancehistory i ON i.id = p.issuanceHistory_Id
+    JOIN client c ON c.id = i.Client_id 
+    JOIN users u ON u.id = p.handledByUserId
+    WHERE u.id IN (:users) AND  Date(p.DateDeposit) = '${date}'
+    ORDER BY p.dateDeposit, u.email;
+    `, {
+        replacements: {
+            users: users.split(',')
+        },
+        type: models.sequelize.QueryTypes.SELECT
+    }).then(data => {
+        console.log(data)
         return res.json(data)
     }).catch(err => {
         res.status(500).send({ error: err })
@@ -64,14 +82,18 @@ exports.totalSales = (req, res) => {
 }
 exports.totalSalesOfCurrentUser = (req, res) => {
     const token = _.get(req.headers, 'authorization', null).split(' ')[1]
-    models.sequelize.query(`SELECT Date(p.dateDeposit) AS Fetcha, u.email AS  Nomber, MONTH(p.date) AS Period,
-    (CAST(p.amountPaidByClient AS unsigned) - CAST(p.amountPaidToDealer AS unsigned)) As Montante, p.remarks AS Remarks FROM paybackperiods p
-    JOIN users u ON u.id=p.handledByUserId
-    WHERE p.dateDeposit IS NOT NULL 
-        AND p.amountPaidByClient IS NOT NULL 
-        AND p.amountPaidToDealer IS NOT NULL 
-        AND u.accessToken = '${token}'
-        AND Date(p.dateDeposit) = CURDATE()
+    const date = req.params.date
+    if (!date) {
+        res.status(500).send({ message: "no user selected or date" })
+        return
+    }
+    models.sequelize.query(`SELECT i.Client_id AS 'Code', CONCAT(c.FirstName, ' ', c.LastName) AS 'Name', u.email, p.amount, p.dateDeposit, i.TypeOfReturnPayment
+    FROM paybackperiods p
+    JOIN issuancehistory i ON i.id = p.issuanceHistory_Id
+    JOIN client c ON c.id = i.Client_id
+    JOIN users u ON u.id = p.handledByUserId
+    WHERE u.accessToken = '${token}' AND  Date(p.DateDeposit) = '${date}'
+    ORDER BY p.dateDeposit, u.email;
 `, { type: models.sequelize.QueryTypes.SELECT }).then(data => {
         return res.json(data)
     }).catch(err => {
@@ -93,7 +115,7 @@ exports.dealerReport = (req, res) => {
     LEFT JOIN paybackperiods p ON p.issuanceHistory_Id=ih.id
     WHERE c.Dealer_id IN (:dealers)
 	group BY c.id,c.Dealer_id
-    Order by c.Dealer_id`,{
+    Order by c.Dealer_id`, {
         replacements: { dealers: dealers.split(',') },
         type: models.sequelize.QueryTypes.SELECT
     })

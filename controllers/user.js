@@ -15,7 +15,32 @@ exports.getAllUsers = (req, res) => {
             });
         });
 };
-
+exports.getAllNotMerchants = (req, res) => {
+    models.user.findAll({
+        where: {
+            isAdmin: { $not: 2 }
+        }
+    }).then((data) => {
+        res.status(200).json(data)
+    }).catch((err) => {
+        res.status(500).send({
+            message:
+                err.message || "Some error occured while getting all the data"
+        })
+    })
+}
+exports.getAllMerchants = (req, res) => {
+    models.sequelize.query(`SELECT m.Name,m.id FROM merchants m
+    JOIN users u ON u.id = m.User_id
+    WHERE u.isAdmin = 2
+    `, {
+            type: models.sequelize.QueryTypes.SELECT
+        }).then(data => {
+            return res.json(data)
+        }).catch(err => {
+            res.status(500).send({ error: err })
+        })
+}
 exports.deleteUser = (req, res) => {
     if (!req.params.id) {
         res.status(400).send({ message: 'Content can not be empty!' });
@@ -60,13 +85,13 @@ exports.getUserById = (req, res) => {
         });
 };
 
-exports.getUserByEmail= (req, res) => {
+exports.getUserByEmail = (req, res) => {
     // const clientId = req.params.id;
     // //console.log('id is ', Number.parseInt(clientId, 10));
     models.user
         .find({
-            where : {
-                email : req.params.email
+            where: {
+                email: req.params.email
             }
         })
         .then((data) => {

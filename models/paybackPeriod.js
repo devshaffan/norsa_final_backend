@@ -48,6 +48,10 @@ module.exports = function (sequelize) {
             type: Sequelize.DATE,
             allowNull: true,
         },
+        TypeOfReturnPayment: {
+            type: Sequelize.STRING(45),
+            allowNull: true
+        },
         handledByUserId: {
             type: Sequelize.STRING,
             allowNull: true,

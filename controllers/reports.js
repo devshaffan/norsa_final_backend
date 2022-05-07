@@ -1,6 +1,5 @@
 const models = require('../models/index');
 const _ = require('lodash');
-
 exports.merchantReport = (req, res) => {
     const date = req.params.date
     models.sequelize.query(`SELECT m.Code, m.Name,
@@ -33,7 +32,6 @@ exports.merchantReport = (req, res) => {
             res.status(500).send({ error: err })
         })
 }
-
 exports.transactionReport = (req, res) => {
     const token = _.get(req.headers, 'authorization', null).split(' ')[1]
     models.sequelize.query(`SELECT m.Name, t.* from transactionhistory t 
@@ -47,7 +45,6 @@ exports.transactionReport = (req, res) => {
             res.status(500).send({ error: err })
         })
 }
-
 exports.totalSales = (req, res) => {
     const users = req.params.users;
     models.sequelize.query(`
@@ -65,7 +62,6 @@ exports.totalSales = (req, res) => {
         res.status(500).send({ error: err })
     })
 }
-
 exports.totalSalesOfCurrentUser = (req, res) => {
     const token = _.get(req.headers, 'authorization', null).split(' ')[1]
     models.sequelize.query(`SELECT Date(p.dateDeposit) AS Fetcha, u.email AS  Nomber, MONTH(p.date) AS Period,
@@ -82,14 +78,25 @@ exports.totalSalesOfCurrentUser = (req, res) => {
         res.status(500).send({ error: err })
     })
 }
-
-
 exports.dealerReport = (req, res) => {
     const dealers = req.params.dealers
     if (!dealers) {
         res.status(500).send({ message: "no dealer selected" })
     }
-    models.sequelize.query(`SELECT c.Code FROM client c WHERE c.Dealer_id = '${dealers}'`, { type: models.sequelize.QueryTypes.SELECT })
+    models.sequelize.query(`SELECT c.Code AS 'Code', c.Dealer_id AS 'Dealer',
+    CONCAT(c.FirstName, ' ', c.LastName) AS 'Name', c.Date AS 'Date',
+    SUM(p.amount) AS 'Paybackperiod_Amount', SUM(i.amount) AS 'insurance', SUM(m.amount) AS 'Membership_Fee', (IFNULL(p.amount,0) + IFNULL(m.amount,0) + IFNULL(i.amount,0)) AS 'Total_Sum'
+    FROM client c
+    LEFT JOIN memberships m ON m.clientFk=c.id
+    LEFT JOIN issuancehistory ih ON ih.Client_id=c.id
+    LEFT JOIN insurances i ON i.issuanceHistoryFk=ih.id
+    LEFT JOIN paybackperiods p ON p.issuanceHistory_Id=ih.id
+    WHERE c.Dealer_id IN (:dealers)
+	group BY c.id,c.Dealer_id
+    Order by c.Dealer_id`,{
+        replacements: { dealers: dealers.split(',') },
+        type: models.sequelize.QueryTypes.SELECT
+    })
         .then(data => {
             return res.json(data)
         })

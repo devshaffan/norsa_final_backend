@@ -47,7 +47,7 @@ module.exports = function (sequelize) {
       allowNull: false
     },
     MaxBorrowAmount: {
-      type: Sequelize.INTEGER,
+      type: Sequelize.STRING(45),
       allowNull: true
     },
     Group: {

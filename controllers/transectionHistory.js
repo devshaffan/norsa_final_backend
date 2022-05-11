@@ -55,12 +55,17 @@ exports.getTransactionHistoryByClientId = (req, res) => {
 };
 // ON TRANSACTION FUNCTIONALITY START // ON TRANSACTION FUNCTIONALITY START // ON TRANSACTION FUNCTIONALITY START // ON TRANSACTION FUNCTIONALITY START // ON TRANSACTION FUNCTIONALITY START // ON TRANSACTION FUNCTIONALITY START 
 // ON TRANSACTION FUNCTIONALITY START // ON TRANSACTION FUNCTIONALITY START // ON TRANSACTION FUNCTIONALITY START // ON TRANSACTION FUNCTIONALITY START // ON TRANSACTION FUNCTIONALITY START 
-const updatePayback = async (issuancehistory_Id, AmountUser, type) => {
-    const allPaybacks = await models.paybackPeriod.findAll({
+const updatePayback = async (issuancehistory_Id, AmountUser, type, typeOfPaybackPeriod) => {
+    let allPaybacks = await models.paybackPeriod.findAll({
         where: {
             issuanceHistory_Id: issuancehistory_Id,
         }
     })
+    // filter allPaybacks where typeOfPaybackPeriod == 1
+    //allPaybacks[4] ---> allPaybacks[2]
+    if (typeOfPaybackPeriod == 1) {
+        allPaybacks = allPaybacks.filter(item => item.type == 1)
+    }
     if (allPaybacks.length == 0) return null
     var eachAmountUser = AmountUser / allPaybacks.length
     if (type == 1) {
@@ -137,12 +142,14 @@ const handleTransactionEntry = async (row) => {
     const interestOn = await getInterestOn(row.Merchant_ID)
     if (!interestOn) return null
     var AmountUser = parseFloat(row.AmountUser)
+    let typeOfPaybackPeriod = 0              //1 == client, 0 == merchant
     if (interestOn.toLocaleLowerCase() == "client") {
+        typeOfPaybackPeriod = 1
         const Interest = await getNumberOfMonthsAndInterest(row.issuancehistoryId, row.Merchant_ID)
         if (!Interest) return null
         AmountUser = AmountUser + AmountUser * parseFloat(Interest) / 100
     }
-    await updatePayback(row.issuancehistoryId, AmountUser, parseInt(row.transactionType))
+    await updatePayback(row.issuancehistoryId, AmountUser, parseInt(row.transactionType), typeOfPaybackPeriod)
 }
 
 
@@ -195,7 +202,9 @@ exports.createTransactionHistory = async (req, res) => {
         dateTime,
         AmountUser,
         issuancehistoryId,
-        transactionType } = req.body;
+        transactionType,
+     } = req.body;
+
     const Merchant_ID = await this.getMerchant_ID(_.get(req.headers, 'authorization', null).split(' ')[1])
 
     if (!Client_id || !ItemDescription || !dateTime || !AmountUser) {

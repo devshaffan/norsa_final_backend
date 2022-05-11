@@ -52,6 +52,10 @@ module.exports = function (sequelize) {
             type: Sequelize.STRING(45),
             allowNull: true
         },
+        type: {
+            type: Sequelize.INTEGER,
+            allowNull: true
+        },
         handledByUserId: {
             type: Sequelize.STRING,
             allowNull: true,

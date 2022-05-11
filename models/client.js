@@ -79,11 +79,11 @@ module.exports = function (sequelize) {
       allowNull: true
     },
     MaxBorrowAmount: {
-      type: Sequelize.INTEGER,
+      type: Sequelize.STRING(45),
       allowNull: true
     },
     dealerBalance: {
-      type: Sequelize.INTEGER,
+      type: Sequelize.STRING(45),
       allowNull: true
     },
     Dealer_id: {
@@ -99,7 +99,7 @@ module.exports = function (sequelize) {
       allowNull: true
     },
     RecievedCreditInPast: {
-      type: Sequelize.INTEGER,
+      type: Sequelize.STRING(45),
       allowNull: true
     },
     dealerStatus: {

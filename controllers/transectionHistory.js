@@ -66,6 +66,9 @@ const updatePayback = async (issuancehistory_Id, AmountUser, type, typeOfPayback
     if (typeOfPaybackPeriod == 1) {
         allPaybacks = allPaybacks.filter(item => item.type == 1)
     }
+    else (
+        allPaybacks = allPaybacks.filter(item => item.type == 2)
+    )
     if (allPaybacks.length == 0) return null
     var eachAmountUser = AmountUser / allPaybacks.length
     if (type == 1) {
@@ -142,7 +145,7 @@ const handleTransactionEntry = async (row) => {
     const interestOn = await getInterestOn(row.Merchant_ID)
     if (!interestOn) return null
     var AmountUser = parseFloat(row.AmountUser)
-    let typeOfPaybackPeriod = 0              //1 == client, 0 == merchant
+    let typeOfPaybackPeriod = 2              //1 == client, 0 == merchant
     if (interestOn.toLocaleLowerCase() == "client") {
         typeOfPaybackPeriod = 1
         const Interest = await getNumberOfMonthsAndInterest(row.issuancehistoryId, row.Merchant_ID)
@@ -203,7 +206,7 @@ exports.createTransactionHistory = async (req, res) => {
         AmountUser,
         issuancehistoryId,
         transactionType,
-     } = req.body;
+    } = req.body;
 
     const Merchant_ID = await this.getMerchant_ID(_.get(req.headers, 'authorization', null).split(' ')[1])
 

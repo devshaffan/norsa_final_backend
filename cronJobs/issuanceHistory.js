@@ -8,13 +8,24 @@ const getMaxCredit = async (Client_id) => {
             id: Client_id
         }
     })
-    return data.MaxBorrowAmount
+    console.log("jjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjj")
+    console.log(data.MaxBorrowAmount)
+    return parseFloat(data.MaxBorrowAmount)
 }
-const insert = async (item) => {
-    const MaxBorrowAmount = getMaxCredit(item.Client_id)
+const createIssuance = async (item) => {
+    const MaxBorrowAmount = 19
+    // ygetMaxCredit(item.Client_id)
     item.Balance = MaxBorrowAmount
     item.Amount = MaxBorrowAmount
     const inserted = await models.issuancehistory.create(item)
+    return inserted
+}
+const createPayback = async (item) => {
+    const data = {}
+    data.amount = 0
+    data.date = new Date(date.setMonth(date.getMonth() + 1));
+    data.issuanceHistory_Id = item.id
+    const inserted = await models.paybackPeriod.create(data)
     return inserted
 }
 
@@ -31,11 +42,14 @@ module.exports = cron.schedule('0 0 1 * *', function () {
                     where: {
                         id: item.id
                     }
-                }).then(data => {
-                    // models.sequelize.query(`SELECT * FROM issuancehistory i GROUP BY i.Cliend_id `, { type: models.sequelize.QueryTypes.SELECT }).then(response => {
+                }).then(  (data) => {
+                    // models.sequelize.query(`SELECT i.* FROM issuancehistory i GROUP BY i.Client_id `, { type: models.sequelize.QueryTypes.SELECT }).then(response => {
+                        
                     //     response.map(async (item) => {
-                    //         const insertedData = await insert(item)
-                    //         console.log(insertedData.map(item => item.Balance))
+                    //         const issuanceResponse = await createIssuance(item)
+                    //         const paybackResponse = await createPayback(item)
+                    //         console.log(issuanceResponse.map(item => item.Balance))
+                    //         console.log(paybackResponse.map(item => item.date))
                     //     })
                     // })
                 })

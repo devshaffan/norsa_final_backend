@@ -106,7 +106,7 @@ exports.dealerReport = (req, res) => {
         res.status(500).send({ message: "no dealer selected" })
     }
     models.sequelize.query(`SELECT c.Code AS 'Code', c.Dealer_id AS 'Dealer',
-    CONCAT(c.FirstName, ' ', c.LastName) AS 'Name', c.Date AS 'Date',
+    CONCAT(c.FirstName, ' ', c.LastName) AS 'Name', p.Date AS 'Date',
     SUM(p.amount) AS 'Paybackperiod_Amount', SUM(i.amount) AS 'insurance', SUM(m.amount) AS 'Membership_Fee', (IFNULL(p.amount,0) + IFNULL(m.amount,0) + IFNULL(i.amount,0)) AS 'Total_Sum'
     FROM client c
     LEFT JOIN memberships m ON m.clientFk=c.id

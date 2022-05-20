@@ -34,13 +34,14 @@ exports.merchantReport = (req, res) => {
 }
 exports.transactionReport = (req, res) => {
     const merchants = req.params.merchants
+    const date = req.params.date
     if (!merchants) {
         res.status(500).send({ message: "no merchants selected " })
         return
     }
     models.sequelize.query(`SELECT m.Name, t.* from transactionhistory t 
     JOIN merchants m ON m.id = t.Merchant_ID
-    WHERE m.id IN (:merchants) 
+    WHERE m.id IN (:merchants) AND Date(t.dateTime) = '${date}'
     group BY t.Merchant_ID
     order by m.Name
     `
@@ -102,19 +103,20 @@ exports.totalSalesOfCurrentUser = (req, res) => {
 }
 exports.dealerReport = (req, res) => {
     const dealers = req.params.dealers
+    const month = req.params.month.split("-")[1]
     if (!dealers) {
         res.status(500).send({ message: "no dealer selected" })
     }
     models.sequelize.query(`SELECT c.Code AS 'Code', c.Dealer_id AS 'Dealer',
     CONCAT(c.FirstName, ' ', c.LastName) AS 'Name', p.Date AS 'Date',
-    SUM(p.amount) AS 'Paybackperiod_Amount', SUM(i.amount) AS 'insurance', SUM(m.amount) AS 'Membership_Fee', (IFNULL(p.amount,0) + IFNULL(m.amount,0) + IFNULL(i.amount,0)) AS 'Total_Sum'
+    SUM(p.amount) AS 'Paybackperiod_Amount', SUM(m.amount) AS 'Membership_Fee', (IFNULL(p.amount,0) + IFNULL(m.amount,0) + IFNULL(i.amount,0)) AS 'Total_Sum'
     FROM client c
     LEFT JOIN memberships m ON m.clientFk=c.id
     LEFT JOIN issuancehistory ih ON ih.Client_id=c.id
     LEFT JOIN insurances i ON i.issuanceHistoryFk=ih.id
     LEFT JOIN paybackperiods p ON p.issuanceHistory_Id=ih.id
-    WHERE c.Dealer_id IN (:dealers)
-	group BY c.id,c.Dealer_id
+    WHERE c.Dealer_id IN (:dealers) AND MONTH(c.Date) = '${month}'
+	group BY c.id,c.Dealer_id 
     Order by c.Dealer_id`, {
         replacements: { dealers: dealers.split(',') },
         type: models.sequelize.QueryTypes.SELECT

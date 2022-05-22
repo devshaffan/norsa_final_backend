@@ -113,7 +113,7 @@ exports.dealerReport = (req, res) => {
     const month = req.params.month.split("-")[1]
     models.sequelize.query(`SELECT c.Code AS 'Code', c.Dealer_id AS 'Dealer',
     CONCAT(c.FirstName, ' ', c.LastName) AS 'Name', p.Date AS 'Date',
-    CAST(CAST(SUM(p.amount) AS float) AS decimal(10,2)) AS 'Paybackperiod_Amount', m.amount AS 'Membership_Fee', CAST(CAST((IFNULL(p.amount,0) + IFNULL(m.amount,0) + IFNULL(i.amount,0)) AS float) AS decimal(10,2)) AS 'Total_Sum'
+    CAST(SUM(p.amount) AS decimal(10,2)) AS 'Paybackperiod_Amount', m.amount AS 'Membership_Fee', CAST((IFNULL(p.amount,0) + IFNULL(m.amount,0) + IFNULL(i.amount,0)) ) AS decimal(10,2)) AS 'Total_Sum'
     FROM client c
     LEFT JOIN memberships m ON m.clientFk=c.id
     LEFT JOIN issuancehistory ih ON ih.Client_id=c.id

@@ -6,16 +6,18 @@ exports.merchantReport = (req, res) => {
     SUM(t.AmountUser) AS 'Total Amount',
     CASE
     WHEN mt.interestOn = 'Client' THEN SUM(t.AmountUser)
-    ELSE CAST((SUM(t.AmountUser) - (SUM(t.AmountUser)/100 * (d.Interest))) as decimal(10,2))
+    ELSE CAST((SUM(t.AmountUser) - (SUM(t.AmountUser)/100 * (d.Interest))) AS DECIMAL(10,2))
     END AS 'Merchant Incentive',
     d.Interest AS 'Percentage %',
     CASE
     WHEN mt.interestOn = 'Client' THEN 0
-    ELSE Cast((SUM(t.AmountUser)/100 * (d.Interest)) as decimal(10,2))
+    ELSE Cast((SUM(t.AmountUser)/100 * (d.Interest)) AS
+     DECIMAL(10,2))
     END AS 'Norsa Profit',
     CASE
     WHEN mt.interestOn = 'Client' THEN 0
-    ELSE Cast((SUM(t.AmountUser)/100 * (d.Interest) * 0.06) as decimal(10,2))
+    ELSE Cast((SUM(t.AmountUser)/100 * (d.Interest) * 0.06) AS
+     DECIMAL(10,2))
     END AS 'Tax On Norsa',
     m.BankName AS 'Bank Name', m.AccountNo AS 'Account No'
     FROM transactionhistory t
@@ -40,7 +42,7 @@ exports.transactionReport = (req, res) => {
         return
     }
     models.sequelize.query(`SELECT m.Name AS 'Merchant_Name',
-    CONCAT(c.FirstName, ' ', c.LastName) AS 'Client_Name', CAST(CAST(t.AmountUser AS float) AS decimal(10,2)) AS 'Amount',
+    CONCAT(c.FirstName, ' ', c.LastName) AS 'Client_Name', CAST(t.AmountUser AS decimal(10,2)) AS 'Amount',
     t.dateTime AS 'Date',t.ItemDescription AS 'Item_Description' from transactionhistory t 
     JOIN merchants m ON m.id = t.Merchant_ID
     JOIN client c ON c.id = t.Client_id
@@ -65,7 +67,7 @@ exports.totalSales = (req, res) => {
         return
     }
     models.sequelize.query(`
-    SELECT i.Client_id AS 'Code', CONCAT(c.FirstName, ' ', c.LastName) AS 'Name', u.email, CAST(CAST(p.amount AS float) AS decimal(10,2)) AS 'Amount', p.dateDeposit, i.TypeOfReturnPayment
+    SELECT i.Client_id AS 'Code', CONCAT(c.FirstName, ' ', c.LastName) AS 'Name', u.email, CAST(p.amount  AS decimal(10,2)) AS 'Amount', p.dateDeposit, i.TypeOfReturnPayment
     FROM paybackperiods p
     JOIN issuancehistory i ON i.id = p.issuanceHistory_Id
     JOIN client c ON c.id = i.Client_id 
@@ -91,7 +93,7 @@ exports.totalSalesOfCurrentUser = (req, res) => {
         res.status(500).send({ message: "no user selected or date" })
         return
     }
-    models.sequelize.query(`SELECT i.Client_id AS 'Code', CONCAT(c.FirstName, ' ', c.LastName) AS 'Name', u.email, CAST(CAST(p.amount AS float) AS decimal(10,2)) AS 'Amount', p.dateDeposit, i.TypeOfReturnPayment
+    models.sequelize.query(`SELECT i.Client_id AS 'Code', CONCAT(c.FirstName, ' ', c.LastName) AS 'Name', u.email, CAST(p.amount AS DECIMAL(10,2)) AS 'Amount', p.dateDeposit, i.TypeOfReturnPayment
     FROM paybackperiods p
     JOIN issuancehistory i ON i.id = p.issuanceHistory_Id
     JOIN client c ON c.id = i.Client_id

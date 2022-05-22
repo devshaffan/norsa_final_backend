@@ -105,11 +105,12 @@ exports.totalSalesOfCurrentUser = (req, res) => {
     })
 }
 exports.dealerReport = (req, res) => {
-    const dealers = req.params.dealers
-    const month = req.params.month.split("-")[1]
-    if (!dealers) {
-        res.status(500).send({ message: "no dealer selected" })
+    if (!req.params.dealers || !req.params.month) {
+        res.status(500).send({ err: "either no dealer or no date is selected" })
+        return
     }
+    const dealers = req.params.dealers.split(",")
+    const month = req.params.month.split("-")[1]
     models.sequelize.query(`SELECT c.Code AS 'Code', c.Dealer_id AS 'Dealer',
     CONCAT(c.FirstName, ' ', c.LastName) AS 'Name', p.Date AS 'Date',
     CAST(CAST(SUM(p.amount) AS float) AS decimal(10,2)) AS 'Paybackperiod_Amount', m.amount AS 'Membership_Fee', CAST(CAST((IFNULL(p.amount,0) + IFNULL(m.amount,0) + IFNULL(i.amount,0)) AS float) AS decimal(10,2)) AS 'Total_Sum'
@@ -118,10 +119,10 @@ exports.dealerReport = (req, res) => {
     LEFT JOIN issuancehistory ih ON ih.Client_id=c.id
     LEFT JOIN insurances i ON i.issuanceHistoryFk=ih.id
     LEFT JOIN paybackperiods p ON p.issuanceHistory_Id=ih.id
-    WHERE c.Dealer_id IN (:dealers) AND MONTH(c.Date) = '${month}'
+    WHERE (c.Dealer_id IN (:dealers)) AND MONTH(c.Date) = '${month}'
 	group BY c.id,c.Dealer_id 
     Order by c.Dealer_id`, {
-        replacements: { dealers: dealers.split(',') },
+        replacements: { dealers: dealers },
         type: models.sequelize.QueryTypes.SELECT
     })
         .then(data => {

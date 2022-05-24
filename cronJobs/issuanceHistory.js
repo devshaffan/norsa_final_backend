@@ -1,5 +1,6 @@
 
-const cron = require('node-cron')
+const cron = require('node-cron');
+const { resetMerchantCreditUsed } = require('../controllers/merchantUtil');
 
 const models = require('../models/index');
 const getMaxCredit = async (Client_id) => {
@@ -43,4 +44,5 @@ module.exports = cron.schedule('0 0 1 * *', async function () {
         const issuanceResponse = await createIssuance(response[i])
         const paybackResponse = await createPayback(response[i])
     }
+    await resetMerchantCreditUsed()
 });

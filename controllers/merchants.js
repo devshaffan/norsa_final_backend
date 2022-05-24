@@ -62,8 +62,6 @@ exports.getMerchantNameByUserId = async (req, res) => {
   res.json(merchant);
   return
 }
-
-
 exports.createMerchant = async (req, res) => {
   if (!req.body.id) {
     res.status(400).send({ message: 'Content can not be empty!' });
@@ -81,6 +79,7 @@ exports.createMerchant = async (req, res) => {
     })
     return
   }
+  req.body.creditUsed = 0
   models.merchants
     .create(req.body)
     .then((data) => res.json(data))

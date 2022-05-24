@@ -3,6 +3,7 @@ const uuidV4 = require('uuid/v4');
 const _ = require('lodash');
 const { Op } = require('sequelize');
 const { getCurrentDate } = require('../utils/dateHandler');
+const { updateMerchantCreditUsed } = require('./merchantUtil');
 exports.getTransactionHistoryById = (req, res) => {
     const id = req.params.id;
     if (!id) {
@@ -232,6 +233,7 @@ exports.createTransactionHistory = async (req, res) => {
         transactionType
     }).then(data => {
         handleTransactionEntry(data)
+        updateMerchantCreditUsed(Merchant_ID, AmountUser)
         models.dailysalesprintcheck.update({
             datePrinted: getCurrentDate(),
             status: false

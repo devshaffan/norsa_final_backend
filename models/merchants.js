@@ -34,9 +34,9 @@ module.exports = function (sequelize) {
       type: Sequelize.STRING(45),
       allowNull: true
     },
-    address : {
-      type : Sequelize.STRING(500),
-      allowNull : true
+    address: {
+      type: Sequelize.STRING(500),
+      allowNull: true
     },
     phoneNumber: {
       type: Sequelize.STRING(45),
@@ -56,6 +56,14 @@ module.exports = function (sequelize) {
     },
     Devices: {
       type: Sequelize.STRING(500),
+      allowNull: true
+    },
+    maxCredit: {
+      type: Sequelize.STRING(45),
+      allowNull: true
+    },
+    creditUsed: {
+      type: Sequelize.STRING(45),
       allowNull: true
     }
   }, {

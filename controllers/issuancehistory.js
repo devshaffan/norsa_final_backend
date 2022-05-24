@@ -82,6 +82,7 @@ const getPaybackPeriodCount = async (issuanceHistoryId) => {
   return count
 }
 const getNonExistantIssuanceInMultipleIssuanes = async (issuanceHistories) => {
+
   const issuanceIds = issuanceHistories.map(itm => itm.id)
   const data = await models.sequelize.query(`SELECT i.* FROM issuanceHistory i 
   LEFT JOIN multipleIssueances mi ON mi.issuancehistoryid = i.id
@@ -89,7 +90,13 @@ const getNonExistantIssuanceInMultipleIssuanes = async (issuanceHistories) => {
     replacements: { issuanceIds: issuanceIds },
     type: models.sequelize.QueryTypes.SELECT
   })
-  const issuanceHistory = issuanceHistories.filter(item => item.id == data[0].id)[0]
+  let issuanceHistory;
+  if (!data || data.length == 0) {
+    return null
+  }
+  else {
+    issuanceHistory = issuanceHistories.filter(item => item.id == data[0].id)[0]
+  }
   return issuanceHistory
 }
 exports.OnNfcAndPinCode = async (req, res) => {
@@ -151,8 +158,10 @@ exports.OnNfcAndPinCode = async (req, res) => {
   // }
   if (!multipleIssuances) {
     issuanceData = await getNonExistantIssuanceInMultipleIssuanes(data)
-    console.log("yyyyy")
-    console.log(issuanceData.id)
+    if (!issuanceData) {
+      res.status(400).send({ message: 'success', error: "Invalid Card!" })
+      return
+    }
   }
   const paybackPeriod = await getPaybackPeriodDate(issuanceData.id)
   if (!multipleIssuances) {
@@ -333,8 +342,6 @@ const getNumberOfMonths = async (id) => {
   }
   return null
 }
-
-
 exports.getIssueanceHistyByClientId = (req, res) => {
   const clientId = req.params.Client_id;
   models.issuancehistory.findOne({ where: { Client_id: clientId, AmountPaid: '0' }, order: [['DateTime', 'DESC']] })

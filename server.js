@@ -11,6 +11,7 @@ var path = require('path');
 var express = require('express');
 var cookieParser = require('cookie-parser');
 var resetAllBalancesCronJob = require('./cronJobs/issuanceHistory')
+
 //const listEndpoints = require('express-list-endpoints')
 
 const routeInitialize = require('./routes');
@@ -20,6 +21,7 @@ const passportInitialize = require('./passport/passport');
 //   key: fs.readFileSync('config/cert/pipdroid.key', 'utf8'),
 //   cert: fs.readFileSync('config/cert/pipdroid.crt', 'utf8'),
 // };
+
 let server; //eslint-disable-line
 let httpServer; //eslint-disable-line
 const port = process.env.PORT || 3000;
@@ -36,6 +38,7 @@ resetAllBalancesCronJob.start()
 //     res.end();
 //   }).listen(80);
 // }
+
 app.logger = logger;
 app.options('*', cors());
 app.use(cors());
@@ -58,6 +61,7 @@ app.use('/static', express.static(path.join(__dirname, 'public')));
 app.use(passport.initialize());
 app.use(passport.session());
 dbInitialize(app);
+
 const user = app.get('models').user;
 passportInitialize(passport, user);
 app.use(authMiddleWare);

@@ -134,3 +134,55 @@ exports.dealerReport = (req, res) => {
             res.status(500).send({ err })
         })
 }
+
+exports.insuranceReport = (req, res) => {
+    if (!req.params.clients) {
+        res.status(500).send({ err: "either no dealer or no date is selected" })
+        return
+    }
+    const clients = req.params.clients.split(",")
+    models.sequelize.query(`SELECT c.Code AS 'Code',
+    CONCAT(c.FirstName, ' ', c.LastName) AS 'Name', 
+    SUM(i.amount) AS 'insuranceAmount' 
+    FROM client c
+    JOIN issuancehistory ih ON ih.Client_id=c.id
+    JOIN insurances i ON i.issuanceHistoryFk=ih.id
+    WHERE (c.id IN (:clients))
+	group BY c.id 
+    Order by c.id`, {
+        replacements: { clients: clients },
+        type: models.sequelize.QueryTypes.SELECT
+    })
+        .then(data => {
+            return res.json(data)
+        })
+        .catch(err => {
+            res.status(500).send({ err })
+        })
+}
+
+exports.membershipFeeReport = (req, res) => {
+    if (!req.params.clients) {
+        res.status(500).send({ err: "either no dealer or no date is selected" })
+        return
+    }
+    const clients = req.params.clients.split(",")
+    models.sequelize.query(`SELECT c.Code AS 'Code',
+    CONCAT(c.FirstName, ' ', c.LastName) AS 'Name', 
+    SUM(p.membershipFee) AS 'Membership_Fee' 
+    FROM client c
+    JOIN issuancehistory ih ON ih.Client_id=c.id
+    JOIN paybackperiods p ON p.issuanceHistory_Id=ih.id
+    WHERE (c.id IN (:clients))
+	group BY c.id 
+    Order by c.id`, {
+        replacements: { clients: clients },
+        type: models.sequelize.QueryTypes.SELECT
+    })
+        .then(data => {
+            return res.json(data)
+        })
+        .catch(err => {
+            res.status(500).send({ err })
+        })
+}

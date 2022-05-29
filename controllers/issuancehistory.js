@@ -39,6 +39,11 @@ const checkIfMerchantExists = async (issuanceHistoryId, merchantId) => {
   if (!data) return null
   return data
 }
+const checkIfMerchantExistsOld = async (issuanceHistoryId, merchantId) => {
+  const data = await models.multipleIssueances.findOne({ where: { issuanceHistoryId: issuanceHistoryId, merchantId: merchantId } })
+  if (!data) return null
+  return data
+}
 const checkIfIssuanceHistoryIdExists = async (issuanceHistoryId) => {
   const data = await models.multipleIssueances.findOne({ where: { issuanceHistoryId: issuanceHistoryId } })
   if (!data) return null
@@ -133,7 +138,7 @@ exports.OnNfcAndPinCode = async (req, res) => {
   let multipleIssuances = null;
   let issuanceData = null
   for (var i = 0; i < data.length; i++) {
-    multipleIssuances = await checkIfMerchantExists(data[i].id, merchant_id)
+    multipleIssuances = await checkIfMerchantExistsOld(data[i].id, merchant_id)
     if (multipleIssuances) {
       issuanceData = data[i];
       // multipleIssuances.push(multipleIssuance)

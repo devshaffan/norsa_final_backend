@@ -169,8 +169,13 @@ exports.membershipFeeReport = (req, res) => {
     const clients = req.params.clients.split(",")
     models.sequelize.query(`SELECT c.Code AS 'Code',
     CONCAT(c.FirstName, ' ', c.LastName) AS 'Name', 
-    SUM(p.membershipFee) AS 'Membership_Fee' 
+    mm.sum AS 'Membership_Amount'
     FROM client c
+    left JOIN (
+	 SELECT SUM(m.amount) AS SUM, m.clientFk
+	 FROM memberships m 
+	 WHERE YEAR(m.month) = YEAR(NOW())
+	 group BY m.clientFk) mm ON mm.clientFk = c.id
     JOIN issuancehistory ih ON ih.Client_id=c.id
     JOIN paybackperiods p ON p.issuanceHistory_Id=ih.id
     WHERE (c.id IN (:clients))

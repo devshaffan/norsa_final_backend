@@ -35,7 +35,7 @@ const getUserAgainstAnyMerchant = async (merchants) => {
 }
 
 const checkIfMerchantExists = async (issuanceHistoryId, merchantId) => {
-  const data = await models.multipleIssueances.findOne({ where: { issuanceHistoryId: issuanceHistoryId, merchantId: merchantId } })
+  const data = await models.multipleIssueances.findAll({ where: { issuanceHistoryId: issuanceHistoryId, merchantId: merchantId } })
   if (!data) return null
   return data
 }
@@ -140,22 +140,6 @@ exports.OnNfcAndPinCode = async (req, res) => {
       break;
     }
   }
-  /*task to be done 26/4
-  
-  1. get all issuance history id
-  2. get all unique inssuance history id that matches with the merchant id in multiple issuances
-  3. get one issuance history id that doesnt exist in multiple issuance 
-  4. combine 2 3
-  5. check payback period date count against issuance history id of 4
-  6. return [{issuancehistory1, paybackperiod1},
-            {issuancehistory2, paybackperiod2}]
-  7. return previous + paybackCount
-  */
-
-  // if (!multipleIssuancesList) {
-  //   res.status(400).send({ message: 'success', error: "Invalid Card!" })
-  //   return
-  // }
   if (!multipleIssuances) {
     issuanceData = await getNonExistantIssuanceInMultipleIssuanes(data)
     if (!issuanceData) {
@@ -185,9 +169,6 @@ exports.OnNfcAndPinCode = async (req, res) => {
     res.status(400).send({ message: 'success', error: "Invalid Card! user" })
     return
   }
-  // const userIds = users.map((item) => {
-  //   return item.User_id
-  // })
   const authorized = await checkIfUserAuthorized(user.User_id, token)
   if (!authorized) {
     res.status(400).send({ message: 'success', error: "Invalid Card! authorized" })
@@ -208,7 +189,31 @@ exports.OnNfcAndPinCode = async (req, res) => {
   const clientCodeAndFullName = { Code: client.Code, FullName: client.FirstName + " " + client.LastName, numberOfMonths }
   res.json({ message: 'success', data: { data: issuanceData, clientCodeAndFullName, paybackPeriod } })
 }
-exports.OnNfcAndPinCodeNew = async (req, res) => {
+const getMerchantById = async (id) => {
+  const data = await models.merchants.findByPk(id)
+  return data
+}
+const getInterestOnByMerchantTypeId = async (id) => {
+  const data = models.merchanttype
+    .findOne({
+      where: {
+        id: id
+      },
+      attributes: ['interestOn']
+    })
+  return data
+}
+const getPaybackPeriodCountByMerchantType = async (issuanceHistoryId, type) => {
+  const count = await models.paybackPeriod.count({
+    where: {
+      issuanceHistory_Id: issuanceHistoryId,
+      type: type
+    }
+  })
+  return count
+}
+
+exports.OnNfcAndPinCodeMultipleIssuance = async (req, res) => {
   const { nfcCardId } = req.body;
   const token = _.get(req.headers, 'authorization', null).split(' ')[1]
   const merchant_id = await getMerchant_ID(token)
@@ -221,23 +226,20 @@ exports.OnNfcAndPinCodeNew = async (req, res) => {
     res.status(400).send({ message: 'success', error: 'Merchant doesnt exist!' });
     return;
   }
-  // const data = await models.issuancehistory.findOne({
-  //   where: { NfcCard_id: nfcCardId },
-  //   order: [['DateTime', 'DESC']]
-  // })
+  const merchantTypeId = (await getMerchantById(merchant_id)).MerchantType_id
+  const {interestOn} = await getInterestOnByMerchantTypeId(merchantTypeId)
 
-  const data = await models.issuancehistory.findAll({
-    where: { NfcCard_id: nfcCardId, AmountPaid: 0 },
-  })
+  const data = await models.sequelize.query(`SELECT  * FROM issuancehistory i WHERE (i.NfcCard_id = '${nfcCardId}' AND i.AmountPaid='0' AND MONTH(i.DateTime) = MONTH(CURDATE()))`, { type: models.sequelize.QueryTypes.SELECT })
+
   if (!data || data.length == 0) {
     res.status(400).send({ message: 'success', error: "Invalid Card! data" })
     return
   }
   // const multipleIssuancesList = await checkIfMerchantExists(data.id)
-  let multipleIssuances = [];
+  let issuances = [];
   for (var i = 0; i < data.length; i++) {
-    const multipleIssuance = await checkIfMerchantExists(data[i].id, merchant_id)
-    if (multipleIssuance) {
+    const multipleIssuancesAgainstIssuanceHistory = await checkIfMerchantExists(data[i].id, merchant_id)
+    if (multipleIssuancesAgainstIssuanceHistory.length > 0) {
       const paybackPeriodDate = await getPaybackPeriodDate(data[i].id)
       const paybackPeriodCount = await getPaybackPeriodCount(data[i].id)
       const client = await getClientCodeAndName(data[i].Client_id)
@@ -245,10 +247,10 @@ exports.OnNfcAndPinCodeNew = async (req, res) => {
         res.status(400).send({ message: 'success', error: "Invalid Card! client2" })
         return
       }
-      const numberOfMonths = await getNumberOfMonths(multipleIssuance.numberOfMonthsId)
-      const clientCodeAndFullName = { Code: client.Code, FullName: client.FirstName + " " + client.LastName, numberOfMonths }
-      multipleIssuances.push({
-        multipleIssuance, paybackPeriodDate: paybackPeriodDate,
+      // const numberOfMonths = await getNumberOfMonths(multipleIssuance.numberOfMonthsId)
+      const clientCodeAndFullName = { Code: client.Code, FullName: client.FirstName + " " + client.LastName, numberOfMonths: paybackPeriodCount }
+      issuances.push({
+        data: data[i], multipleIssuancesAgainstIssuanceHistory, paybackPeriodDate: paybackPeriodDate,
         paybackPeriodCount: paybackPeriodCount, clientCodeAndFullName
       })
     }
@@ -256,83 +258,28 @@ exports.OnNfcAndPinCodeNew = async (req, res) => {
       const outlierIssuance = await checkIfIssuanceHistoryIdExists(data[i].id)
       if (!outlierIssuance) {
         const paybackPeriod = await getPaybackPeriodDate(data[i].id)
-        const paybackPeriodCount = await getPaybackPeriodCount(data[i].id)
+        let paybackPeriodCount;
+        if (interestOn.toLocaleLowerCase() == "client") {
+          paybackPeriodCount = await getPaybackPeriodCountByMerchantType(data[i].id, 1)
+        }
+        else {
+          paybackPeriodCount = await getPaybackPeriodCountByMerchantType(data[i].id, 2)
+        }
         const client = await getClientCodeAndName(data[i].Client_id)
         if (!client) {
           res.status(400).send({ message: 'success', error: "Invalid Card! client2" })
           return
         }
-        const numberOfMonths = await getNumberOfMonths(outlierIssuance.numberOfMonthsId)
-        const clientCodeAndFullName = { Code: client.Code, FullName: client.FirstName + " " + client.LastName, numberOfMonths }
-        multipleIssuances.push({
-          multipleIssuance: outlierIssuance, paybackPeriod: paybackPeriod,
+        const clientCodeAndFullName = { Code: client.Code, FullName: client.FirstName + " " + client.LastName, numberOfMonths: paybackPeriodCount }
+        issuances.push({
+          data: data[i], issuance: outlierIssuance, paybackPeriod: paybackPeriod,
           paybackPeriodCount: paybackPeriodCount, clientCodeAndFullName
         })
       }
     }
   }
-  res.json({ message: 'success', data: multipleIssuances })
+  res.json({ message: 'success', data: issuances })
   return;
-  /*task to be done 26/4
-  
-  1. get all issuance history id with current month
-  2. get all unique inssuance history id that matches with the merchant id in multiple issuances
-  3. get one issuance history id that doesnt exist in multiple issuance 
-  4. combine 2 3
-
-  5. check payback period date count against issuance history id of 4
-  6. return [{issuancehistory1, paybackperiod1},
-            {issuancehistory2, paybackperiod2}]
-  7. return previous + paybackCount
-  */
-
-  // if (!multipleIssuancesList) {
-  //   res.status(400).send({ message: 'success', error: "Invalid Card!" })
-  //   return
-  // }
-  // if (!multipleIssuances) {
-  //   if (!data[0].Client_id) {
-  //     res.status(400).send({ message: 'success', error: "Invalid Card! multipleIssuances" })
-  //     return
-  //   }
-  //   const client = await getClientCodeAndName(data[0].Client_id)
-  //   if (!client) {
-  //     res.status(400).send({ message: 'success', error: "Invalid Card! client" })
-  //     return
-  //   }
-  //   const clientCodeAndFullName = { Code: client.Code, FullName: client.FirstName + " " + client.LastName, numberOfMonths: 1 }
-  //   const issuanceData = data[0]
-  //   res.json({ message: 'success', data: { data: issuanceData, clientCodeAndFullName, paybackPeriod } })
-  //   return;
-  // }
-
-  // const user = await getUserAgainstAnyMerchant(multipleIssuances.merchantId)
-  // if (!user) {
-  //   res.status(400).send({ message: 'success', error: "Invalid Card! user" })
-  //   return
-  // }
-  // // const userIds = users.map((item) => {
-  // //   return item.User_id
-  // // })
-  // const authorized = await checkIfUserAuthorized(user.User_id, token)
-  // if (!authorized) {
-  //   res.status(400).send({ message: 'success', error: "Invalid Card! authorized" })
-  //   return;
-  // }
-  // if (!data[0].Client_id) {
-  //   res.status(400).send({ message: 'success', error: "Invalid Card! data[0].Client_id" })
-  //   return
-  // }
-  // // get that issuance history which is against multiple issuances
-
-  // const client = await getClientCodeAndName(issuanceData.Client_id)
-  // if (!client) {
-  //   res.status(400).send({ message: 'success', error: "Invalid Card! client2" })
-  //   return
-  // }
-  // const numberOfMonths = await getNumberOfMonths(multipleIssuances.numberOfMonthsId)
-  // const clientCodeAndFullName = { Code: client.Code, FullName: client.FirstName + " " + client.LastName, numberOfMonths }
-  // res.json({ message: 'success', data: { data: issuanceData, clientCodeAndFullName, paybackPeriod } })
 }
 
 const getNumberOfMonths = async (id) => {

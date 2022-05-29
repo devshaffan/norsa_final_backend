@@ -10,7 +10,7 @@ module.exports = function (sequelize) {
             type: Sequelize.STRING(45)
         },
         month:{
-            type: Sequelize.STRING(45)
+            type: Sequelize.DATEONLY
         },
         clientFk:{
             type: Sequelize.STRING(45),

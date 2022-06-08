@@ -36,7 +36,11 @@ exports.merchantReport = (req, res) => {
 }
 exports.transactionReport = (req, res) => {
     const merchants = req.params.merchants
-    const date = req.params.date
+    const dateFrom = req.params.dateFrom
+    const dateTo = req.params.dateTo
+    console.log('jhkjhkjhkjhkjhkjhkjhkjhkjhkjhkjhkj')
+    console.log(dateFrom)
+
     if (!merchants) {
         res.status(500).send({ message: "no merchants selected " })
         return
@@ -46,7 +50,7 @@ exports.transactionReport = (req, res) => {
     t.dateTime AS 'Date',t.ItemDescription AS 'Item_Description' from transactionhistory t 
     JOIN merchants m ON m.id = t.Merchant_ID
     JOIN client c ON c.id = t.Client_id
-    WHERE m.id IN (:merchants)
+    WHERE m.id IN (:merchants) AND (DATE(t.dateTime) > '${dateFrom}' AND DATE(t.dateTime) < '${dateTo}')
     group BY t.Merchant_ID
     order by m.Name
     `

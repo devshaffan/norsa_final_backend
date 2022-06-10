@@ -199,7 +199,23 @@ exports.getMerchantsTodaysTransactions = async (req, res) => {
             });
         });
 }
+const checkMerchantCredit = async (id) => {
+    const merchantData = await models.merchants.findOne({
+        attributes: ['maxCredit', 'creditUsed'],
+        where: {
+            id: id,
+        }
+    })
+    const { maxCredit, creditUsed } = merchantData
+    if (!maxCredit || !creditUsed) {
+        return false;
+    }
+    if (parseFloat(creditUsed) >= parseFloat(maxCredit)) {
+        return false;
+    }
+    return true;
 
+}
 exports.createTransactionHistory = async (req, res) => {
     const { Client_id,
         ItemDescription,
@@ -219,6 +235,13 @@ exports.createTransactionHistory = async (req, res) => {
     if (!Merchant_ID) {
         res.status(400).send({
             message: 'This User doesnt exist as a merchant'
+        });
+        return;
+    }
+    const ifMerchantTransact = await checkMerchantCredit(Merchant_ID)
+    if (!ifMerchantTransact) {
+        res.status(500).send({
+            message: 'Not Sufficient Credit'
         });
         return;
     }

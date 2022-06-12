@@ -9,10 +9,13 @@ module.exports = function (sequelize) {
         amount: {
             type: Sequelize.STRING(45)
         },
-        month:{
+        remainingAmount: {
+            type: Sequelize.STRING(45)
+        },
+        month: {
             type: Sequelize.DATEONLY
         },
-        clientFk:{
+        clientFk: {
             type: Sequelize.STRING(45),
             references: {
                 model: 'client',

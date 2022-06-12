@@ -105,7 +105,7 @@ exports.todaysTransaction = (req, res) => {
 exports.paidByClientToday = (req, res) => {
     models.sequelize.query(`SELECT SUM(p.amountPaidByClient) AS "AmountPaidByClient"
     FROM paybackperiods p
-    WHERE DATE(p.dateDeposit) = DATE(NOW())`, { type: models.sequelize.QueryTypes.SELECT }).then(data => {
+    WHERE DATE(p.dateDeposit) = DATE(NOW()) AND p.TypeOfReturnPayment = 'Cash'`, { type: models.sequelize.QueryTypes.SELECT }).then(data => {
         return res.json(data)
     }).catch(err => {
         res.status(500).send({ error: err })

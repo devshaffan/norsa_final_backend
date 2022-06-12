@@ -1,32 +1,66 @@
 const models = require('../models/index');
 const _ = require('lodash');
 exports.merchantReport = (req, res) => {
-    const date = req.params.date
-    models.sequelize.query(`SELECT m.Code, m.Name,
+    const month = req.params.date.split("-")[1]
+    // CASE
+    // WHEN mt.interestOn = 'Client' THEN 0
+    // ELSE Cast((SUM(t.AmountUser) / 100 * (d.Interest)) AS
+    //  DECIMAL(10, 2))
+    // END AS 'Norsa Profit',
+    models.sequelize.query(`SELECT m.Code AS "Merchant Code", m.Name AS "Merchant Name",
     SUM(t.AmountUser) AS 'Total Amount',
     CASE
     WHEN mt.interestOn = 'Client' THEN SUM(t.AmountUser)
     ELSE CAST((SUM(t.AmountUser) - (SUM(t.AmountUser)/100 * (d.Interest))) AS DECIMAL(10,2))
-    END AS 'Merchant Incentive',
+    END AS 'Sum Of Final Amount (Exculding Tax and Norsa Profit)',
     d.Interest AS 'Percentage %',
-    CASE
-    WHEN mt.interestOn = 'Client' THEN 0
-    ELSE Cast((SUM(t.AmountUser)/100 * (d.Interest)) AS
-     DECIMAL(10,2))
-    END AS 'Norsa Profit',
     CASE
     WHEN mt.interestOn = 'Client' THEN 0
     ELSE Cast((SUM(t.AmountUser)/100 * (d.Interest) * 0.06) AS
      DECIMAL(10,2))
-    END AS 'Tax On Norsa',
-    m.BankName AS 'Bank Name', m.AccountNo AS 'Account No'
+    END AS 'OB(TAX)',
+    m.BankName AS 'Bank Name', m.AccountNo AS 'Bank Account'
     FROM transactionhistory t
     JOIN merchants m ON m.id = t.Merchant_ID
     JOIN merchanttype mt ON mt.id = m.MerchantType_id
     JOIN issuancehistory i ON i.id = t.issuancehistoryId
     JOIN multipleissueances mi ON (mi.merchantId = t.Merchant_ID AND mi.issuancehistoryId = t.issuancehistoryId)
     JOIN merchanttypediscount d ON d.id = mi.numberOfMonthsId
-    WHERE Month(DATE(t.dateTime)) = Month('${date}')
+    WHERE Month(DATE(t.dateTime)) = '${month}'
+    group BY t.Merchant_ID`
+        , { type: models.sequelize.QueryTypes.SELECT }).then(data => {
+            return res.json(data)
+        }).catch(err => {
+            res.status(500).send({ error: err })
+        })
+}
+exports.supermarketReport = (req, res) => {
+    const month = req.params.date.split("-")[1]
+    // CASE
+    // WHEN mt.interestOn = 'Client' THEN 0
+    // ELSE Cast((SUM(t.AmountUser) / 100 * (d.Interest)) AS
+    //  DECIMAL(10, 2))
+    // END AS 'Norsa Profit',
+    models.sequelize.query(`SELECT m.Code AS "Merchant Code", m.Name AS "Merchant Name",
+    SUM(t.AmountUser) AS 'Total Amount',
+    CASE
+    WHEN mt.interestOn = 'Client' THEN SUM(t.AmountUser)
+    ELSE CAST((SUM(t.AmountUser) - (SUM(t.AmountUser)/100 * (d.Interest))) AS DECIMAL(10,2))
+    END AS 'Sum Of Final Amount (Exculding Tax and Norsa Profit)',
+    d.Interest AS 'Percentage %',
+    CASE
+    WHEN mt.interestOn = 'Client' THEN 0
+    ELSE Cast((SUM(t.AmountUser)/100 * (d.Interest) * 0.06) AS
+     DECIMAL(10,2))
+    END AS 'OB(TAX)',
+    m.BankName AS 'Bank Name', m.AccountNo AS 'Bank Account'
+    FROM transactionhistory t
+    JOIN merchants m ON m.id = t.Merchant_ID
+    JOIN merchanttype mt ON mt.id = m.MerchantType_id
+    JOIN issuancehistory i ON i.id = t.issuancehistoryId
+    JOIN multipleissueances mi ON (mi.merchantId = t.Merchant_ID AND mi.issuancehistoryId = t.issuancehistoryId)
+    JOIN merchanttypediscount d ON d.id = mi.numberOfMonthsId
+    WHERE Month(DATE(t.dateTime)) = '${month}' AND mt.Title = 'Supermarket'
     group BY t.Merchant_ID`
         , { type: models.sequelize.QueryTypes.SELECT }).then(data => {
             return res.json(data)
@@ -72,11 +106,19 @@ exports.totalSales = (req, res) => {
     }
     models.sequelize.query(`
     SELECT i.Client_id AS 'Code', CONCAT(c.FirstName, ' ', c.LastName) AS 'Name', u.email, CAST(p.amount  AS decimal(10,2)) AS 'Amount', p.dateDeposit, i.TypeOfReturnPayment
-    FROM paybackperiods p
+    , IFNULL(SUM(ins.amount),0) AS 'Insurance Charged', IFNULL(SUM(m.amount),0) AS 'Membeship Charged',
+    CASE 
+    WHEN p.paidByDealer = 1 THEN c.dealerCommision*-1
+    ELSE 0
+    END AS 'dealer Commision'
+	 FROM paybackperiods p
     JOIN issuancehistory i ON i.id = p.issuanceHistory_Id
-    JOIN client c ON c.id = i.Client_id 
+    LEFT JOIN insurances ins ON ins.issuanceHistoryFk = i.id
+    JOIN client c ON c.id = i.Client_id
+    LEFT JOIN memberships m ON m.clientFk= c.id
     JOIN users u ON u.id = p.handledByUserId
     WHERE u.id IN (:users) AND  Date(p.DateDeposit) = '${date}'
+    group BY c.id
     ORDER BY p.dateDeposit, u.email;
     `, {
         replacements: {
@@ -97,7 +139,7 @@ exports.totalSalesOfCurrentUser = (req, res) => {
         res.status(500).send({ message: "no user selected or date" })
         return
     }
-    models.sequelize.query(`SELECT i.Client_id AS 'Code', CONCAT(c.FirstName, ' ', c.LastName) AS 'Name', u.email, CAST(p.amount AS DECIMAL(10,2)) AS 'Amount', p.dateDeposit, i.TypeOfReturnPayment
+    models.sequelize.query(`SELECT Date(p.DateDeposit) AS  "Fecha",i.Client_id AS 'Code', CONCAT(c.FirstName, ' ', c.LastName) AS 'Name', u.email, CAST(p.amount AS DECIMAL(10,2)) AS 'Amount',  i.TypeOfReturnPayment
     FROM paybackperiods p
     JOIN issuancehistory i ON i.id = p.issuanceHistory_Id
     JOIN client c ON c.id = i.Client_id
@@ -117,9 +159,12 @@ exports.dealerReport = (req, res) => {
     }
     const dealers = req.params.dealers.split(",")
     const month = req.params.month.split("-")[1]
-    models.sequelize.query(`SELECT c.Code AS 'Code', c.Dealer_id AS 'Dealer',
-    CONCAT(c.FirstName, ' ', c.LastName) AS 'Name', p.Date AS 'Date',
-    CAST(SUM(p.amount) AS DECIMAL(10,2)) AS 'Paybackperiod_Amount', m.amount AS 'Membership_Fee', CAST((IFNULL(p.amount,0) + IFNULL(m.amount,0) + IFNULL(i.amount,0)) AS DECIMAL(10,2)) AS 'Total_Sum'
+    //CAST(SUM(p.amount) AS DECIMAL(10,2)) AS 'Paybackperiod_Amount', m.amount AS 'Membership_Fee',
+    models.sequelize.query(`SELECT  c.Dealer_id AS 'Dealer', c.Code AS 'Code',
+    CONCAT(c.FirstName, ' ', c.LastName) AS 'Nomber', p.Date AS 'FECHA',
+    CAST((IFNULL(p.amount,0) + IFNULL(m.amount,0) + IFNULL(i.amount,0)) AS DECIMAL(10,2)) AS 'SUB TOTAL',
+    0 AS 'ADM KSTN',
+    (CAST((IFNULL(p.amount,0) + IFNULL(m.amount,0) + IFNULL(i.amount,0)) AS DECIMAL(10,2)) + 0) AS 'TOTAL'
     FROM client c
     LEFT JOIN memberships m ON m.clientFk=c.id
     LEFT JOIN issuancehistory ih ON ih.Client_id=c.id
@@ -140,10 +185,11 @@ exports.dealerReport = (req, res) => {
 }
 
 exports.insuranceReport = (req, res) => {
-    if (!req.params.clients) {
+    if (!req.params.clients || !req.params.month) {
         res.status(500).send({ err: "either no dealer or no date is selected" })
         return
     }
+    const month = req.params.month.split("-")[1]
     const clients = req.params.clients.split(",")
     models.sequelize.query(`SELECT c.Code AS 'Code',
     CONCAT(c.FirstName, ' ', c.LastName) AS 'Name', 
@@ -151,7 +197,7 @@ exports.insuranceReport = (req, res) => {
     FROM client c
     JOIN issuancehistory ih ON ih.Client_id=c.id
     JOIN insurances i ON i.issuanceHistoryFk=ih.id
-    WHERE (c.id IN (:clients))
+    WHERE (c.id IN (:clients)) AND MONTH(c.Date) = '${month}'
 	group BY c.id 
     Order by c.id`, {
         replacements: { clients: clients },

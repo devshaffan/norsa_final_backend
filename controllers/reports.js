@@ -130,6 +130,7 @@ exports.totalSales = (req, res) => {
     FROM paybackperiods pp
     JOIN issuancehistory ii ON ii.id = pp.issuanceHistory_Id
     JOIN client cc ON cc.id = ii.Client_id
+    JOIN users uu ON uu.id = pp.handledByUserId
     LEFT JOIN (
     SELECT mmm.clientFk, SUM(mmm.amount) AS 'memberSum'
     FROM memberships mmm
@@ -140,6 +141,7 @@ exports.totalSales = (req, res) => {
     FROM insurances insuu
     WHERE DATE(insuu.createdAt) = '${date}') inss ON inss.issuanceHistoryFk = ii.id
     WHERE DATE(pp.dateDeposit) = '${date}'
+    AND p.handledByUserId IN (:users)
         ) 
     `, {
         replacements: {

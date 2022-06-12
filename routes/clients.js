@@ -14,7 +14,7 @@ router.get('/getAllActiveClients', clients.getAllActiveClients);
 router.get('/getAllActiveAllClients', clients.getAllActiveAllClients);
 router.get('/getClientById/:id', clients.getClientById);
 router.get('/checkSedulaExist/:idCard', clients.checkSedulaExist)
-router.post('/createClient', clients.createClient);
+router.post('/createClient/:typeOfClient', clients.createClient);
 router.post('/upsertClient', clients.upsertClient);
 router.delete('/deleteClient/:id', clients.deleteClient);
 module.exports = router;

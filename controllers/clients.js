@@ -378,6 +378,13 @@ exports.getClientById = (req, res) => {
       });
     });
 };
+const checkIfClientExist = async (id) => {
+  const response = await models.client.findByPk(id)
+  if (!response) {
+    return false
+  }
+  return true
+}
 
 exports.createClient = async (req, res) => {
   if (!req.body.id) {
@@ -387,17 +394,27 @@ exports.createClient = async (req, res) => {
   if (req.body.MaxBorrowAmount) {
     req.body.dealerBalance = req.body.MaxBorrowAmount
   }
+  const { typeOfClient } = req.params
   const { id } = req.body
   let newId = null;
-  if (id.startsWith("K")) {
-    newId = await getK_Id()
+  if (typeOfClient && typeOfClient != 3) {
+    if (id.startsWith("K")) {
+      newId = await getK_Id()
+    }
+    else if (id.startsWith("N")) {
+      newId = await getNK_Id()
+    }
+    if (newId) {
+      req.body.id = newId
+      req.body.Code = newId
+    }
   }
-  else if (id.startsWith("N")) {
-    newId = await getNK_Id()
-  }
-  if (newId) {
-    req.body.id = newId
-    req.body.Code = newId
+  const clientExist = await checkIfClientExist(req.body.id)
+  if (clientExist) {
+    res.status(500).send({
+      message: 'Same Client Code Exist',
+    });
+    return;
   }
   models.client
     .create(req.body)

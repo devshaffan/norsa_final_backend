@@ -15,5 +15,6 @@ router.post('/getClientByNfcAndPinCode', issuancehistory.getClientByNfcAndPinCod
 router.delete('/deleteIssuancehistory/:id', issuancehistory.deleteIssuancehistory);
 router.post('/OnNfcAndPinCode', issuancehistory.OnNfcAndPinCode);
 router.post('/OnNfcAndPinCodeMI', issuancehistory.OnNfcAndPinCodeMultipleIssuance);
+router.get('/getMaxRemainingCreditClient/:id', issuancehistory.getMaxRemainingCreditClient);
 
 module.exports = router;

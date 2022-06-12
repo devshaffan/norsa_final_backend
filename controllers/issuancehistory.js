@@ -34,6 +34,8 @@ const getUserAgainstAnyMerchant = async (merchants) => {
     })
 }
 
+
+
 const checkIfMerchantExists = async (issuanceHistoryId, merchantId) => {
   const data = await models.multipleIssueances.findAll({ where: { issuanceHistoryId: issuanceHistoryId, merchantId: merchantId } })
   if (!data) return null
@@ -103,6 +105,23 @@ const getNonExistantIssuanceInMultipleIssuanes = async (issuanceHistories) => {
     issuanceHistory = issuanceHistories.filter(item => item.id == data[0].id)[0]
   }
   return issuanceHistory
+}
+exports.getMaxRemainingCreditClient = async (req, res) => {
+  if (!req.params.id) {
+    res.status(400).send({ message: 'Content can not be empty!' });
+    return;
+  }
+  const { id } = req.params
+  const data = await models.sequelize.query(
+    `SELECT c.MaxBorrowAmount - SUM(i.Amount) AS 'Remaining'
+      FROM issuancehistory i
+      JOIN client c ON c.id = i.Client_id
+      WHERE MONTH(i.DateTime) = MONTH(NOW())
+      AND c.id = '${id}'`
+    , { type: models.sequelize.QueryTypes.SELECT })
+  const amount = data.Remaining ? data.Remaining < 0 ? 0 : data.Remaining : 0
+  res.json({ message: 'success',  amount })
+  return
 }
 exports.OnNfcAndPinCode = async (req, res) => {
   const { nfcCardId } = req.body;
@@ -232,7 +251,7 @@ exports.OnNfcAndPinCodeMultipleIssuance = async (req, res) => {
     return;
   }
   const merchantTypeId = (await getMerchantById(merchant_id)).MerchantType_id
-  const {interestOn} = await getInterestOnByMerchantTypeId(merchantTypeId)
+  const { interestOn } = await getInterestOnByMerchantTypeId(merchantTypeId)
 
   const data = await models.sequelize.query(`SELECT  * FROM issuancehistory i WHERE (i.NfcCard_id = '${nfcCardId}' AND i.AmountPaid='0' AND MONTH(i.DateTime) = MONTH(CURDATE()))`, { type: models.sequelize.QueryTypes.SELECT })
 

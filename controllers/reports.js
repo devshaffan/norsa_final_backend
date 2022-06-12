@@ -60,7 +60,7 @@ exports.supermarketReport = (req, res) => {
     JOIN issuancehistory i ON i.id = t.issuancehistoryId
     JOIN multipleissueances mi ON (mi.merchantId = t.Merchant_ID AND mi.issuancehistoryId = t.issuancehistoryId)
     JOIN merchanttypediscount d ON d.id = mi.numberOfMonthsId
-    WHERE Month(DATE(t.dateTime)) = '${month}' AND mt.Title = 'Supermarket'
+    WHERE Month(DATE(t.dateTime)) = '${month}' AND mt.interestOn = 'Client'
     group BY t.Merchant_ID`
         , { type: models.sequelize.QueryTypes.SELECT }).then(data => {
             return res.json(data)
@@ -85,7 +85,6 @@ exports.transactionReport = (req, res) => {
     JOIN merchants m ON m.id = t.Merchant_ID
     JOIN client c ON c.id = t.Client_id
     WHERE m.id IN (:merchants) AND (DATE(t.dateTime) > '${dateFrom}' AND DATE(t.dateTime) < '${dateTo}')
-    group BY t.Merchant_ID
     order by m.Name
     `
         , {
@@ -141,7 +140,7 @@ exports.totalSales = (req, res) => {
     FROM insurances insuu
     WHERE DATE(insuu.createdAt) = '${date}') inss ON inss.issuanceHistoryFk = ii.id
     WHERE DATE(pp.dateDeposit) = '${date}'
-    AND pp.handledByUserId IN (:users)
+    AND pp.handledByUserId IN (:users) AND pp.TypeOfReturnPayment = 'Cash'
         ) 
     `, {
         replacements: {
@@ -198,7 +197,7 @@ exports.totalSalesOfCurrentUser = (req, res) => {
     SELECT insuu.amount, insuu.issuanceHistoryFk
     FROM insurances insuu
     WHERE DATE(insuu.createdAt) = '${date}') inss ON inss.issuanceHistoryFk = ii.id
-    WHERE DATE(pp.dateDeposit) = '${date}' AND uu.accessToken = '${token}'
+    WHERE DATE(pp.dateDeposit) = '${date}' AND uu.accessToken = '${token}' AND pp.TypeOfReturnPayment = 'Cash'
         ) 
 `, { type: models.sequelize.QueryTypes.SELECT }).then(data => {
         return res.json(data)
@@ -214,19 +213,36 @@ exports.dealerReport = (req, res) => {
     const dealers = req.params.dealers.split(",")
     const month = req.params.month.split("-")[1]
     //CAST(SUM(p.amount) AS DECIMAL(10,2)) AS 'Paybackperiod_Amount', m.amount AS 'Membership_Fee',
-    models.sequelize.query(`SELECT  c.Dealer_id AS 'Dealer', c.Code AS 'Code',
-    CONCAT(c.FirstName, ' ', c.LastName) AS 'Nomber', p.Date AS 'FECHA',
-    CAST((IFNULL(p.amount,0) + IFNULL(m.amount,0) + IFNULL(i.amount,0)) AS DECIMAL(10,2)) AS 'SUB TOTAL',
-    0 AS 'ADM KSTN',
-    (CAST((IFNULL(p.amount,0) + IFNULL(m.amount,0) + IFNULL(i.amount,0)) AS DECIMAL(10,2)) + 0) AS 'TOTAL'
-    FROM client c
-    LEFT JOIN memberships m ON m.clientFk=c.id
-    LEFT JOIN issuancehistory ih ON ih.Client_id=c.id
-    LEFT JOIN insurances i ON i.issuanceHistoryFk=ih.id
-    LEFT JOIN paybackperiods p ON p.issuanceHistory_Id=ih.id
-    WHERE (c.Dealer_id IN (:dealers)) AND MONTH(c.Date) = '${month}'
-	group BY c.id,c.Dealer_id 
-    Order by c.Dealer_id`, {
+    models.sequelize.query(`SELECT c.Dealer_id AS 'Dealer', c.Code, p.date, FORMAT(IFNULL(p.amount, 0), 2), FORMAT(IFNULL(mm.memberSum, 0), 2) AS 'ADN KSTN',
+    FORMAT(IFNULL(p.amount, 0) + IFNULL(mm.memberSum, 0), 2) AS 'Total'
+    FROM paybackperiods p
+    JOIN issuancehistory i ON i.id = p.issuanceHistory_Id
+    JOIN client c ON c.id = i.Client_id
+    LEFT JOIN (
+    SELECT m.clientFk, SUM(m.amount) AS 'memberSum'
+    FROM memberships m
+    WHERE YEAR(m.month) = YEAR(NOW())
+    group BY m.clientFk
+    HAVING SUM(m.amount) < 50) mm ON mm.clientFk = c.id
+    WHERE MONTH(p.date) = '${month}'
+    AND c.Dealer_id IN (:dealers)
+    UNION
+    SELECT '', '', '', '', '', ''
+    UNION 
+    SELECT '', '', '', '', 'Total', (
+    SELECT SUM(FORMAT(IFNULL(pp.amount, 0) + IFNULL(mmmm.memberSum, 0), 2)) AS 'Total'
+    FROM paybackperiods pp
+    JOIN issuancehistory ii ON ii.id = pp.issuanceHistory_Id
+    JOIN client cc ON cc.id = ii.Client_id
+    LEFT JOIN (
+    SELECT mmm.clientFk, SUM(mmm.amount) AS 'memberSum'
+    FROM memberships mmm
+    WHERE YEAR(mmm.month) = YEAR(NOW())
+    group BY mmmclientFk
+    HAVING SUM(mmm.amount) < 50) mmmm ON mmmm.clientFk = c.id
+    WHERE MONTH(pp.date) = '${month}'
+    AND cc.Dealer_id IN (:dealers))
+    `, {
         replacements: { dealers: dealers },
         type: models.sequelize.QueryTypes.SELECT
     })

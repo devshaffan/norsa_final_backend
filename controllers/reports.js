@@ -42,7 +42,7 @@ exports.supermarketReport = (req, res) => {
     //  DECIMAL(10, 2))
     // END AS 'Norsa Profit',
     models.sequelize.query(`SELECT m.Code AS "Merchant Code", m.Name AS "Merchant Name",
-    SUM(t.AmountUser) AS 'Total Amount',
+    FORMAT(SUM(t.AmountUser),2) AS 'Total Amount',
     CASE
     WHEN mt.interestOn = 'Client' THEN SUM(t.AmountUser)
     ELSE CAST((SUM(t.AmountUser) - (SUM(t.AmountUser)/100 * (d.Interest))) AS DECIMAL(10,2))

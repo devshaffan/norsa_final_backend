@@ -105,21 +105,41 @@ exports.totalSales = (req, res) => {
         return
     }
     models.sequelize.query(`
-    SELECT i.Client_id AS 'Code', CONCAT(c.FirstName, ' ', c.LastName) AS 'Name', u.email, CAST(p.amount  AS decimal(10,2)) AS 'Amount', p.dateDeposit, i.TypeOfReturnPayment
-    , IFNULL(SUM(ins.amount),0) AS 'Insurance Charged', IFNULL(SUM(m.amount),0) AS 'Membeship Charged',
-    CASE 
-    WHEN p.paidByDealer = 1 THEN c.dealerCommision*-1
-    ELSE 0
-    END AS 'dealer Commision'
-	 FROM paybackperiods p
-    JOIN issuancehistory i ON i.id = p.issuanceHistory_Id
-    LEFT JOIN insurances ins ON ins.issuanceHistoryFk = i.id
-    JOIN client c ON c.id = i.Client_id
-    LEFT JOIN memberships m ON m.clientFk= c.id
-    JOIN users u ON u.id = p.handledByUserId
-    WHERE u.id IN (:users) AND  Date(p.DateDeposit) = '${date}'
-    group BY c.id
-    ORDER BY p.dateDeposit, u.email;
+        SELECT p.dateDeposit, i.Client_id, CONCAT(c.FirstName, c.LastName) AS 'Nomber', p.handledByUserId, p.amountPaidByClient,
+        p.TypeOfReturnPayment, (p.amountPaidToDealer* (-1)) AS 'Dealer Comission', mm.memberSum AS 'Membership', ins.amount AS 'Insurance'
+        FROM paybackperiods p
+        JOIN issuancehistory i ON i.id = p.issuanceHistory_Id
+        JOIN client c ON c.id = i.Client_id
+        LEFT JOIN (
+        SELECT m.clientFk, SUM(m.amount) AS 'memberSum'
+        FROM memberships m
+        WHERE m.month = '${date}')
+        group BY m.clientFk) mm ON mm.clientFk = i.Client_id
+        LEFT JOIN (
+        SELECT ins.amount, ins.issuanceHistoryFk
+        FROM insurances ins
+        WHERE DATE(ins.createdAt) = '${date}') ins ON ins.issuanceHistoryFk = i.id
+        WHERE DATE(p.dateDeposit) = '${date}'
+        AND p.handledByUserId IN (:users)
+        UNION
+        SELECT '', '', '', '', '', '', '', '', ''
+        UNION
+        SELECT '', '', '', '', '', '', '', 'Total', (
+        SELECT IFNULL(FORMAT(SUM(IFNULL(p.amountPaidByClient, 0) - IFNULL(p.amountPaidToDealer, 0) + IFNULL(mm.memberSum, 0) + IFNULL(ins.amount, 0)), 2), 0) AS 'Total'
+        FROM paybackperiods p
+        JOIN issuancehistory i ON i.id = p.issuanceHistory_Id
+        JOIN client c ON c.id = i.Client_id
+        LEFT JOIN (
+        SELECT m.clientFk, SUM(m.amount) AS 'memberSum'
+        FROM memberships m
+        WHERE m.month = '${date}'
+        group BY m.clientFk) mm ON mm.clientFk = i.Client_id
+        LEFT JOIN (
+        SELECT ins.amount, ins.issuanceHistoryFk
+        FROM insurances ins
+        WHERE DATE(ins.createdAt) = '${date}') ins ON ins.issuanceHistoryFk = i.id
+        WHERE DATE(p.dateDeposit) = '${date}'
+        ) 
     `, {
         replacements: {
             users: users.split(',')

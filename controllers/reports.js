@@ -135,9 +135,9 @@ exports.totalSales = (req, res) => {
         WHERE m.month = '${date}'
         group BY m.clientFk) mm ON mm.clientFk = i.Client_id
         LEFT JOIN (
-        SELECT ins.amount, ins.issuanceHistoryFk
-        FROM insurances ins
-        WHERE DATE(ins.createdAt) = '${date}') ins ON ins.issuanceHistoryFk = i.id
+        SELECT insu.amount, insu.issuanceHistoryFk
+        FROM insurances insu
+        WHERE DATE(insu.createdAt) = '${date}') ins ON ins.issuanceHistoryFk = i.id
         WHERE DATE(p.dateDeposit) = '${date}'
         ) 
     `, {

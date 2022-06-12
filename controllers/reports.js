@@ -186,6 +186,7 @@ exports.totalSalesOfCurrentUser = (req, res) => {
     FROM paybackperiods pp
     JOIN issuancehistory ii ON ii.id = pp.issuanceHistory_Id
     JOIN client cc ON cc.id = ii.Client_id
+    JOIN users uu ON uu.id = pp.handledByUserId
     LEFT JOIN (
     SELECT mmm.clientFk, SUM(mmm.amount) AS 'memberSum'
     FROM memberships mmm
@@ -195,7 +196,7 @@ exports.totalSalesOfCurrentUser = (req, res) => {
     SELECT insuu.amount, insuu.issuanceHistoryFk
     FROM insurances insuu
     WHERE DATE(insuu.createdAt) = '${date}') inss ON inss.issuanceHistoryFk = ii.id
-    WHERE DATE(pp.dateDeposit) = '${date}'
+    WHERE DATE(pp.dateDeposit) = '${date}' AND uu.accessToken = '${token}'
         ) 
 `, { type: models.sequelize.QueryTypes.SELECT }).then(data => {
         return res.json(data)

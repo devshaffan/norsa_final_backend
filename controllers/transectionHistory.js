@@ -206,10 +206,11 @@ const checkMerchantCredit = async (id) => {
             id: id,
         }
     })
-    const { maxCredit, creditUsed } = merchantData
-    if (!maxCredit || !creditUsed) {
+    let { maxCredit, creditUsed } = merchantData
+    if (!maxCredit) {
         return false;
     }
+    creditUsed = creditUsed || 0
     if (parseFloat(creditUsed) >= parseFloat(maxCredit)) {
         return false;
     }

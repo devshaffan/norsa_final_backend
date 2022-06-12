@@ -141,7 +141,7 @@ exports.totalSales = (req, res) => {
     FROM insurances insuu
     WHERE DATE(insuu.createdAt) = '${date}') inss ON inss.issuanceHistoryFk = ii.id
     WHERE DATE(pp.dateDeposit) = '${date}'
-    AND p.handledByUserId IN (:users)
+    AND pp.handledByUserId IN (:users)
         ) 
     `, {
         replacements: {

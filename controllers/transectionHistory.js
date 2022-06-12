@@ -215,7 +215,6 @@ const checkMerchantCredit = async (id) => {
         return false;
     }
     return true;
-
 }
 exports.createTransactionHistory = async (req, res) => {
     const { Client_id,
@@ -242,7 +241,7 @@ exports.createTransactionHistory = async (req, res) => {
     const ifMerchantTransact = await checkMerchantCredit(Merchant_ID)
     if (!ifMerchantTransact) {
         res.status(500).send({
-            message: 'Not Sufficient Credit'
+            message: 'Not Sufficient Credit of Merchant'
         });
         return;
     }

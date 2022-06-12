@@ -105,11 +105,12 @@ exports.totalSales = (req, res) => {
         return
     }
     models.sequelize.query(`
-    SELECT p.dateDeposit, i.Client_id, CONCAT(c.FirstName, c.LastName) AS 'Nomber', p.handledByUserId, p.amountPaidByClient,
-    p.TypeOfReturnPayment, (p.amountPaidToDealer* (-1)) AS 'Dealer Comission', mm.memberSum AS 'Membership', ins.amount AS 'Insurance'
+    SELECT p.dateDeposit, i.Client_id, CONCAT(c.FirstName, c.LastName) AS 'Nomber', u.email AS 'Email', FORMAT(p.amountPaidByClient,2),
+    p.TypeOfReturnPayment, FORMAT((p.amountPaidToDealer* (-1)),2) AS 'Dealer Comission', FORMAT(mm.memberSum,2) AS 'Membership', FORMAT(ins.amount,2) AS 'Insurance'
     FROM paybackperiods p
     JOIN issuancehistory i ON i.id = p.issuanceHistory_Id
     JOIN client c ON c.id = i.Client_id
+    JOIN users u ON u.id = p.handledByUserId
     LEFT JOIN (
     SELECT m.clientFk, SUM(m.amount) AS 'memberSum'
     FROM memberships m
@@ -160,8 +161,8 @@ exports.totalSalesOfCurrentUser = (req, res) => {
         return
     }
     models.sequelize.query(` 
-        SELECT p.dateDeposit, i.Client_id, CONCAT(c.FirstName, c.LastName) AS 'Nomber', p.handledByUserId, p.amountPaidByClient,
-    p.TypeOfReturnPayment, (p.amountPaidToDealer* (-1)) AS 'Dealer Comission', mm.memberSum AS 'Membership', ins.amount AS 'Insurance'
+    SELECT p.dateDeposit, i.Client_id, CONCAT(c.FirstName, c.LastName) AS 'Nomber', u.email AS 'Email', FORMAT(p.amountPaidByClient,2),
+    p.TypeOfReturnPayment, FORMAT((p.amountPaidToDealer* (-1)),2) AS 'Dealer Comission', FORMAT(mm.memberSum,2) AS 'Membership', FORMAT(ins.amount,2) AS 'Insurance'
     FROM paybackperiods p
     JOIN issuancehistory i ON i.id = p.issuanceHistory_Id
     JOIN client c ON c.id = i.Client_id

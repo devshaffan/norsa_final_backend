@@ -159,13 +159,43 @@ exports.totalSalesOfCurrentUser = (req, res) => {
         res.status(500).send({ message: "no user selected or date" })
         return
     }
-    models.sequelize.query(`SELECT Date(p.DateDeposit) AS  "Fecha",i.Client_id AS 'Code', CONCAT(c.FirstName, ' ', c.LastName) AS 'Name', u.email, CAST(p.amount AS DECIMAL(10,2)) AS 'Amount',  i.TypeOfReturnPayment
-    FROM paybackperiods p
-    JOIN issuancehistory i ON i.id = p.issuanceHistory_Id
-    JOIN client c ON c.id = i.Client_id
-    JOIN users u ON u.id = p.handledByUserId
-    WHERE u.accessToken = '${token}' AND  Date(p.DateDeposit) = '${date}'
-    ORDER BY p.dateDeposit, u.email;
+    models.sequelize.query(`
+    SELECT p.dateDeposit, i.Client_id, CONCAT(c.FirstName, c.LastName) AS 'Nomber', p.handledByUserId, p.amountPaidByClient,
+        p.TypeOfReturnPayment, (p.amountPaidToDealer* (-1)) AS 'Dealer Comission', mm.memberSum AS 'Membership', ins.amount AS 'Insurance'
+        FROM paybackperiods p
+        JOIN issuancehistory i ON i.id = p.issuanceHistory_Id
+        JOIN client c ON c.id = i.Client_id
+        JOIN users u ON u.id = p.handledByUserId
+        LEFT JOIN (
+        SELECT m.clientFk, SUM(m.amount) AS 'memberSum'
+        FROM memberships m
+        WHERE m.month = '${date}')
+        group BY m.clientFk) mm ON mm.clientFk = i.Client_id
+        LEFT JOIN (
+        SELECT ins.amount, ins.issuanceHistoryFk
+        FROM insurances ins
+        WHERE DATE(ins.createdAt) = '${date}') ins ON ins.issuanceHistoryFk = i.id
+        WHERE DATE(p.dateDeposit) = '${date}'
+        AND u.accessToken = '${token}'
+        UNION
+        SELECT '', '', '', '', '', '', '', '', ''
+        UNION
+        SELECT '', '', '', '', '', '', '', 'Total', (
+        SELECT IFNULL(FORMAT(SUM(IFNULL(p.amountPaidByClient, 0) - IFNULL(p.amountPaidToDealer, 0) + IFNULL(mm.memberSum, 0) + IFNULL(ins.amount, 0)), 2), 0) AS 'Total'
+        FROM paybackperiods p
+        JOIN issuancehistory i ON i.id = p.issuanceHistory_Id
+        JOIN client c ON c.id = i.Client_id
+        LEFT JOIN (
+        SELECT m.clientFk, SUM(m.amount) AS 'memberSum'
+        FROM memberships m
+        WHERE m.month = '${date}'
+        group BY m.clientFk) mm ON mm.clientFk = i.Client_id
+        LEFT JOIN (
+        SELECT ins.amount, ins.issuanceHistoryFk
+        FROM insurances ins
+        WHERE DATE(ins.createdAt) = '${date}') ins ON ins.issuanceHistoryFk = i.id
+        WHERE DATE(p.dateDeposit) = '${date}'
+        ) 
 `, { type: models.sequelize.QueryTypes.SELECT }).then(data => {
         return res.json(data)
     }).catch(err => {

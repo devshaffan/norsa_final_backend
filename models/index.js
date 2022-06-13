@@ -14,7 +14,6 @@ const dbOptions = {
   dialectOptions: {
     connectTimeout: 60000,
     useUTC: false,
-    timezone
   }
   , timezone
 

@@ -27,7 +27,7 @@ exports.getTransactionHistoryByClientId = (req, res) => {
             message: 'id is required'
         });
     }
-    models.sequelize.query(`SELECT m.Name AS 'Name', t.*, count(p.date) AS "PaybackMonths" FROM transactionhistory t
+    models.sequelize.query(`SELECT m.Name AS 'Name',  t.Amountuser AS 'Amount', DATE(t.dateTime) AS 'Date', TIME(t.dateTime) AS 'Time', count(p.date) AS "PaybackMonths" FROM transactionhistory t
     JOIN merchants m ON m.id = t.Merchant_ID 
     JOIN issuancehistory i ON i.id = t.issuancehistoryId 
     JOIN paybackperiods p ON p.issuanceHistory_Id = i.id 

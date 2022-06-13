@@ -113,14 +113,14 @@ exports.getMaxRemainingCreditClient = async (req, res) => {
   }
   const { id } = req.params
   const data = await models.sequelize.query(
-    `SELECT c.MaxBorrowAmount - SUM(i.Amount) AS 'Remaining'
+    `SELECT (IFNULL(c.MaxBorrowAmount,0)- SUM(IFNULL(i.Amount,0))) AS 'Remaining'
       FROM issuancehistory i
       JOIN client c ON c.id = i.Client_id
       WHERE MONTH(i.DateTime) = MONTH(NOW())
       AND c.id = '${id}'`
     , { type: models.sequelize.QueryTypes.SELECT })
-  const amount = data.Remaining ? data.Remaining < 0 ? 0 : data.Remaining : 0
-  res.json({ message: 'success',  amount })
+  const amount = data[0].Remaining ? data[0].Remaining < 0 ? 0 : data[0].Remaining : 0
+  res.json({ message: 'success', amount })
   return
 }
 exports.OnNfcAndPinCode = async (req, res) => {

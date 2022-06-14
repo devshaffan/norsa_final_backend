@@ -104,8 +104,8 @@ exports.totalSales = (req, res) => {
         return
     }
     models.sequelize.query(`
-    SELECT p.dateDeposit, i.Client_id, CONCAT(c.FirstName, c.LastName) AS 'Nomber', u.email AS 'Email', FORMAT(p.amountPaidByClient,2),
-    p.TypeOfReturnPayment, FORMAT((p.amountPaidToDealer* (-1)),2) AS 'Dealer Comission', FORMAT(mm.memberSum,2) AS 'Membership', FORMAT(ins.amount,2) AS 'Insurance'
+    SELECT p.dateDeposit as 'Date Deposit', i.Client_id as 'Client', CONCAT(c.FirstName, c.LastName) AS 'Nomber', u.email AS 'Email', FORMAT(p.amountPaidByClient,2) as 'Amount Paid By Client',
+    p.TypeOfReturnPayment as 'Type of Payment', FORMAT((p.amountPaidToDealer* (-1)),2) AS 'Dealer Comission', FORMAT(mm.memberSum,2) AS 'Membership', FORMAT(ins.amount,2) AS 'Insurance'
     FROM paybackperiods p
     JOIN issuancehistory i ON i.id = p.issuanceHistory_Id
     JOIN client c ON c.id = i.Client_id

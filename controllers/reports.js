@@ -238,8 +238,8 @@ exports.dealerReport = (req, res) => {
     SELECT mmm.clientFk, SUM(mmm.amount) AS 'memberSum'
     FROM memberships mmm
     WHERE YEAR(mmm.month) = YEAR(NOW())
-    group BY mmmclientFk
-    HAVING SUM(mmm.amount) < 50) mmmm ON mmmm.clientFk = c.id
+    group BY mmm.clientFk
+    HAVING SUM(mmm.amount) < 50) mmmm ON mmmm.clientFk = cc.id
     WHERE MONTH(pp.date) = '${month}'
     AND cc.Dealer_id IN (:dealers))
     `, {

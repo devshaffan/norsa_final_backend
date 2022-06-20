@@ -234,7 +234,7 @@ exports.dealerReport = (req, res) => {
     group BY mmm.clientFk
     HAVING SUM(mmm.amount) < 50) mmmm ON mmmm.clientFk = cc.id
     WHERE MONTH(pp.date) = '${month}'
-    AND cc.Dealer_id IN (:dealers)) AND p.amount IS NOT NULL
+    AND cc.Dealer_id IN (:dealers)) AND pp.amount IS NOT NULL
     `, {
         replacements: { dealers: dealers },
         type: models.sequelize.QueryTypes.SELECT

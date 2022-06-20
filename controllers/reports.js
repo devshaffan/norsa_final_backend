@@ -214,7 +214,7 @@ exports.dealerReport = (req, res) => {
     LEFT JOIN (
     SELECT m.clientFk, SUM(m.amount) AS 'memberSum'
     FROM memberships m
-    WHERE YEAR(m.month) = YEAR(NOW())
+    WHERE YEAR(m.month) = YEAR(NOW()) AND MONTH(m.month) = '${month}'
     group BY m.clientFk
     HAVING SUM(m.amount) < 50) mm ON mm.clientFk = c.id
     WHERE MONTH(p.date) = '${month}'

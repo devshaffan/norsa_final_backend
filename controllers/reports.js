@@ -206,7 +206,7 @@ exports.dealerReport = (req, res) => {
     const dealers = req.params.dealers.split(",")
     const month = req.params.month.split("-")[1]
     //CAST(SUM(p.amount) AS DECIMAL(10,2)) AS 'Paybackperiod_Amount', m.amount AS 'Membership_Fee',
-    models.sequelize.query(`SELECT c.Dealer_id AS 'Dealer', c.Code AS 'Nomber', Date(p.date) AS 'Fecha', FORMAT(IFNULL(p.amount, 0), 2) AS 'Sub Total', FORMAT(IFNULL(mm.memberSum, 0), 2) AS 'ADN KSTN',
+    models.sequelize.query(`SELECT c.Dealer_id AS 'Dealer', c.Code AS 'Nomber', Date(p.date) AS 'Fecha', FORMAT(p.amount, 2) AS 'Sub Total', FORMAT(IFNULL(mm.memberSum, 0), 2) AS 'ADN KSTN',
     (IFNULL(p.amount, 0) + IFNULL(mm.memberSum, 0)) AS 'Total'
     FROM paybackperiods p
     JOIN issuancehistory i ON i.id = p.issuanceHistory_Id
@@ -218,7 +218,7 @@ exports.dealerReport = (req, res) => {
     group BY m.clientFk
     HAVING SUM(m.amount) < 50) mm ON mm.clientFk = c.id
     WHERE MONTH(p.date) = '${month}'
-    AND c.Dealer_id IN (:dealers)
+    AND c.Dealer_id IN (:dealers) AND p.amount IS NOT NULL
     UNION
     SELECT '', '', '', '', '', ''
     UNION 
@@ -234,7 +234,7 @@ exports.dealerReport = (req, res) => {
     group BY mmm.clientFk
     HAVING SUM(mmm.amount) < 50) mmmm ON mmmm.clientFk = cc.id
     WHERE MONTH(pp.date) = '${month}'
-    AND cc.Dealer_id IN (:dealers)) 
+    AND cc.Dealer_id IN (:dealers)) AND p.amount IS NOT NULL
     `, {
         replacements: { dealers: dealers },
         type: models.sequelize.QueryTypes.SELECT

@@ -26,7 +26,7 @@ exports.merchantReport = (req, res) => {
     LEFT JOIN multipleissueances mi ON (mi.merchantId = t.Merchant_ID AND mi.issuancehistoryId = t.issuancehistoryId)
     LEFT JOIN merchanttypediscount d ON d.id = mi.numberOfMonthsId
     LEFT JOIN (SELECT SUM(tt.AmountUser) AS 'Retour', tt.Merchant_ID FROM transactionhistory tt WHERE tt.transactionType = 2 group BY tt.Merchant_ID)  ttt ON ttt.Merchant_ID = t.Merchant_ID
-  	 WHERE Month(DATE(t.dateTime)) = '${month}'  AND t.transactionType = 1
+  	WHERE Month(DATE(t.dateTime)) = '${month}'  AND t.transactionType = 1
     group BY t.Merchant_ID`
         , { type: models.sequelize.QueryTypes.SELECT }).then(data => {
             return res.json(data)
@@ -43,8 +43,6 @@ exports.supermarketReport = (req, res) => {
     // END AS 'Norsa Profit',
     models.sequelize.query(`SELECT m.Code AS "Merchant Code", m.Name AS "Merchant Name",
     FORMAT(SUM(t.AmountUser) - IFNULL(ttt.Retour,0),2) AS 'Total Amount',
-    FORMAT(SUM(t.AmountUser) - IFNULL(ttt.Retour,0),2) AS 'Sum Of Final Amount (Exculding Tax and Norsa Profit)',
-    0 AS 'OB(TAX)',
     m.BankName AS 'Bank Name', m.AccountNo AS 'Bank Account'
     FROM transactionhistory t
     JOIN merchants m ON m.id = t.Merchant_ID
@@ -218,23 +216,25 @@ exports.dealerReport = (req, res) => {
     group BY m.clientFk
     HAVING SUM(m.amount) < 50) mm ON mm.clientFk = c.id
     WHERE MONTH(p.date) = '${month}'
-    AND c.Dealer_id IN (:dealers) AND p.amount IS NOT NULL
+    AND c.Dealer_id IN (:dealers) AND p.amount IS NOT NULL AND p.amount > 0
     UNION
     SELECT '', '', '', '', '', ''
     UNION 
     SELECT '', '', '', '', 'Total', (
-    SELECT SUM(FORMAT(IFNULL(pp.amount, 0) + IFNULL(mmmm.memberSum, 0), 2)) AS 'Total'
-    FROM paybackperiods pp
-    JOIN issuancehistory ii ON ii.id = pp.issuanceHistory_Id
-    JOIN client cc ON cc.id = ii.Client_id
-    LEFT JOIN (
-    SELECT mmm.clientFk, SUM(mmm.amount) AS 'memberSum'
-    FROM memberships mmm
-    WHERE YEAR(mmm.month) = YEAR(NOW())
-    group BY mmm.clientFk
-    HAVING SUM(mmm.amount) < 50) mmmm ON mmmm.clientFk = cc.id
+        SELECT SUM(FORMAT(IFNULL(pp.amount, 0) + IFNULL(mmmm.memberSum, 0), 2)) AS 'Total'
+        FROM paybackperiods pp
+        JOIN issuancehistory ii ON ii.id = pp.issuanceHistory_Id
+        JOIN client cc ON cc.id = ii.Client_id
+        LEFT JOIN (
+            SELECT mmm.clientFk, SUM(mmm.amount) AS 'memberSum'
+            FROM memberships mmm
+            WHERE YEAR(mmm.month) = YEAR(NOW()) AND MONTH(mmm.month) = '${month}'
+            group BY mmm.clientFk
+            HAVING SUM(mmm.amount) < 50
+        ) 
+        mmmm ON mmmm.clientFk = cc.id
     WHERE MONTH(pp.date) = '${month}'
-    AND cc.Dealer_id IN (:dealers)) AND pp.amount IS NOT NULL
+    AND cc.Dealer_id IN (:dealers) AND pp.amount IS NOT NULL AND pp.amount > 0) 
     `, {
         replacements: { dealers: dealers },
         type: models.sequelize.QueryTypes.SELECT

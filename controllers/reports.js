@@ -204,8 +204,11 @@ exports.dealerReport = (req, res) => {
     const dealers = req.params.dealers.split(",")
     const month = req.params.month.split("-")[1]
     //CAST(SUM(p.amount) AS DECIMAL(10,2)) AS 'Paybackperiod_Amount', m.amount AS 'Membership_Fee',
-    models.sequelize.query(`SELECT c.Dealer_id AS 'Dealer', c.Code AS 'Nomber', Date(p.date) AS 'Fecha', FORMAT(p.amount, 2) AS 'Sub Total',
-    CASE
+    models.sequelize.query(`SELECT c.Dealer_id AS 'Dealer', c.Code AS 'Nomber', Date(p.date) AS 'Fecha', CASE 
+    WHEN p.type = 1 THEN 'Interest On Client'
+    WHEN p.type = 2 THEN 'Interest On Merchant'
+    ELSE p.type END AS 'Type',
+    FORMAT(p.amount, 2) AS 'Sub Total', CASE
     WHEN FORMAT(IFNULL(mm.memberSum, 0), 2) = 0 THEN '4.2'
     ELSE '0' END AS 'ADN KSTN',
     (IFNULL(p.amount, 0) + (CASE
@@ -227,9 +230,9 @@ exports.dealerReport = (req, res) => {
     WHERE MONTH(p.date) = ${month}
     AND c.Dealer_id IN (:dealers) AND p.amount IS NOT NULL AND p.amount > 0
     UNION
-    SELECT '', '', '', '', '', ''
+    SELECT '', '', '', '','', '', ''
     UNION 
-    SELECT '', '', '', '', 'Total', (
+    SELECT '', '', '','', '', 'Total', (
     SELECT SUM(
     (IFNULL(p.amount, 0) + (CASE
     WHEN FORMAT(IFNULL(mm.memberSum, 0), 2) = 0 THEN '4.2'

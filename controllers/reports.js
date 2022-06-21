@@ -26,7 +26,7 @@ exports.merchantReport = (req, res) => {
     LEFT JOIN multipleissueances mi ON (mi.merchantId = t.Merchant_ID AND mi.issuancehistoryId = t.issuancehistoryId)
     LEFT JOIN merchanttypediscount d ON d.id = mi.numberOfMonthsId
     LEFT JOIN (SELECT SUM(tt.AmountUser) AS 'Retour', tt.Merchant_ID FROM transactionhistory tt WHERE tt.transactionType = 2 group BY tt.Merchant_ID)  ttt ON ttt.Merchant_ID = t.Merchant_ID
-  	WHERE Month(DATE(t.dateTime)) = '${month}'  AND t.transactionType = 1
+  	WHERE Month(DATE(t.dateTime)) = '${month}'  AND mt.interestOn = 'Merchant' AND t.transactionType = 1
     group BY t.Merchant_ID`
         , { type: models.sequelize.QueryTypes.SELECT }).then(data => {
             return res.json(data)
@@ -204,37 +204,51 @@ exports.dealerReport = (req, res) => {
     const dealers = req.params.dealers.split(",")
     const month = req.params.month.split("-")[1]
     //CAST(SUM(p.amount) AS DECIMAL(10,2)) AS 'Paybackperiod_Amount', m.amount AS 'Membership_Fee',
-    models.sequelize.query(`SELECT c.Dealer_id AS 'Dealer', c.Code AS 'Nomber', Date(p.date) AS 'Fecha', FORMAT(p.amount, 2) AS 'Sub Total', FORMAT(IFNULL(mm.memberSum, 0), 2) AS 'ADN KSTN',
-    (IFNULL(p.amount, 0) + IFNULL(mm.memberSum, 0)) AS 'Total'
+    models.sequelize.query(`SELECT c.Dealer_id AS 'Dealer', c.Code AS 'Nomber', Date(p.date) AS 'Fecha', FORMAT(p.amount, 2) AS 'Sub Total',
+    CASE
+    WHEN FORMAT(IFNULL(mm.memberSum, 0), 2) = 0 THEN '4.2'
+    ELSE '0' END AS 'ADN KSTN',
+    (IFNULL(p.amount, 0) + (CASE
+    WHEN FORMAT(IFNULL(mm.memberSum, 0), 2) = 0 THEN '4.2'
+    ELSE '0' END)) AS 'Total'
     FROM paybackperiods p
     JOIN issuancehistory i ON i.id = p.issuanceHistory_Id
     JOIN client c ON c.id = i.Client_id
     LEFT JOIN (
-    SELECT m.clientFk, SUM(m.amount) AS 'memberSum'
+    SELECT mem.clientFk, mem.amount AS 'memberSum'
+    FROM memberships mem 
+    LEFT JOIN (
+    SELECT m.clientFk, SUM(m.amount) AS 'amount'
     FROM memberships m
-    WHERE YEAR(m.month) = YEAR(NOW()) AND MONTH(m.month) = '${month}'
+    WHERE YEAR(m.month) = YEAR(NOW())
     group BY m.clientFk
-    HAVING SUM(m.amount) < 50) mm ON mm.clientFk = c.id
-    WHERE MONTH(p.date) = '${month}'
+    HAVING SUM(m.amount) >= 50) a ON a.clientFk = mem.clientFk
+    WHERE MONTH(mem.month) = ${month}) mm ON mm.clientFk = c.id
+    WHERE MONTH(p.date) = ${month}
     AND c.Dealer_id IN (:dealers) AND p.amount IS NOT NULL AND p.amount > 0
     UNION
     SELECT '', '', '', '', '', ''
     UNION 
     SELECT '', '', '', '', 'Total', (
-        SELECT SUM(FORMAT(IFNULL(pp.amount, 0) + IFNULL(mmmm.memberSum, 0), 2)) AS 'Total'
-        FROM paybackperiods pp
-        JOIN issuancehistory ii ON ii.id = pp.issuanceHistory_Id
-        JOIN client cc ON cc.id = ii.Client_id
-        LEFT JOIN (
-            SELECT mmm.clientFk, SUM(mmm.amount) AS 'memberSum'
-            FROM memberships mmm
-            WHERE YEAR(mmm.month) = YEAR(NOW()) AND MONTH(mmm.month) = '${month}'
-            group BY mmm.clientFk
-            HAVING SUM(mmm.amount) < 50
-        ) 
-        mmmm ON mmmm.clientFk = cc.id
-    WHERE MONTH(pp.date) = '${month}'
-    AND cc.Dealer_id IN (:dealers) AND pp.amount IS NOT NULL AND pp.amount > 0) 
+    SELECT SUM(
+    (IFNULL(p.amount, 0) + (CASE
+    WHEN FORMAT(IFNULL(mm.memberSum, 0), 2) = 0 THEN '4.2'
+    ELSE '0' END))) AS 'Total'
+    FROM paybackperiods p
+    JOIN issuancehistory i ON i.id = p.issuanceHistory_Id
+    JOIN client c ON c.id = i.Client_id
+    LEFT JOIN (
+    SELECT mem.clientFk, mem.amount AS 'memberSum'
+    FROM memberships mem 
+    LEFT JOIN (
+    SELECT m.clientFk, SUM(m.amount) AS 'amount'
+    FROM memberships m
+    WHERE YEAR(m.month) = YEAR(NOW())
+    group BY m.clientFk
+    HAVING SUM(m.amount) >= 50) a ON a.clientFk = mem.clientFk
+    WHERE MONTH(mem.month) = ${month}) mm ON mm.clientFk = c.id
+    WHERE MONTH(p.date) = ${month}
+    AND c.Dealer_id IN (:dealers) AND p.amount IS NOT NULL AND p.amount > 0)
     `, {
         replacements: { dealers: dealers },
         type: models.sequelize.QueryTypes.SELECT

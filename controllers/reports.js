@@ -205,8 +205,8 @@ exports.dealerReport = (req, res) => {
     const month = req.params.month.split("-")[1]
     //CAST(SUM(p.amount) AS DECIMAL(10,2)) AS 'Paybackperiod_Amount', m.amount AS 'Membership_Fee',
     models.sequelize.query(`SELECT c.Dealer_id AS 'Dealer', c.Code AS 'Nomber', Date(p.date) AS 'Fecha', CASE 
-    WHEN p.type = 1 THEN 'Interest On Client'
-    WHEN p.type = 2 THEN 'Interest On Merchant'
+    WHEN '${type}' = 1 THEN 'Interest On Client'
+    WHEN '${type}' = 2 THEN 'Interest On Merchant'
     ELSE p.type END AS 'Type',
     FORMAT(p.amount, 2) AS 'Sub Total', CASE
     WHEN FORMAT(IFNULL(mm.memberSum, 0), 2) = 0 THEN '4.2'
@@ -228,7 +228,7 @@ exports.dealerReport = (req, res) => {
     HAVING SUM(m.amount) >= 50) a ON a.clientFk = mem.clientFk
     WHERE MONTH(mem.month) = ${month}) mm ON mm.clientFk = c.id
     WHERE MONTH(p.date) = ${month}
-    AND c.Dealer_id IN (:dealers) AND p.amount IS NOT NULL AND p.amount > 0
+    AND c.Dealer_id IN (:dealers) AND p.amount IS NOT NULL AND p.amount > 0 AND p.type = '${type}'
     UNION
     SELECT '', '', '', '','', '', ''
     UNION 

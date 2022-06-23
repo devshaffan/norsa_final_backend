@@ -75,7 +75,7 @@ exports.transactionReport = (req, res) => {
     t.dateTime AS 'Date',t.ItemDescription AS 'Item_Description' from transactionhistory t 
     JOIN merchants m ON m.id = t.Merchant_ID
     JOIN client c ON c.id = t.Client_id
-    WHERE m.id IN (:merchants) AND (DATE(t.dateTime) > '${dateFrom}' AND DATE(t.dateTime) < '${dateTo}')
+    WHERE m.id IN (:merchants) AND (DATE(t.dateTime) >= '${dateFrom}' AND DATE(t.dateTime) <= '${dateTo}')
     order by m.Name
     `
         , {
@@ -242,31 +242,36 @@ exports.dealerReport = (req, res) => {
             group BY m.clientFk
             HAVING SUM(m.amount) >= 50
         ) a ON a.clientFk = mem.clientFk
-        WHERE MONTH(mem.month) = ${month}) mm ON mm.clientFk = c.id
-        WHERE MONTH(p.date) = ${month} AND c.Dealer_id IN (:dealers) AND p.amount IS NOT NULL AND p.amount > 0 AND p.type = '${type}'
+        WHERE MONTH(mem.month) = '${month}') mm ON mm.clientFk = c.id
+    WHERE MONTH(p.date) = '${month}' AND c.Dealer_id IN (:dealers) AND p.amount IS NOT NULL AND p.amount > 0 AND p.type = '${type}'
     UNION
     SELECT '', '', '', '','', '', ''
     UNION 
-    SELECT '', '', '','', '', 'Total', (
-    SELECT SUM(
-    (IFNULL(p.amount, 0) + (CASE
-    WHEN FORMAT(IFNULL(mm.memberSum, 0), 2) = 0 THEN '4.2'
-    ELSE '0' END))) AS 'Total'
+    SELECT 'Total', (
+    SELECT SUM( (IFNULL(p.amount, 0) + (
+        CASE
+            WHEN FORMAT(IFNULL(mmm.memberSum, 0), 2) = 0 
+            THEN '4.2'
+            ELSE '0'
+        END)
+        )
+    ) AS 'Total'
     FROM paybackperiods p
     JOIN issuancehistory i ON i.id = p.issuanceHistory_Id
     JOIN client c ON c.id = i.Client_id
     LEFT JOIN (
-    SELECT mem.clientFk, mem.amount AS 'memberSum'
-    FROM memberships mem 
-    LEFT JOIN (
-    SELECT m.clientFk, SUM(m.amount) AS 'amount'
-    FROM memberships m
-    WHERE YEAR(m.month) = YEAR(NOW())
-    group BY m.clientFk
-    HAVING SUM(m.amount) >= 50) a ON a.clientFk = mem.clientFk
-    WHERE MONTH(mem.month) = ${month}) mm ON mm.clientFk = c.id
-    WHERE MONTH(p.date) = ${month}
-    AND c.Dealer_id IN (:dealers) AND p.amount IS NOT NULL AND p.amount > 0)
+        SELECT memb.clientFk, memb.amount AS 'memberSum' FROM memberships memb
+        LEFT JOIN (
+            SELECT me.clientFk, SUM(me.amount) AS 'amount' FROM memberships me
+            WHERE YEAR(me.month) = YEAR(NOW())
+            group BY me.clientFk
+            HAVING SUM(me.amount) >= 50) a ON a.clientFk = memb.clientFk
+        WHERE MONTH(memb.month) = '${month}') mmm ON mmm.clientFk = c.id
+    WHERE MONTH(p.date) = '${month}'AND
+    c.Dealer_id IN (:dealers) AND
+    p.amount IS NOT NULL AND
+    p.amount > 0 AND 
+    p.type = '${type}'),'','', '','', ''
     `, {
         replacements: { dealers: dealers },
         type: models.sequelize.QueryTypes.SELECT

@@ -254,7 +254,7 @@ exports.dealerReport = async (req, res) => {
                     FORMAT(IFNULL(mm.memberSum, 0), 2) = 0
                 THEN '4.2'
                 ELSE '0' 
-            END AS 'ADN KSTN',
+            END AS 'ADM KSTN',
             (
                 Format(IFNULL(p.amount, 0),2) + (
                     CASE

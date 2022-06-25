@@ -72,7 +72,8 @@ exports.transactionReport = (req, res) => {
     }
     models.sequelize.query(`SELECT m.Name AS 'Merchant_Name',
     CONCAT(c.FirstName, ' ', c.LastName) AS 'Client_Name', CAST(t.AmountUser AS decimal(10,2)) AS 'Amount',
-    t.dateTime AS 'Date',t.ItemDescription AS 'Item_Description' from transactionhistory t 
+    CONCAT(DATE(t.dateTime),' : ',TIME(t.dateTime)) AS 'Date',
+    t.ItemDescription AS 'Item_Description' from transactionhistory t 
     JOIN merchants m ON m.id = t.Merchant_ID
     JOIN client c ON c.id = t.Client_id
     WHERE m.id IN (:merchants) AND (DATE(t.dateTime) >= '${dateFrom}' AND DATE(t.dateTime) <= '${dateTo}')
@@ -206,7 +207,7 @@ exports.dealerReport = (req, res) => {
     const type = req.params.type
     //CAST(SUM(p.amount) AS DECIMAL(10,2)) AS 'Paybackperiod_Amount', m.amount AS 'Membership_Fee',
     models.sequelize.query(`
-    SELECT c.Dealer_id AS 'Dealer', c.Code AS 'Nomber', Date(p.date) AS 'Fecha',
+    SELECT c.Dealer_id AS 'Dealer', c.Code AS 'Nomber', CONCAT(c.FirstName, ' ', c.LastName) AS 'Name', Date(p.date) AS 'Fecha',
     CASE 
         WHEN
             '${type}' = 1 THEN 'Interest On Client'
@@ -223,7 +224,7 @@ exports.dealerReport = (req, res) => {
         ELSE '0' 
     END AS 'ADN KSTN',
     (
-        IFNULL(p.amount, 0) + (
+        Format(IFNULL(p.amount, 0),2) + (
             CASE
                 WHEN
                     FORMAT(IFNULL(mm.memberSum, 0), 2) = 0
@@ -245,9 +246,9 @@ exports.dealerReport = (req, res) => {
         WHERE MONTH(mem.month) = '${month}') mm ON mm.clientFk = c.id
     WHERE MONTH(p.date) = '${month}' AND c.Dealer_id IN (:dealers) AND p.amount IS NOT NULL AND p.amount > 0 AND p.type = '${type}'
     UNION
-    SELECT '', '', '', '','', '', ''
+    SELECT '', '', '', '','', '', '',''
     UNION 
-    SELECT 'Total', (
+    SELECT 'Total', Format((
     SELECT SUM( (IFNULL(p.amount, 0) + (
         CASE
             WHEN FORMAT(IFNULL(mmm.memberSum, 0), 2) = 0 
@@ -271,7 +272,7 @@ exports.dealerReport = (req, res) => {
     c.Dealer_id IN (:dealers) AND
     p.amount IS NOT NULL AND
     p.amount > 0 AND 
-    p.type = '${type}'),'','', '','', ''
+    p.type = '${type}'),2),'','', '','', '',''
     `, {
         replacements: { dealers: dealers },
         type: models.sequelize.QueryTypes.SELECT

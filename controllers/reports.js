@@ -225,7 +225,7 @@ exports.dealerReport = async (req, res) => {
         // finalQuery.push(prequery3[0])
         // finalQuery.push({'' : ''})
         const data = await models.sequelize.query(`
-            SELECT '' AS Dealer,'' AS 'Nomber','' AS 'Name','' AS 'Fecha','' AS 'Type','' AS 'Sub Total','' AS 'ADN KSTN','' AS 'Total'
+            SELECT '' AS Dealer,'' AS 'Nomber','' AS 'Name','' AS 'Fecha','' AS 'Type','' AS 'Sub Total','' AS 'ADM KSTN','' AS 'Total'
             UNION ALL
             SELECT 'Kuentanan Bankario di Norsa N.V.','','','','','','',''
             UNION ALL
@@ -237,7 +237,7 @@ exports.dealerReport = async (req, res) => {
             UNION ALL
             SELECT '', '', '', '','', '', '',''
             UNION ALL
-            SELECT 'Dealer','Nomber','Name','Fecha','Type','Sub Total','ADN KSTN','Total'
+            SELECT 'Dealer','Nomber','Name','Fecha','Type','Sub Total','ADM KSTN','Total'
             UNION ALL
             SELECT c.Dealer_id AS 'Dealer', c.Code AS 'Nomber', CONCAT(c.FirstName, ' ', c.LastName) AS 'Name', Date(p.date) AS 'Fecha',
             CASE 

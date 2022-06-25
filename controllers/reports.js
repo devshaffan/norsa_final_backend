@@ -70,7 +70,7 @@ exports.transactionReport = (req, res) => {
         res.status(500).send({ message: "no merchants selected " })
         return
     }
-    models.sequelize.query(`SELECT m.Name AS 'Merchant_Name',
+    models.sequelize.query(`SELECT m.Name AS 'Merchant_Name',c.Code AS 'Nomber',
     CONCAT(c.FirstName, ' ', c.LastName) AS 'Client_Name', CAST(t.AmountUser AS decimal(10,2)) AS 'Amount',
     CONCAT(DATE(t.dateTime),' : ',TIME(t.dateTime)) AS 'Date',
     t.ItemDescription AS 'Item_Description' from transactionhistory t 
@@ -197,92 +197,127 @@ exports.totalSalesOfCurrentUser = (req, res) => {
         res.status(500).send({ error: err })
     })
 }
-exports.dealerReport = (req, res) => {
-    if (!req.params.dealers || !req.params.month) {
-        res.status(500).send({ err: "either no dealer or no date is selected" })
-        return
-    }
-    const dealers = req.params.dealers.split(",")
-    const month = req.params.month.split("-")[1]
-    const type = req.params.type
-    //CAST(SUM(p.amount) AS DECIMAL(10,2)) AS 'Paybackperiod_Amount', m.amount AS 'Membership_Fee',
-    models.sequelize.query(`
-    SELECT c.Dealer_id AS 'Dealer', c.Code AS 'Nomber', CONCAT(c.FirstName, ' ', c.LastName) AS 'Name', Date(p.date) AS 'Fecha',
-    CASE 
-        WHEN
-            '${type}' = 1 THEN 'Interest On Client'
-        WHEN
-            '${type}' = 2 THEN 'Interest On Merchant'
-        ELSE 
-            p.type
-    END AS 'Type',
-    FORMAT(p.amount, 2) AS 'Sub Total',
-    CASE
-        WHEN
-            FORMAT(IFNULL(mm.memberSum, 0), 2) = 0
-        THEN '4.2'
-        ELSE '0' 
-    END AS 'ADN KSTN',
-    (
-        Format(IFNULL(p.amount, 0),2) + (
+exports.dealerReport = async (req, res) => {
+    try {
+        if (!req.params.dealers || !req.params.month) {
+            res.status(500).send({ err: "either no dealer or no date is selected" })
+            return
+        }
+        const dealers = req.params.dealers.split(",")
+        const month = req.params.month.split("-")[1]
+        const type = req.params.type
+        //CAST(SUM(p.amount) AS DECIMAL(10,2)) AS 'Paybackperiod_Amount', m.amount AS 'Membership_Fee',
+        const finalQuery = []
+        // const prequery1 = await models.sequelize.query(`
+        //     SELECT 'Kuentanan Bankario di Norsa N.V.'
+        //     `, { type: models.sequelize.QueryTypes.SELECT })
+        // const prequery2 = await models.sequelize.query(`
+        //     SELECT 'MCB : 81291304'
+        //     `, { type: models.sequelize.QueryTypes.SELECT })
+        // const prequery3 = await models.sequelize.query(`
+        //     SELECT 'RBC : 8000000013345067'
+        //     `, { type: models.sequelize.QueryTypes.SELECT })
+
+
+        // finalQuery.push(prequery1[0])
+        // finalQuery.push({'' : ''})
+        // finalQuery.push(prequery2[0])
+        // finalQuery.push(prequery3[0])
+        // finalQuery.push({'' : ''})
+        const data = await models.sequelize.query(`
+            SELECT '' AS Dealer,'' AS 'Nomber','' AS 'Name','' AS 'Fecha','' AS 'Type','' AS 'Sub Total','' AS 'ADN KSTN','' AS 'Total'
+            UNION ALL
+            SELECT 'Kuentanan Bankario di Norsa N.V.','','','','','','',''
+            UNION ALL
+            SELECT '', '', '', '','', '', '',''
+            UNION ALL
+            SELECT 'MCB : 81291304', '', '', '','', '', '',''
+            UNION ALL
+            SELECT 'RBC : 8000000013345067','', '', '','', '', '','' 
+            UNION ALL
+            SELECT '', '', '', '','', '', '',''
+            UNION ALL
+            SELECT 'Dealer','Nomber','Name','Fecha','Type','Sub Total','ADN KSTN','Total'
+            UNION ALL
+            SELECT c.Dealer_id AS 'Dealer', c.Code AS 'Nomber', CONCAT(c.FirstName, ' ', c.LastName) AS 'Name', Date(p.date) AS 'Fecha',
+            CASE 
+                WHEN
+                    '${type}' = 1 THEN 'Interest On Client'
+                WHEN
+                    '${type}' = 2 THEN 'Interest On Merchant'
+                ELSE 
+                    p.type
+            END AS 'Type',
+            FORMAT(p.amount, 2) AS 'Sub Total',
             CASE
                 WHEN
                     FORMAT(IFNULL(mm.memberSum, 0), 2) = 0
                 THEN '4.2'
-                ELSE '0'
-            END )
-    ) AS 'Total'
-    FROM paybackperiods p
-    JOIN issuancehistory i ON i.id = p.issuanceHistory_Id
-    JOIN client c ON c.id = i.Client_id
-    LEFT JOIN (
-        SELECT mem.clientFk, mem.amount AS 'memberSum' FROM memberships mem 
-        LEFT JOIN (
-            SELECT m.clientFk, SUM(m.amount) AS 'amount' FROM memberships m
-            WHERE YEAR(m.month) = YEAR(NOW())
-            group BY m.clientFk
-            HAVING SUM(m.amount) >= 50
-        ) a ON a.clientFk = mem.clientFk
-        WHERE MONTH(mem.month) = '${month}') mm ON mm.clientFk = c.id
-    WHERE MONTH(p.date) = '${month}' AND c.Dealer_id IN (:dealers) AND p.amount IS NOT NULL AND p.amount > 0 AND p.type = '${type}'
-    UNION
-    SELECT '', '', '', '','', '', '',''
-    UNION 
-    SELECT 'Total', Format((
-    SELECT SUM( (IFNULL(p.amount, 0) + (
-        CASE
-            WHEN FORMAT(IFNULL(mmm.memberSum, 0), 2) = 0 
-            THEN '4.2'
-            ELSE '0'
-        END)
-        )
-    ) AS 'Total'
-    FROM paybackperiods p
-    JOIN issuancehistory i ON i.id = p.issuanceHistory_Id
-    JOIN client c ON c.id = i.Client_id
-    LEFT JOIN (
-        SELECT memb.clientFk, memb.amount AS 'memberSum' FROM memberships memb
-        LEFT JOIN (
-            SELECT me.clientFk, SUM(me.amount) AS 'amount' FROM memberships me
-            WHERE YEAR(me.month) = YEAR(NOW())
-            group BY me.clientFk
-            HAVING SUM(me.amount) >= 50) a ON a.clientFk = memb.clientFk
-        WHERE MONTH(memb.month) = '${month}') mmm ON mmm.clientFk = c.id
-    WHERE MONTH(p.date) = '${month}'AND
-    c.Dealer_id IN (:dealers) AND
-    p.amount IS NOT NULL AND
-    p.amount > 0 AND 
-    p.type = '${type}'),2),'','', '','', '',''
-    `, {
-        replacements: { dealers: dealers },
-        type: models.sequelize.QueryTypes.SELECT
-    })
-        .then(data => {
-            return res.json(data)
+                ELSE '0' 
+            END AS 'ADN KSTN',
+            (
+                Format(IFNULL(p.amount, 0),2) + (
+                    CASE
+                        WHEN
+                            FORMAT(IFNULL(mm.memberSum, 0), 2) = 0
+                        THEN '4.2'
+                        ELSE '0'
+                    END )
+            ) AS 'Total'
+            FROM paybackperiods p
+            JOIN issuancehistory i ON i.id = p.issuanceHistory_Id
+            JOIN client c ON c.id = i.Client_id
+            LEFT JOIN (
+                SELECT mem.clientFk, mem.amount AS 'memberSum' FROM memberships mem 
+                LEFT JOIN (
+                    SELECT m.clientFk, SUM(m.amount) AS 'amount' FROM memberships m
+                    WHERE YEAR(m.month) = YEAR(NOW())
+                    group BY m.clientFk
+                    HAVING SUM(m.amount) >= 50
+                ) a ON a.clientFk = mem.clientFk
+                WHERE MONTH(mem.month) = '${month}') mm ON mm.clientFk = c.id
+            WHERE MONTH(p.date) = '${month}' AND c.Dealer_id IN (:dealers) AND p.amount IS NOT NULL AND p.amount > 0 AND p.type = '${type}'
+            UNION ALL
+            SELECT '', '', '', '','', '', '',''
+            UNION ALL 
+            SELECT '','', '','', '','','Total', Format((
+            SELECT SUM( (IFNULL(p.amount, 0) + (
+                CASE
+                    WHEN FORMAT(IFNULL(mmm.memberSum, 0), 2) = 0 
+                    THEN '4.2'
+                    ELSE '0'
+                END)
+                )
+            ) AS 'Total'
+            FROM paybackperiods p
+            JOIN issuancehistory i ON i.id = p.issuanceHistory_Id
+            JOIN client c ON c.id = i.Client_id
+            LEFT JOIN (
+                SELECT memb.clientFk, memb.amount AS 'memberSum' FROM memberships memb
+                LEFT JOIN (
+                    SELECT me.clientFk, SUM(me.amount) AS 'amount' FROM memberships me
+                    WHERE YEAR(me.month) = YEAR(NOW())
+                    group BY me.clientFk
+                    HAVING SUM(me.amount) >= 50) a ON a.clientFk = memb.clientFk
+                WHERE MONTH(memb.month) = '${month}') mmm ON mmm.clientFk = c.id
+            WHERE MONTH(p.date) = '${month}'AND
+            c.Dealer_id IN (:dealers) AND
+            p.amount IS NOT NULL AND
+            p.amount > 0 AND 
+            p.type = '${type}'),2) 
+            
+        `, {
+            replacements: { dealers: dealers },
+            type: models.sequelize.QueryTypes.SELECT
         })
-        .catch(err => {
-            res.status(500).send({ err })
+        data.map(item => {
+            finalQuery.push(item)
         })
+        return res.send(data)
+    }
+    catch (err) {
+        res.status(500).send({ err })
+    }
 }
 
 exports.insuranceReport = (req, res) => {

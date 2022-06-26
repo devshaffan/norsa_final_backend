@@ -255,7 +255,7 @@ exports.dealerReport = async (req, res) => {
                 THEN '4.2'
                 ELSE '0' 
             END AS 'ADM KSTN',
-            (
+            Format((
                 Format(IFNULL(p.amount, 0),2) + (
                     CASE
                         WHEN
@@ -263,7 +263,7 @@ exports.dealerReport = async (req, res) => {
                         THEN '4.2'
                         ELSE '0'
                     END )
-            ) AS 'Total'
+            ),2) AS 'Total'
             FROM paybackperiods p
             JOIN issuancehistory i ON i.id = p.issuanceHistory_Id
             JOIN client c ON c.id = i.Client_id

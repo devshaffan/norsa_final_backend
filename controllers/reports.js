@@ -238,9 +238,9 @@ exports.dealerReport = async (req, res) => {
             SELECT '', '', '', '','', '', '',''
             UNION ALL
             SELECT 'Dealer','Nomber','Name','Fecha','Type','Sub Total','ADM KSTN','Total'
-            UNION ALL
+            UNION All
             SELECT c.Dealer_id AS 'Dealer', c.Code AS 'Nomber', CONCAT(c.FirstName, ' ', c.LastName) AS 'Name', Date(p.date) AS 'Fecha',
-            CASE 
+            CASE
                 WHEN
                     '${type}' = 1 THEN 'Interest On Client'
                 WHEN
@@ -279,7 +279,7 @@ exports.dealerReport = async (req, res) => {
             WHERE MONTH(p.date) = '${month}' AND c.Dealer_id IN (:dealers) AND p.amount IS NOT NULL AND p.amount > 0 AND p.type = '${type}'
             UNION ALL
             SELECT '', '', '', '','', '', '',''
-            UNION ALL 
+            UNION
             SELECT '','', '','', '','','Total', Format((
             SELECT SUM( (IFNULL(p.amount, 0) + (
                 CASE
@@ -304,8 +304,8 @@ exports.dealerReport = async (req, res) => {
             c.Dealer_id IN (:dealers) AND
             p.amount IS NOT NULL AND
             p.amount > 0 AND 
-            p.type = '${type}'),2) 
-            
+            p.type = '${type}'),2)
+
         `, {
             replacements: { dealers: dealers },
             type: models.sequelize.QueryTypes.SELECT

@@ -256,12 +256,12 @@ exports.dealerReport = async (req, res) => {
                 ELSE '0' 
             END AS 'ADM KSTN',
             Format((
-                Format(IFNULL(p.amount, 0),2) + (
+                p.amount + (
                     CASE
                         WHEN
-                            FORMAT(IFNULL(mm.memberSum, 0), 2) = 0
-                        THEN '4.2'
-                        ELSE '0'
+                            IFNULL(mm.memberSum, 0) = 0
+                        THEN 4.2
+                        ELSE 0
                     END )
             ),2) AS 'Total'
             FROM paybackperiods p

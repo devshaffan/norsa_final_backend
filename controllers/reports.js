@@ -237,7 +237,7 @@ exports.dealerReport = async (req, res) => {
             UNION ALL
             SELECT '', '', '', '','', '', '',''
             UNION ALL
-            SELECT 'Dealer','Nomber','Name','Fecha','Type','Sub Total','ADM KSTN','Total'
+            SELECT 'Dealer','Client Code','Nomber','Fecha','Type','Sub Total','ADM KSTN','Total'
             UNION All
             SELECT c.Dealer_id AS 'Dealer', c.Code AS 'Nomber', CONCAT(c.FirstName, ' ', c.LastName) AS 'Name', Date(p.date) AS 'Fecha',
             CASE

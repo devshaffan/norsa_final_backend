@@ -276,7 +276,9 @@ exports.dealerReport = async (req, res) => {
                 WHERE YEAR(m.month) = YEAR(NOW())
                 group BY m.clientFk
                 HAVING SUM(m.amount) >= 50) mm ON mm.clientFk = c.id
-            WHERE MONTH(p.date) = '${month}' AND c.Dealer_id IN (:dealers) AND p.amount IS NOT NULL AND p.amount > 0 AND p.type = '${type}'
+            WHERE MONTH(p.date) = '${month}' AND c.Dealer_id IN (:dealers) AND 
+            p.amount IS NOT NULL AND p.amount > 0 AND p.type = '${type} AND
+            p.amountPaidByClient = 0' 
             UNION ALL
             SELECT '', '', '', '','', '', '',''
             UNION
@@ -305,7 +307,10 @@ exports.dealerReport = async (req, res) => {
             c.Dealer_id IN (:dealers) AND
             p.amount IS NOT NULL AND
             p.amount > 0 AND 
-            p.type = '${type}'),2)
+            p.type = '${type}'
+            AND
+            p.amountPaidByClient = 0
+            ),2)
 
         `, {
             replacements: { dealers: dealers },

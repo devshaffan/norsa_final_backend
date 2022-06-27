@@ -282,17 +282,17 @@ exports.dealerReport = async (req, res) => {
             UNION ALL
             SELECT '', '', '', '','', '', '',''
             UNION
-            SELECT '','', '','', '','','Total', Format((
-            SELECT SUM((IFNULL(p.amount, 0) + (
+            SELECT '','', '','', '','','Total', 
+            (SELECT Format(SUM((IFNULL(pp.amount, 0) + (
                 CASE
                     WHEN IFNULL(mmm.memberSum, 0) = 0 
-                    THEN 4.2
-                    ELSE 0
+                    THEN '4.2'
+                    ELSE '0'
                 END)
                 )
-            ) AS 'Total'
-            FROM paybackperiods p
-            JOIN issuancehistory i ON i.id = p.issuanceHistory_Id
+            ),2) AS 'Total'
+            FROM paybackperiods pp
+            JOIN issuancehistory i ON i.id = pp.issuanceHistory_Id
             JOIN client c ON c.id = i.Client_id
             LEFT JOIN (
                 SELECT mem.clientFk, mem.amount AS 'memberSum' 
@@ -303,14 +303,14 @@ exports.dealerReport = async (req, res) => {
                 WHERE YEAR(m.month) = YEAR(NOW())
                 group BY m.clientFk
                 HAVING SUM(m.amount) >= 50) mmm ON mmm.clientFk = c.id
-            WHERE MONTH(p.date) = '${month}'AND
+            WHERE MONTH(pp.date) = '${month}'AND
             c.Dealer_id IN (:dealers) AND
-            p.amount IS NOT NULL AND
-            p.amount > 0 AND 
-            p.type = '${type}'
+            pp.amount IS NOT NULL AND
+            pp.amount > 0 AND 
+            pp.type = '${type}'
             AND
-            p.amountPaidByClient = 0
-            ),2)
+            pp.amountPaidByClient = 0
+            )
 
         `, {
             replacements: { dealers: dealers },

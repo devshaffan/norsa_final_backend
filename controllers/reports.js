@@ -287,7 +287,7 @@ exports.dealerReport = async (req, res) => {
                 group BY m.clientFk
                 HAVING SUM(m.amount) >= 50) mm ON mm.clientFk = c.id
             WHERE MONTH(p.date) = '${month}' AND c.Dealer_id IN (:dealers) AND 
-            p.amount IS NOT NULL AND p.amount > 0 AND p.type = '${type}' AND  pay.period = '${period}' AND
+            p.amount IS NOT NULL AND p.amount > 0 AND p.type = '${type}' AND  pay.period IN (:period) AND
             IFNULL(p.amountPaidByClient,0) = 0
             UNION ALL
             SELECT '', '', '', '','', '', '',''
@@ -323,11 +323,14 @@ exports.dealerReport = async (req, res) => {
             pp.amount IS NOT NULL AND
             pp.amount > 0 AND 
             pp.type = '${type}'
-            AND  payy.period = '${period}' AND
+            AND  payy.period IN (:period) AND
             IFNULL(pp.amountPaidByClient,0)= 0
             )
         `, {
-            replacements: { dealers: dealers },
+            replacements: {
+                dealers: dealers,
+                period: period
+            },
             type: models.sequelize.QueryTypes.SELECT
         })
         data.map(item => {

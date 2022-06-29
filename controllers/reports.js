@@ -206,6 +206,7 @@ exports.dealerReport = async (req, res) => {
         const dealers = req.params.dealers.split(",")
         const month = req.params.month.split("-")[1]
         const type = req.params.type
+        const period = req.params.period
         //CAST(SUM(p.amount) AS DECIMAL(10,2)) AS 'Paybackperiod_Amount', m.amount AS 'Membership_Fee',
         const finalQuery = []
         // const prequery1 = await models.sequelize.query(`
@@ -286,8 +287,8 @@ exports.dealerReport = async (req, res) => {
                 group BY m.clientFk
                 HAVING SUM(m.amount) >= 50) mm ON mm.clientFk = c.id
             WHERE MONTH(p.date) = '${month}' AND c.Dealer_id IN (:dealers) AND 
-            p.amount IS NOT NULL AND p.amount > 0 AND p.type = '${type} AND  pay.period = 2 AND
-            IFNULL(p.amountPaidByClient,0) = 0'
+            p.amount IS NOT NULL AND p.amount > 0 AND p.type = '${type}' AND  pay.period = '${period}' AND
+            IFNULL(p.amountPaidByClient,0) = 0
             UNION ALL
             SELECT '', '', '', '','', '', '',''
             UNION
@@ -322,10 +323,9 @@ exports.dealerReport = async (req, res) => {
             pp.amount IS NOT NULL AND
             pp.amount > 0 AND 
             pp.type = '${type}'
-            AND  payy.period =  2 AND
+            AND  payy.period = '${period}' AND
             IFNULL(pp.amountPaidByClient,0)= 0
             )
-
         `, {
             replacements: { dealers: dealers },
             type: models.sequelize.QueryTypes.SELECT

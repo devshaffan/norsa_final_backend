@@ -206,7 +206,7 @@ exports.dealerReport = async (req, res) => {
         const dealers = req.params.dealers.split(",")
         const month = req.params.month.split("-")[1]
         const type = req.params.type
-        const period = req.params.period
+        const period = req.params.period.split(",")
         //CAST(SUM(p.amount) AS DECIMAL(10,2)) AS 'Paybackperiod_Amount', m.amount AS 'Membership_Fee',
         const finalQuery = []
         // const prequery1 = await models.sequelize.query(`
@@ -360,6 +360,37 @@ exports.insuranceReport = (req, res) => {
 	group BY c.id 
     Order by c.id`, {
         replacements: { clients: clients },
+        type: models.sequelize.QueryTypes.SELECT
+    })
+        .then(data => {
+            return res.json(data)
+        })
+        .catch(err => {
+            res.status(500).send({ err })
+        })
+}
+exports.membership = (req, res) => {
+    if (!req.params.dealers) {
+        res.status(500).send({ err: "either no dealer or no date is selected" })
+        return
+    }
+    const dealers = req.params.dealers.split(",")
+    const month = req.params.month
+    models.sequelize.query(`SELECT c.Code AS 'Code',
+    CONCAT(c.FirstName, ' ', c.LastName) AS 'Name', 
+    mm.sum AS 'Membership_Amount'
+    FROM client c
+    left JOIN (
+	 SELECT SUM(m.amount) AS SUM, m.clientFk
+	 FROM memberships m 
+	 WHERE YEAR(m.month) = YEAR(NOW())
+	 group BY m.clientFk) mm ON mm.clientFk = c.id
+    JOIN issuancehistory ih ON ih.Client_id=c.id
+    JOIN paybackperiods p ON p.issuanceHistory_Id=ih.id
+    WHERE (c.id IN (:clients))
+	group BY c.id 
+    Order by c.id`, {
+        replacements: { dealers: dealers },
         type: models.sequelize.QueryTypes.SELECT
     })
         .then(data => {

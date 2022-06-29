@@ -375,21 +375,32 @@ exports.membership = (req, res) => {
         return
     }
     const dealers = req.params.dealers.split(",")
-    const month = req.params.month
-    models.sequelize.query(`SELECT c.Code AS 'Code',
-    CONCAT(c.FirstName, ' ', c.LastName) AS 'Name', 
-    mm.sum AS 'Membership_Amount'
-    FROM client c
-    left JOIN (
-	 SELECT SUM(m.amount) AS SUM, m.clientFk
-	 FROM memberships m 
-	 WHERE YEAR(m.month) = YEAR(NOW())
-	 group BY m.clientFk) mm ON mm.clientFk = c.id
-    JOIN issuancehistory ih ON ih.Client_id=c.id
-    JOIN paybackperiods p ON p.issuanceHistory_Id=ih.id
-    WHERE (c.id IN (:clients))
-	group BY c.id 
-    Order by c.id`, {
+    const month = req.params.month.split("-")[1]
+    models.sequelize.query(`SELECT c.Dealer_id AS 'Dealer', c.Code AS 'Code', CONCAT(c.FirstName, ' ', c.LastName) AS 'Name', CASE
+    WHEN FORMAT(IFNULL(mm.memberSum, 0), 2) = 0 THEN '4.2'
+    ELSE '0' END AS 'ADM KSTN'
+    FROM paybackperiods p
+    JOIN issuancehistory i ON i.id = p.issuanceHistory_Id
+    LEFT JOIN (
+    Select COUNT(ppp.id) AS 'period', ppp.issuanceHistory_Id
+    from paybackperiods ppp
+    GROUP BY ppp.issuanceHistory_Id
+    ) pay ON pay.issuanceHistory_Id = i.id
+    JOIN client c ON c.id = i.Client_id
+    LEFT JOIN (
+    SELECT mem.clientFk, mem.amount AS 'memberSum'
+    FROM memberships mem
+    LEFT JOIN (
+    SELECT m.clientFk, SUM(m.amount) AS 'amount'
+    FROM memberships m
+    WHERE YEAR(m.month) = YEAR(NOW())
+    group BY m.clientFk
+    HAVING SUM(m.amount) >= 50
+    ) a ON a.clientFk = mem.clientFk
+    WHERE MONTH(mem.month) = '${month}') mm ON mm.clientFk = c.id
+    WHERE MONTH(p.date) = '${month}'
+    AND c.Dealer_id IN (:dealers)
+    AND FORMAT(IFNULL(mm.memberSum, 0), 2) = 0 `, {
         replacements: { dealers: dealers },
         type: models.sequelize.QueryTypes.SELECT
     })

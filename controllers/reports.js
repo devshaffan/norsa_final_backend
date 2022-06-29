@@ -224,6 +224,15 @@ exports.dealerReport = async (req, res) => {
         // finalQuery.push(prequery2[0])
         // finalQuery.push(prequery3[0])
         // finalQuery.push({'' : ''})
+
+        //6/28 ADM KSTN pre 0
+        // CASE
+        //         WHEN
+        //             FORMAT(IFNULL(mm.memberSum, 0), 2) = 0
+        //         THEN '4.2'
+        //         ELSE '0' 
+        //     END AS 'ADM KSTN',
+
         const data = await models.sequelize.query(`
             SELECT '' AS Dealer,'' AS 'Nomber','' AS 'Name','' AS 'Fecha','' AS 'Type','' AS 'Sub Total','' AS 'ADM KSTN','' AS 'Total'
             UNION ALL
@@ -249,12 +258,7 @@ exports.dealerReport = async (req, res) => {
                     p.type
             END AS 'Type',
             FORMAT(p.amount, 2) AS 'Sub Total',
-            CASE
-                WHEN
-                    FORMAT(IFNULL(mm.memberSum, 0), 2) = 0
-                THEN '4.2'
-                ELSE '0' 
-            END AS 'ADM KSTN',
+            0 AS 'ADM KSTN',
             Format((
                 p.amount + (
                     CASE
@@ -266,6 +270,11 @@ exports.dealerReport = async (req, res) => {
             ),2) AS 'Total'
             FROM paybackperiods p
             JOIN issuancehistory i ON i.id = p.issuanceHistory_Id
+            LEFT JOIN (
+                Select COUNT(ppp.id) AS 'period', ppp.issuanceHistory_Id
+                from paybackperiods ppp
+                GROUP BY ppp.issuanceHistory_Id
+                ) pay ON pay.issuanceHistory_Id = i.id
             JOIN client c ON c.id = i.Client_id
             LEFT JOIN (
                 SELECT mem.clientFk, mem.amount AS 'memberSum' 
@@ -277,8 +286,8 @@ exports.dealerReport = async (req, res) => {
                 group BY m.clientFk
                 HAVING SUM(m.amount) >= 50) mm ON mm.clientFk = c.id
             WHERE MONTH(p.date) = '${month}' AND c.Dealer_id IN (:dealers) AND 
-            p.amount IS NOT NULL AND p.amount > 0 AND p.type = '${type} AND
-            p.amountPaidByClient = 0' 
+            p.amount IS NOT NULL AND p.amount > 0 AND p.type = '${type} AND  pay.period = 2 AND
+            IFNULL(p.amountPaidByClient,0) = 0'
             UNION ALL
             SELECT '', '', '', '','', '', '',''
             UNION
@@ -293,6 +302,11 @@ exports.dealerReport = async (req, res) => {
             ),2) AS 'Total'
             FROM paybackperiods pp
             JOIN issuancehistory i ON i.id = pp.issuanceHistory_Id
+            LEFT JOIN (
+                Select COUNT(pppp.id) AS 'period', pppp.issuanceHistory_Id
+                from paybackperiods pppp
+                GROUP BY pppp.issuanceHistory_Id
+                ) payy ON payy.issuanceHistory_Id = i.id
             JOIN client c ON c.id = i.Client_id
             LEFT JOIN (
                 SELECT mem.clientFk, mem.amount AS 'memberSum' 
@@ -308,8 +322,8 @@ exports.dealerReport = async (req, res) => {
             pp.amount IS NOT NULL AND
             pp.amount > 0 AND 
             pp.type = '${type}'
-            AND
-            pp.amountPaidByClient = 0
+            AND  payy.period =  2 AND
+            IFNULL(pp.amountPaidByClient,0)= 0
             )
 
         `, {

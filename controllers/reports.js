@@ -70,14 +70,21 @@ exports.transactionReport = (req, res) => {
         res.status(500).send({ message: "no merchants selected " })
         return
     }
-    models.sequelize.query(`SELECT m.Name AS 'Merchant_Name',c.Code AS 'Nomber',
-    CONCAT(c.FirstName, ' ', c.LastName) AS 'Client_Name', CAST(t.AmountUser AS decimal(10,2)) AS 'Amount',
-    CONCAT(DATE(t.dateTime),' : ',TIME(t.dateTime)) AS 'Date',
-    t.ItemDescription AS 'Item_Description' from transactionhistory t 
-    JOIN merchants m ON m.id = t.Merchant_ID
-    JOIN client c ON c.id = t.Client_id
-    WHERE m.id IN (:merchants) AND (DATE(t.dateTime) >= '${dateFrom}' AND DATE(t.dateTime) <= '${dateTo}')
-    order by m.Name
+    models.sequelize.query(`
+        SELECT m.Name AS 'Merchant_Name', t.Client_id AS 'Client_Code', CONCAT(c.FirstName, ' ', c.LastName) AS 'Client_Name',
+        CAST(t.AmountUser AS decimal(10,2)) AS 'Amount', CONCAT(DATE(t.dateTime),' : ',TIME(t.dateTime)) AS 'Date',
+        t.ItemDescription AS 'Item_Description', CASE
+        WHEN COUNT(p.id) = 2 THEN 1
+        ELSE COUNT(p.id) END AS 'Period'
+        FROM transactionhistory t
+        JOIN merchants m ON m.id = t.Merchant_ID
+        JOIN client c ON c.id = t.Client_id
+        JOIN paybackperiods p ON p.issuanceHistory_Id = t.issuancehistoryId
+        WHERE m.id IN (:merchants)
+        AND DATE(t.dateTime) >= '${dateFrom}'
+        AND DATE(t.dateTime) <= '${dateTo}'
+        GROUP BY t.id
+        ORDER by m.Name
     `
         , {
             replacements: { merchants: merchants.split(',') },

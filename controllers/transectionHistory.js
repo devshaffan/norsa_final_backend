@@ -199,7 +199,7 @@ exports.getMerchantsTodaysTransactions = async (req, res) => {
             });
         });
 }
-const checkMerchantCredit = async (id) => {
+const checkMerchantCredit = async (id, newAmount) => {
     const merchantData = await models.merchants.findOne({
         attributes: ['maxCredit', 'creditUsed'],
         where: {
@@ -211,7 +211,7 @@ const checkMerchantCredit = async (id) => {
         return false;
     }
     creditUsed = creditUsed || 0
-    if (parseFloat(creditUsed) >= parseFloat(maxCredit)) {
+    if (parseFloat(creditUsed) + parseFloat(newAmount) >= parseFloat(maxCredit)) {
         return false;
     }
     return true;
@@ -238,7 +238,7 @@ exports.createTransactionHistory = async (req, res) => {
         });
         return;
     }
-    const ifMerchantTransact = await checkMerchantCredit(Merchant_ID)
+    const ifMerchantTransact = await checkMerchantCredit(Merchant_ID,AmountUser)
     if (!ifMerchantTransact) {
         res.status(500).send({
             message: 'Not Sufficient Credit of Merchant'
@@ -254,35 +254,36 @@ exports.createTransactionHistory = async (req, res) => {
         AmountUser,
         issuancehistoryId,
         transactionType
-    }).then(data => {
-        handleTransactionEntry(data)
-        updateMerchantCreditUsed(Merchant_ID, AmountUser)
-        models.dailysalesprintcheck.update({
-            datePrinted: getCurrentDate(),
-            status: false
-        }, {
-            where:
-            {
-                merchantId: data.Merchant_ID
-            }
+    }).then(async data => {
+        try {
+            await handleTransactionEntry(data)
+            await updateMerchantCreditUsed(Merchant_ID, AmountUser)
+            await models.dailysalesprintcheck.update({
+                datePrinted: getCurrentDate(),
+                status: false
+            }, {
+                where:
+                {
+                    merchantId: data.Merchant_ID
+                }
+            })
+            res.status(200).send({ success: true, data: data })
+        } catch (error) {
+            res.status(500).send({
+                message:
+                    error.message || 'Some error occurred while creating the dealer.',
+            });
+        }
+
+    })
+        .catch(err => {
+            res.status(500).send({
+                message:
+                    err.message || 'Some error occurred while creating the dealer.',
+            });
         })
-            .then(dailySalesData => {
-                res.status(200).send({ success: true, data: data })
-            })
-            .catch(err => {
-                res.status(500).send({
-                    message:
-                        err.message || 'Some error occurred while creating the dealer.',
-                });
-            })
-        // res.json({ message: 'success', data: data });
-    }).catch(err => {
-        res.status(500).send({
-            message:
-                err.message || 'Some error occurred while creating the dealer.',
-        });
-    });
-};
+    // res.json({ message: 'success', data: data });
+}
 
 
 exports.bulkCreateTransectionHistory = (req, res) => {

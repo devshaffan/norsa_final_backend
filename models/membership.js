@@ -15,6 +15,10 @@ module.exports = function (sequelize) {
         month: {
             type: Sequelize.DATEONLY
         },
+        paymentType: {
+            type: Sequelize.STRING(45),
+            allowNull: true
+        },
         clientFk: {
             type: Sequelize.STRING(45),
             references: {

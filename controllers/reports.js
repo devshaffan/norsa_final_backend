@@ -42,7 +42,7 @@ exports.supermarketReport = (req, res) => {
     //  DECIMAL(10, 2))
     // END AS 'Norsa Profit',
     models.sequelize.query(`SELECT m.Code AS "Merchant Code", m.Name AS "Merchant Name",
-    FORMAT(SUM(t.AmountUser) - IFNULL(ttt.Retour,0),2) AS 'Total Amount',
+    FORMAT(SUM(t.AmountUser) - IFNULL(ttt.Retour,0),2) AS 'Total Amount', m.id,
     m.BankName AS 'Bank Name', m.AccountNo AS 'Bank Account'
     FROM transactionhistory t
     JOIN merchants m ON m.id = t.Merchant_ID
@@ -50,8 +50,14 @@ exports.supermarketReport = (req, res) => {
     JOIN issuancehistory i ON i.id = t.issuancehistoryId
     LEFT JOIN multipleissueances mi ON (mi.merchantId = t.Merchant_ID AND mi.issuancehistoryId = t.issuancehistoryId)
     LEFT JOIN merchanttypediscount d ON d.id = mi.numberOfMonthsId
-    LEFT JOIN (SELECT SUM(tt.AmountUser) AS 'Retour', tt.Merchant_ID FROM transactionhistory tt WHERE tt.transactionType = 2 group BY tt.Merchant_ID)  ttt ON ttt.Merchant_ID = t.Merchant_ID
-  	 WHERE Month(DATE(t.dateTime)) = '${month}' AND mt.interestOn = 'Client' AND t.transactionType = 1
+    LEFT JOIN (SELECT FORMAT(SUM(tt.AmountUser),2) AS 'Retour', tt.Merchant_ID
+    FROM transactionhistory tt
+    WHERE tt.transactionType = 2
+    AND MONTH(tt.dateTime) = 6
+    group BY tt.Merchant_ID)  ttt ON ttt.Merchant_ID = t.Merchant_ID
+    WHERE Month(DATE(t.dateTime)) = '${month}'
+    AND mt.interestOn = 'Client'
+    AND t.transactionType = 1
     group BY t.Merchant_ID`
         , { type: models.sequelize.QueryTypes.SELECT }).then(data => {
             return res.json(data)

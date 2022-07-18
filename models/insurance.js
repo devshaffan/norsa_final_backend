@@ -22,6 +22,14 @@ module.exports = function (sequelize) {
                 model: 'issuancehistory',
                 key: 'id'
             }
+        },
+        handledByUserId: {
+            type: Sequelize.STRING,
+            allowNull: true,
+            references: {
+                model: 'users',
+                key: 'id'
+            }
         }
     }, {
         timestamps: true,

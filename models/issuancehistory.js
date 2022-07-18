@@ -76,7 +76,6 @@ module.exports = function (sequelize) {
       type: Sequelize.BOOLEAN,
       allowNull: true
     }
-
   }, {
     sequelize,
     tableName: 'issuancehistory',

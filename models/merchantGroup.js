@@ -1,25 +1,23 @@
 const Sequelize = require('sequelize');
 module.exports = function (sequelize) {
-    return sequelize.define('insurance', {
+    return sequelize.define('merchantGroup', {
         id: {
             type: Sequelize.STRING(45),
             allowNull: false,
             primaryKey: true
         },
-        amount: {
-            type: Sequelize.STRING(45)
-        },
-        tax:{
-            type: Sequelize.STRING(45)
-        },
-        paymentType: {
-            type: Sequelize.STRING(45),
-            allowNull: true
-        },
-        issuanceHistoryFk:{
+        merchantId: {
             type: Sequelize.STRING(45),
             references: {
-                model: 'issuancehistory',
+                model: 'merchants',
+                key: 'id'
+            }
+        },
+        User_id: {
+            type: Sequelize.STRING,
+            allowNull: false,
+            references: {
+                model: 'user',
                 key: 'id'
             }
         }

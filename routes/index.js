@@ -8,6 +8,8 @@ const userRouter = require('./user')
 const publicClientsRouter = require('./publicClient')
 const reportRouter = require('./reports')
 const merchantsRouter = require('./merchants');
+const merchantGroupRouter = require('./merchantGroup');
+
 const dealerRouter = require('./dealer');
 const deviceRouter = require('./device');
 const issuancehistoryRouter = require('./issuancehistory');
@@ -27,12 +29,14 @@ module.exports = function (app) {
   app.use('/api/user', userRouter);
   app.use('/api/clients', clientsRouter);
   app.use('/api/clientProfilePicture', clientPictureRouter)
-  
+
   app.use('/api/public/clients', publicClientsRouter)
   app.use('/api/public/clientProfilePicture', publicClientPictureRouter)
   app.use('/api/public/cpoa', publicClientProofOfAddressRouter)
 
   app.use('/api/merchants', merchantsRouter);
+  app.use('/api/merchantGroup', merchantGroupRouter);
+
   app.use('/api/nfcCard', nfcCardRouter);
   app.use('/api/dealers', dealerRouter);
   app.use('/api/device', deviceRouter);

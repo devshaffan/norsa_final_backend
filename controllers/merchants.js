@@ -31,6 +31,7 @@ exports.getMerchantById = (req, res) => {
       });
     });
 };
+
 exports.getMerchantNameByUserId = async (req, res) => {
   const token = _.get(req.headers, 'authorization', null).split(' ')[1]
 

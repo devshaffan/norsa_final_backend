@@ -17,7 +17,7 @@ module.exports = function (sequelize) {
             type: Sequelize.STRING,
             allowNull: false,
             references: {
-                model: 'user',
+                model: 'users',
                 key: 'id'
             }
         }
@@ -25,3 +25,4 @@ module.exports = function (sequelize) {
         timestamps: true,
     });
 };
+

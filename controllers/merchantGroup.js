@@ -11,7 +11,7 @@ exports.getMerchantsByUser = async (req, res) => {
             })
             return
         }
-        const userMerchant = (await getAllUserMerchants(userId)).map(item => item.merchantId)
+        const userMerchant = (await getUserMerchants(userId)).map(item => item.merchantId)
         const merchants = await models.merchants.findAll({
             where: {
                 id: userMerchant
@@ -34,13 +34,28 @@ const getAllMerchants = async () => {
         attributes: ['id', 'Name']
     })
 }
-const getAllUserMerchants = async (userId) => {
+const getUserMerchants = async (userId) => {
     return await models.merchantGroup.findAll({
         where: {
             User_id: userId
         }
     })
 }
+const getAllUsersMerchants = async () => {
+    return await models.merchantGroup.findAll()
+}
+exports.getAll = async (req, res) => {
+    const data = await models.sequelize.query(`
+        Select mg.id, u.Email AS 'uEmail', m.Name AS 'mName', m.Code AS 'mCode', u.id AS 'uid'
+        from merchantgroups mg
+        JOIN merchants m ON m.id = mg.merchantId
+        JOIN users u ON u.id = mg.User_id
+    `, {
+        type: models.sequelize.QueryTypes.SELECT
+    })
+    res.status(200).send(data)
+}
+
 exports.getAvailaibleMerchant = async (req, res) => {
     const userId = req.params.userId
     if (!userId) {
@@ -49,9 +64,9 @@ exports.getAvailaibleMerchant = async (req, res) => {
         })
         return
     }
-    const userMerchant = (await getAllUserMerchants(userId)).map(item => item.merchantId)
+    const usersMerchant = (await getAllUsersMerchants()).map(item => item.merchantId)
     const merchants = await getAllMerchants()
-    const userMerchantSet = new Set(userMerchant)
+    const userMerchantSet = new Set(usersMerchant)
     const availableMerchants = merchants.filter((item) => {
         if (userMerchantSet.has(item.id)) {
             return false
@@ -94,6 +109,34 @@ exports.addMerchantsToGroup = async (req, res) => {
         }
     }
 }
+exports.forfeitMerchantByMID = (req, res) => {
+    if (!req.params.mid) {
+        res.status(400).send({ message: 'Content can not be empty!' });
+        return;
+    }
+    const id = req.params.mid;
+    models.merchantGroup
+        .destroy({
+            where: {
+                merchantId: id
+            },
+        })
+        .then((num) => {
+            if (num === 1) {
+                res.send({ message: 'merchants was deleted successfully!' });
+            } else {
+                res.send({
+                    message: `Cannot delete merchants with id=${id}. Maybe merchants was not found!`,
+                });
+            }
+        })
+        .catch((err) => {
+            res.status(500).send({
+                message: err.message || 'Some error occurred while Deleting merchants.',
+            });
+        });
+};
+
 exports.forfeitMerchant = (req, res) => {
     if (!req.params.id) {
         res.status(400).send({ message: 'Content can not be empty!' });
@@ -103,7 +146,7 @@ exports.forfeitMerchant = (req, res) => {
     models.merchantGroup
         .destroy({
             where: {
-                merchantId: id
+                id: id
             },
         })
         .then((num) => {

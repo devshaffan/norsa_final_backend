@@ -496,7 +496,7 @@ exports.merchantTransactionLanding = async (req, res) => {
     AND u.accessToken = '${token}'
     GROUP BY t.id`,
         { type: models.sequelize.QueryTypes.SELECT }).then((data) => {
-            res.json({ message: 'success', data })
+            res.json(data)
         }).catch((err) => {
             res.status(500).send({
                 message: 'error', error: err

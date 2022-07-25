@@ -476,3 +476,30 @@ exports.membershipFeeReport = (req, res) => {
             res.status(500).send({ err })
         })
 }
+
+exports.merchantTransactionLanding = async (req, res) => {
+    const token = _.get(req.headers, 'authorization', null).split(' ')[1]
+    const date = req.params.date
+    if (!token || !date) {
+        res.status(400).send({
+            message: 'This User doesnt exist as a merchant'
+        });
+        return;
+    }
+
+    models.sequelize.query(`SELECT m.Name AS 'Name', t.*
+    FROM transactionhistory t
+    JOIN merchants m ON m.id = t.Merchant_ID
+    JOIN merchantgroups g ON g.merchantId = m.id
+    JOIN users u ON u.id = g.User_id
+    WHERE Date(t.dateTime) = '${date}'
+    AND u.accessToken = '${token}'
+    GROUP BY t.id`,
+        { type: models.sequelize.QueryTypes.SELECT }).then((data) => {
+            res.json({ message: 'success', data })
+        }).catch((err) => {
+            res.status(500).send({
+                message: 'error', error: err
+            });
+        });
+}

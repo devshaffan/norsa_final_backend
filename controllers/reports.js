@@ -479,8 +479,9 @@ exports.membershipFeeReport = (req, res) => {
 
 exports.merchantTransactionLanding = async (req, res) => {
     const token = _.get(req.headers, 'authorization', null).split(' ')[1]
-    const date = req.params.date
-    if (!token || !date) {
+    const dateFrom = req.params.dateFrom
+    const dateTo = req.params.dateTo
+    if (!token || !dateFrom || !dateTo) {
         res.status(400).send({
             message: 'This User doesnt exist as a merchant'
         });
@@ -493,7 +494,8 @@ exports.merchantTransactionLanding = async (req, res) => {
     JOIN merchantgroups g ON g.merchantId = m.id
     JOIN users u ON u.id = g.User_id
     JOIN paybackperiods p ON p.issuanceHistory_Id=t.issuanceHistoryId
-    WHERE Date(t.dateTime) = '${date}'
+    WHERE DATE(t.dateTime) >= '${dateFrom}'
+    AND DATE(t.dateTime) <= '${dateTo}'
     AND u.accessToken = '${token}'
     
     GROUP BY t.id`,

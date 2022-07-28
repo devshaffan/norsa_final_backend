@@ -487,13 +487,15 @@ exports.merchantTransactionLanding = async (req, res) => {
         return;
     }
 
-    models.sequelize.query(`SELECT m.Name AS 'Name', t.*
+    models.sequelize.query(`SELECT m.Name AS 'Name', Date(t.dateTime) AS 'Date', t.AmountUser As 'Montante', count(p.id) AS 'Payback_Period_Months'
     FROM transactionhistory t
     JOIN merchants m ON m.id = t.Merchant_ID
     JOIN merchantgroups g ON g.merchantId = m.id
     JOIN users u ON u.id = g.User_id
+    JOIN paybackperiods p ON p.issuanceHistory_Id=t.issuanceHistoryId
     WHERE Date(t.dateTime) = '${date}'
     AND u.accessToken = '${token}'
+    
     GROUP BY t.id`,
         { type: models.sequelize.QueryTypes.SELECT }).then((data) => {
             res.json(data)

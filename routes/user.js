@@ -5,6 +5,7 @@ const user = require('../controllers/user');
 router.get('/getAllUsers', user.getAllUsers);
 router.get('/getAllNotMerchants', user.getAllNotMerchants)
 router.get('/getAllMerchants', user.getAllMerchants)
+router.get('/getAllMerchantsForGroups', user.getAllMerchantsForGroups)
 router.delete('/delete/:id', user.deleteUser)
 router.post('/update/:id', user.updateUser)
 router.get('/getUserById/:id', user.getUserById)

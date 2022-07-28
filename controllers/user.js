@@ -30,6 +30,19 @@ exports.getAllNotMerchants = (req, res) => {
     })
 }
 exports.getAllMerchants = (req, res) => {
+    models.sequelize.query(`SELECT m.Name,m.id FROM merchants m
+    JOIN users u ON u.id = m.User_id
+    WHERE u.isAdmin = 2
+    `, {
+        type: models.sequelize.QueryTypes.SELECT
+    }).then(data => {
+        return res.json(data)
+    }).catch(err => {
+        res.status(500).send({ error: err })
+    })
+}
+
+exports.getAllMerchantsForGroups = (req, res) => {
     models.sequelize.query(`SELECT u.id, u.email, m.Name,m.id AS "mid" FROM merchants m
     JOIN users u ON u.id = m.User_id
     WHERE u.isAdmin = 2
